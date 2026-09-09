@@ -6,18 +6,6 @@
   NODE_VERSION = "20"
 
 [[redirects]]
-  from = "https://anant.cscorp.in/*"
-  to = "https://ankitchaudhary-com.netlify.app/anant-chaudhary"
-  status = 301
-  force = true
-
-[[redirects]]
-  from = "http://anant.cscorp.in/*"
-  to = "https://ankitchaudhary-com.netlify.app/anant-chaudhary"
-  status = 301
-  force = true
-
-[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
