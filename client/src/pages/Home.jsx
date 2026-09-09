@@ -113,7 +113,7 @@ const Home = () => {
             desc: 'The foundational parent organization uniting family heritage, public service, enterprise advisory, and strategic digital platforms across verticals.',
             stats: ['Foundational Heritage', 'Family Leadership', 'Enterprise Ecosystem'],
             tags: ['Parent Organization', 'Family Heritage', 'Public Service', 'Strategic Advisory'],
-            link: '/chaudhary-and-sons',
+            link: '/',
             actionText: 'Visit'
         },
         {
@@ -194,7 +194,7 @@ const Home = () => {
     // Email Copy Toast State
     const [copiedEmail, setCopiedEmail] = useState(false);
     const copyEmailToClipboard = () => {
-        navigator.clipboard.writeText("the.chaudhary.connect@gmail.com");
+        navigator.clipboard.writeText("admin@cscorp.in");
         setCopiedEmail(true);
         setTimeout(() => setCopiedEmail(false), 2500);
     };
@@ -755,7 +755,7 @@ const Home = () => {
 
                             <div className="portal-contact-actions">
                                 <a 
-                                    href="mailto:the.chaudhary.connect@gmail.com?subject=Enterprise%20Architecture%20Inquiry" 
+                                    href="mailto:admin@cscorp.in?subject=Enterprise%20Architecture%20Inquiry" 
                                     className="cyber-btn cyber-btn-primary portal-btn"
                                 >
                                     <Mail size={18} />
@@ -764,7 +764,7 @@ const Home = () => {
 
                                 <button onClick={copyEmailToClipboard} className="cyber-btn cyber-btn-secondary portal-btn">
                                     {copiedEmail ? <Check size={18} color="#10b981" /> : <Copy size={18} />}
-                                    <span>{copiedEmail ? 'Email Copied!' : 'the.chaudhary.connect@gmail.com'}</span>
+                                    <span>{copiedEmail ? 'Email Copied!' : 'admin@cscorp.in'}</span>
                                 </button>
                             </div>
 

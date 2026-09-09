@@ -17,7 +17,7 @@ const Resume = () => {
         <div className="resume-page-wrapper animate-fade-in">
             {/* Floating Top Control Bar (Hidden during print) */}
             <div className="resume-controls-bar no-print">
-                <Link to="/" className="control-btn back-btn">
+                <Link to="/ankit-chaudhary" className="control-btn back-btn">
                     <ArrowLeft size={16} /> Portfolio Home
                 </Link>
                 <div className="control-right-group">
@@ -49,8 +49,8 @@ const Resume = () => {
                     </div>
 
                     <div className="resume-contact-col">
-                        <a href="mailto:the.chaudhary.connect@gmail.com" className="contact-link">
-                            <Mail size={14} className="contact-icon" /> the.chaudhary.connect@gmail.com
+                        <a href="mailto:admin@cscorp.in" className="contact-link">
+                            <Mail size={14} className="contact-icon" /> admin@cscorp.in
                         </a>
                         <span className="contact-link">
                             <MapPin size={14} className="contact-icon" /> India (Open to Remote & Global)

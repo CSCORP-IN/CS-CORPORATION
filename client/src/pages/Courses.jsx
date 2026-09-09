@@ -613,7 +613,7 @@ const Courses = () => {
                         <MessageSquare size={18} /> Reserve Seat / Enquire
                     </button>
                     <a 
-                        href="mailto:the.chaudhary.connect@gmail.com?subject=IBM%20Maximo%20Training%20Enquiry" 
+                        href="mailto:admin@cscorp.in?subject=IBM%20Maximo%20Training%20Enquiry" 
                         className="btn-secondary"
                     >
                         <Mail size={18} /> Email Directly

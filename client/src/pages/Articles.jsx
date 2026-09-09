@@ -78,7 +78,7 @@ const Articles = () => {
                         <span>ChaudharyConnect</span>
                         <ArrowUpRight size={12} className="eco-arrow" />
                     </Link>
-                    <Link to="/chaudhary-and-sons" className="eco-nav-chip">
+                    <Link to="/" className="eco-nav-chip">
                         <Building2 size={14} />
                         <span>Chaudhary &amp; Sons</span>
                         <ArrowUpRight size={12} className="eco-arrow" />

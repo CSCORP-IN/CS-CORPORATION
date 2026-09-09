@@ -16,7 +16,7 @@ const ChaudharySons = () => {
 
     // Typewriter Rotating Tagline
     const roles = [
-        "Foundational Parent Organization",
+        "CS Corporation • Foundational Parent Organization",
         "Generational Heritage & Public Service",
         "Enterprise Advisory & Strategic Platforms",
         "Open Knowledge Repositories & Academies"
@@ -50,7 +50,7 @@ const ChaudharySons = () => {
     }, [currentText, isDeleting, currentRoleIndex, typingSpeed]);
 
     const copyEmail = () => {
-        navigator.clipboard.writeText("the.chaudhary.connect@gmail.com");
+        navigator.clipboard.writeText("admin@cscorp.in");
         setCopiedEmail(true);
         setTimeout(() => setCopiedEmail(false), 2500);
     };
@@ -154,7 +154,7 @@ const ChaudharySons = () => {
             desc: 'Lead Enterprise Asset Management Architect with 4+ years of specialized engineering mastery across IBM Maximo, Java EE development, MIF enterprise integrations, Jython automation scripts, MAS 8.x digital transformation, and modern AI copilot tools.',
             expertise: ['IBM Maximo EAM', 'Java EE & Jython Automation', 'MIF Integration Architecture', 'Generative AI Developer Tools'],
             quote: '“Engineering resilient, high-performance enterprise systems with precision, scalability, and automated intelligence.”',
-            portfolioLink: '/',
+            portfolioLink: '/ankit-chaudhary',
             portfolioText: 'View Ankit Chaudhary EAM Portfolio'
         },
         {
@@ -200,7 +200,7 @@ const ChaudharySons = () => {
                     {/* Status Pill */}
                     <div className="cs-status-pill">
                         <span className="cs-live-dot"></span>
-                        <span>CHAUDHARY &amp; SONS • PARENT ORGANIZATION</span>
+                        <span>CS CORPORATION • CHAUDHARY &amp; SONS • cscorp.in</span>
                         <span className="cs-status-sep">•</span>
                         <span>EST. 2020</span>
                     </div>
@@ -219,7 +219,7 @@ const ChaudharySons = () => {
 
                     {/* Clean Dignified Parent Subtitle */}
                     <p className="cs-hero-subtitle">
-                        The foundational parent organization uniting family heritage, public service, enterprise consulting, technical knowledge repositories, and next-generation digital platforms.
+                        The foundational parent enterprise (<strong>cscorp.in</strong>) uniting family heritage, public service, enterprise EAM architecture, supply chain distribution, and next-generation technical knowledge platforms.
                     </p>
 
                     {/* Action CTA Cluster */}
@@ -403,7 +403,7 @@ const ChaudharySons = () => {
                                 <Mail size={20} color="#f97316" />
                                 <div>
                                     <small>PRIMARY CONTACT EMAIL</small>
-                                    <strong>the.chaudhary.connect@gmail.com</strong>
+                                    <strong>admin@cscorp.in</strong>
                                 </div>
                                 <button className="cs-copy-btn" onClick={copyEmail}>
                                     {copiedEmail ? <Check size={16} color="#10b981" /> : <Copy size={16} />}

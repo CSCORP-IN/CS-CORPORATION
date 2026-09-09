@@ -537,11 +537,11 @@ const AnantPortfolio = () => {
 
                         {/* Navigation back to ecosystem */}
                         <div className="ap-ecosystem-links">
-                            <Link to="/chaudhary-and-sons" className="ap-eco-btn">
+                            <Link to="/" className="ap-eco-btn">
                                 <span>Chaudhary &amp; Sons Enterprise</span>
                                 <ArrowRight size={14} />
                             </Link>
-                            <Link to="/" className="ap-eco-btn">
+                            <Link to="/ankit-chaudhary" className="ap-eco-btn">
                                 <span>Ankit Chaudhary (EAM Architect)</span>
                                 <ArrowRight size={14} />
                             </Link>

@@ -484,6 +484,17 @@
     color: #3f3f46;
     font-size: 0.96rem;
     line-height: 1.75;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+/* Hide duplicate h1 & subtitle rendered inside HTML payloads */
+.docs-article-body > h1:first-child,
+.docs-article-body > .page-subtitle,
+.docs-article-body > section > h1:first-child,
+.docs-article-body > section > .page-subtitle {
+    display: none;
 }
 
 .docs-article-body h2 {
@@ -576,6 +587,7 @@
     padding: 2px 7px;
     border-radius: 6px;
     border: 1px solid #e4e4e7;
+    word-break: break-word;
 }
 
 /* --------------------------------------------------------------------------
@@ -583,7 +595,7 @@
    -------------------------------------------------------------------------- */
 .docs-article-body .portal-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 16px;
     margin: 24px 0 32px 0;
 }
@@ -680,6 +692,7 @@
     margin: 20px 0;
     overflow: hidden;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    max-width: 100%;
 }
 
 .docs-article-body .ibm-code-header {
@@ -692,6 +705,8 @@
     font-size: 0.78rem;
     font-weight: 700;
     color: #a1a1aa;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .docs-article-body .btn-copy {
@@ -718,10 +733,14 @@
     padding: 16px 20px;
     margin: 0;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     font-family: 'IBM Plex Mono', 'JetBrains Mono', Consolas, monospace;
     font-size: 0.86rem;
     line-height: 1.6;
     color: #f4f4f5;
+    white-space: pre;
+    word-break: normal;
+    scrollbar-width: thin;
 }
 
 /* Callouts (Orange Brand Theme) */
@@ -806,13 +825,16 @@
 
 /* Tables */
 .docs-article-body table {
+    display: block;
     width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border-collapse: collapse;
     margin: 24px 0;
     font-size: 0.88rem;
     border: 1px solid #e4e4e7;
     border-radius: 12px;
-    overflow: hidden;
 }
 
 .docs-article-body th {
@@ -889,6 +911,37 @@
     margin-top: 2px;
 }
 
+/* Mobile Drawer Backdrop & Close Button */
+.docs-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1100;
+    animation: fadeIn 0.2s ease forwards;
+}
+
+.sidebar-mobile-close-btn {
+    display: none;
+    background: #f4f4f5;
+    border: 1px solid #e4e4e7;
+    border-radius: 8px;
+    width: 26px;
+    height: 26px;
+    align-items: center;
+    justify-content: center;
+    color: #52525b;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.sidebar-mobile-close-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    border-color: #fca5a5;
+}
+
 /* --------------------------------------------------------------------------
    RESPONSIVENESS
    -------------------------------------------------------------------------- */
@@ -901,15 +954,28 @@
         display: inline-flex;
     }
 
+    .sidebar-mobile-close-btn {
+        display: flex;
+    }
+
     .docs-sidebar-tree {
         display: none;
         position: fixed;
-        top: 80px;
+        top: 16px;
+        bottom: 16px;
         left: 16px;
         right: 16px;
-        height: 75vh;
-        z-index: 1000;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        height: auto;
+        max-height: calc(100dvh - 32px);
+        z-index: 1200;
+        border-radius: 20px;
+        box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.35);
+        animation: docsDrawerSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes docsDrawerSlide {
+        from { opacity: 0; transform: translateY(16px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .docs-sidebar-tree.mobile-open {
@@ -920,60 +986,209 @@
 @media (max-width: 768px) {
     .docs-master-container {
         padding-top: 80px;
-        padding-left: 16px;
-        padding-right: 16px;
+        padding-left: 14px;
+        padding-right: 14px;
+        padding-bottom: 3.5rem;
     }
 
     .docs-brand-topbar {
         flex-direction: column;
         align-items: stretch;
+        padding: 16px;
+        gap: 14px;
+        border-radius: 16px;
+        margin-bottom: 18px;
+    }
+
+    .docs-badge-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+    }
+
+    .docs-brand-name {
+        font-size: 1.22rem;
+    }
+
+    .docs-brand-sub {
+        font-size: 0.74rem;
     }
 
     .docs-search-shell {
         max-width: 100%;
+        min-width: 0;
+    }
+
+    .docs-mobile-toc-toggle {
+        width: 100%;
+        justify-content: center;
     }
 
     .docs-reader-main {
-        padding: 20px 16px;
+        padding: 20px 14px;
         border-radius: 18px;
     }
 
+    .docs-article-header {
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+    }
+
     .docs-article-title {
-        font-size: clamp(1.6rem, 7vw, 2.2rem);
+        font-size: clamp(1.45rem, 6vw, 1.95rem);
+        line-height: 1.25;
     }
 
     .docs-article-subtitle {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .docs-article-body {
+        font-size: 0.92rem;
+        line-height: 1.65;
+    }
+
+    .docs-article-body h2 {
+        font-size: 1.3rem;
+        margin: 26px 0 10px 0;
+        padding-bottom: 6px;
+    }
+
+    .docs-article-body h3 {
+        font-size: 1.1rem;
+        margin: 20px 0 8px 0;
+    }
+
+    .docs-article-body h4 {
+        font-size: 0.96rem;
+        margin: 16px 0 6px 0;
+    }
+
+    .docs-article-body p {
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+    }
+
+    .docs-article-body ul,
+    .docs-article-body ol {
+        padding-left: 1.25rem;
+        margin: 0.6rem 0 1.2rem 0;
+    }
+
+    .docs-article-body ul ul,
+    .docs-article-body ol ol,
+    .docs-article-body ul ol,
+    .docs-article-body ol ul {
+        margin: 0.3rem 0 0.3rem 0.6rem;
+        padding-left: 0.9rem;
+    }
+
+    .docs-article-body li {
+        font-size: 0.88rem;
+        margin-bottom: 6px;
+        line-height: 1.6;
+    }
+
+    .docs-article-body .ibm-code-block {
+        margin: 16px 0;
+        border-radius: 12px;
+    }
+
+    .docs-article-body .ibm-code-header {
+        padding: 8px 12px;
+        font-size: 0.74rem;
+    }
+
+    .docs-article-body pre {
+        padding: 12px 14px;
+        font-size: 0.78rem;
+        line-height: 1.5;
+    }
+
+    .docs-article-body .ibm-callout {
+        padding: 12px 14px;
+        margin: 16px 0;
+        border-radius: 10px;
+    }
+
+    .docs-article-body .ibm-checkbox-container {
+        padding: 12px 14px;
+        gap: 10px;
+        border-radius: 12px;
+    }
+
+    .docs-article-body .ibm-checkbox-text h4 {
+        font-size: 0.88rem;
+    }
+
+    .docs-article-body .ibm-checkbox-text p {
+        font-size: 0.8rem;
+    }
+
+    .docs-article-body table {
+        margin: 16px 0;
+        font-size: 0.82rem;
+    }
+
+    .docs-article-body th,
+    .docs-article-body td {
+        padding: 8px 12px;
+    }
+
+    .docs-article-body .portal-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .docs-article-body .portal-card {
+        padding: 16px;
+        border-radius: 14px;
     }
 
     .docs-footer-pagination {
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
+        margin-top: 32px;
+        padding-top: 20px;
     }
 
     .docs-nav-page-btn {
         max-width: 100%;
         width: 100%;
+        padding: 12px 16px;
     }
 }
 
 @media (max-width: 480px) {
     .docs-master-container {
         padding-top: 74px;
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    .docs-brand-name {
-        font-size: 1.25rem;
+        padding-left: 10px;
+        padding-right: 10px;
     }
 
     .docs-reader-main {
-        padding: 16px 12px;
+        padding: 16px 10px;
+        border-radius: 14px;
     }
 
-    .docs-code-block pre {
-        font-size: 0.76rem;
-        padding: 12px;
+    .docs-article-body ul,
+    .docs-article-body ol {
+        padding-left: 1.1rem;
+    }
+
+    .docs-article-body code {
+        font-size: 0.82em;
+        padding: 1px 5px;
+    }
+
+    .docs-article-body pre {
+        font-size: 0.72rem;
+        padding: 10px;
+    }
+
+    .docs-article-body .btn-copy {
+        padding: 3px 8px;
+        font-size: 0.68rem;
     }
 }

@@ -4,7 +4,7 @@
 
 export const sendOTPEmail = async (email, otp, recipientName = 'User') => {
     const brevoApiKey = process.env.BREVO_API_KEY;
-    const senderEmail = process.env.EMAIL_FROM || 'the.chaudhary.connect@gmail.com';
+    const senderEmail = process.env.EMAIL_FROM || 'admin@cscorp.in';
     const senderName = process.env.EMAIL_FROM_NAME || 'Chaudhary & Sons';
 
     // If no API key configured, use local dev logger fallback
@@ -57,7 +57,7 @@ export const sendOTPEmail = async (email, otp, recipientName = 'User') => {
 
                 <div style="background: #fafafa; border-top: 1px solid #f4f4f5; padding: 16px 28px; text-align: center;">
                     <p style="color: #a1a1aa; font-size: 11px; margin: 0;">
-                        &copy; ${new Date().getFullYear()} Chaudhary &amp; Sons. All rights reserved.
+                        &copy; ${new Date().getFullYear()} Chaudhary &amp; Sons Corporation. All rights reserved.
                     </p>
                 </div>
             </div>

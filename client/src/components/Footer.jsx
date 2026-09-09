@@ -8,7 +8,7 @@ const Footer = () => {
     const [copied, setCopied] = useState(false);
 
     const handleCopyEmail = () => {
-        navigator.clipboard.writeText("the.chaudhary.connect@gmail.com");
+        navigator.clipboard.writeText("admin@cscorp.in");
         setCopied(true);
         setTimeout(() => setCopied(false), 2500);
     };
@@ -30,8 +30,7 @@ const Footer = () => {
                             <Logo size={32} />
                         </Link>
                         <p className="footer-brand-desc">
-                            Enterprise Asset Management (EAM) Architecture, Mission-Critical Java Systems, 
-                            and Cloud-Ready Integration Engineering.
+                            CS Corporation (cscorp.in • Chaudhary &amp; Sons Corporation) is the foundational parent enterprise driving mission-critical IBM Maximo architecture, supply chain distribution, and technical knowledge platforms.
                         </p>
                         <div className="footer-social-cluster">
                             <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="social-icon-btn" aria-label="GitHub">
@@ -40,7 +39,7 @@ const Footer = () => {
                             <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-icon-btn" aria-label="LinkedIn">
                                 <Linkedin size={18} />
                             </a>
-                            <a href="mailto:the.chaudhary.connect@gmail.com" className="social-icon-btn" aria-label="Email">
+                            <a href="mailto:admin@cscorp.in" className="social-icon-btn" aria-label="Email">
                                 <Mail size={18} />
                             </a>
                         </div>
@@ -50,11 +49,11 @@ const Footer = () => {
                     <div className="footer-nav-col">
                         <h4 className="footer-nav-title">Navigation</h4>
                         <ul className="footer-links">
-                            <li><Link to="/">Home Architecture</Link></li>
-                            <li><a href="#projects">Enterprise Projects &amp; Tools</a></li>
-                            <li><a href="#experience">Career Roadmap</a></li>
-                            <li><a href="#skills">Technical Arsenal</a></li>
-                            <li><a href="#contact">Direct Consultation</a></li>
+                            <li><Link to="/">Chaudhary &amp; Sons Home</Link></li>
+                            <li><Link to="/ankit-chaudhary">Ankit Chaudhary (EAM)</Link></li>
+                            <li><Link to="/anant-chaudhary">Anant Chaudhary (Supply Chain)</Link></li>
+                            <li><Link to="/docs">ChaudharyDocs</Link></li>
+                            <li><Link to="/courses">ChaudharyConnect</Link></li>
                         </ul>
                     </div>
 
@@ -62,11 +61,11 @@ const Footer = () => {
                     <div className="footer-nav-col">
                         <h4 className="footer-nav-title">Chaudhary Ecosystem</h4>
                         <ul className="footer-links">
-                            <li><Link to="/chaudhary-and-sons">Chaudhary &amp; Sons</Link></li>
-                            <li><Link to="/docs">ChaudharyDocs</Link></li>
-                            <li><Link to="/courses">ChaudharyConnect</Link></li>
-                            <li><Link to="/articles">ChaudharyArticles</Link></li>
-                            <li><Link to="/anant-chaudhary">Anant Chaudhary Portfolio</Link></li>
+                            <li><Link to="/">Parent Organization</Link></li>
+                            <li><Link to="/docs">Knowledge Base &amp; Scripts</Link></li>
+                            <li><Link to="/courses">Live Maximo Bootcamp</Link></li>
+                            <li><Link to="/articles">Technical Publications</Link></li>
+                            <li><Link to="/post">Publish an Article</Link></li>
                         </ul>
                     </div>
 
@@ -76,7 +75,7 @@ const Footer = () => {
                         <p className="footer-contact-note">Available for high-impact enterprise consultations &amp; MAS migration advisory.</p>
                         <button onClick={handleCopyEmail} className="footer-copy-pill">
                             {copied ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
-                            <span>{copied ? 'Copied to Clipboard!' : 'the.chaudhary.connect@gmail.com'}</span>
+                            <span>{copied ? 'Copied to Clipboard!' : 'admin@cscorp.in'}</span>
                         </button>
                     </div>
 
@@ -84,7 +83,7 @@ const Footer = () => {
 
                 {/* Bottom Copyright & Security Strip */}
                 <div className="footer-copyright-strip">
-                    <p>© {new Date().getFullYear()} Ankit Chaudhary (Chaudhary &amp; Sons). All rights reserved.</p>
+                    <p>{`© ${new Date().getFullYear()} CS Corporation (Chaudhary & Sons Corporation) • cscorp.in. All rights reserved.`}</p>
                     <div className="footer-status-pill">
                         <span className="live-status-dot"></span>
                         <span>Enterprise Systems Operational</span>

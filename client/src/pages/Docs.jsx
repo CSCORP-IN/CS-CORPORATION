@@ -272,6 +272,15 @@ const Docs = () => {
                 </button>
             </div>
 
+            {/* Mobile Drawer Backdrop */}
+            {mobileDrawerOpen && (
+                <div 
+                    className="docs-drawer-backdrop" 
+                    onClick={() => setMobileDrawerOpen(false)} 
+                    aria-hidden="true"
+                />
+            )}
+
             {/* Layout: Left Dynamic-Height Sticky TOC Tree + Right Documentation Content Canvas */}
             <div className="docs-layout-grid">
                 
@@ -287,7 +296,15 @@ const Docs = () => {
                             >
                                 {isAllExpanded ? 'Collapse All' : 'Expand All'}
                             </button>
-                            <span className="sidebar-tree-count">{flatPageList.length} Guides</span>
+                            <span className="sidebar-tree-count">{flatPageList.length}</span>
+                            <button 
+                                type="button" 
+                                className="sidebar-mobile-close-btn"
+                                onClick={() => setMobileDrawerOpen(false)}
+                                aria-label="Close Navigation"
+                            >
+                                <X size={18} />
+                            </button>
                         </div>
                     </div>
 

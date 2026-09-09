@@ -89,6 +89,7 @@
 
 .logo-type-text {
     display: inline-block;
+    color: #09090b;
 }
 
 /* Row 2: Secondary Word (Tracked Subtitle Accent) */
@@ -126,19 +127,6 @@
         font-size: 0.68rem;
         letter-spacing: 0.14em;
     }
-}
-
-/* Dark mode theme compatibility */
-[data-theme='dark'] .logo-row-top.english-cursive,
-.dark .logo-row-top.english-cursive,
-[data-theme='dark'] .logo-row-top.hindi-cursive,
-.dark .logo-row-top.hindi-cursive {
-    color: #f4f4f5;
-}
-
-[data-theme='dark'] .logo-row-bottom,
-.dark .logo-row-bottom {
-    color: #fb923c;
 }
 
 /* Right Group: Hamburger + Contact Pill */

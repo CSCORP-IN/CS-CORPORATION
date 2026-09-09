@@ -6,12 +6,26 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
+    // Clean up any legacy permanent localStorage tokens from previous version
+    try {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+    } catch (e) {}
+
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
-        return localStorage.getItem('auth_token') === 'true';
+        try {
+            return sessionStorage.getItem('auth_token') === 'true';
+        } catch (e) {
+            return false;
+        }
     });
     const [user, setUser] = useState(() => {
-        const savedUser = localStorage.getItem('auth_user');
-        return savedUser ? JSON.parse(savedUser) : null;
+        try {
+            const savedUser = sessionStorage.getItem('auth_user');
+            return savedUser ? JSON.parse(savedUser) : null;
+        } catch (e) {
+            return null;
+        }
     });
 
     const login = async (username, password) => {
@@ -25,8 +39,8 @@ export const AuthProvider = ({ children }) => {
             if (data.success) {
                 setIsAuthenticated(true);
                 setUser(data.user);
-                localStorage.setItem('auth_token', 'true');
-                localStorage.setItem('auth_user', JSON.stringify(data.user));
+                sessionStorage.setItem('auth_token', 'true');
+                sessionStorage.setItem('auth_user', JSON.stringify(data.user));
                 return { success: true, role: data.user.role };
             }
             if (data.requireOtp) {
@@ -71,8 +85,8 @@ export const AuthProvider = ({ children }) => {
             if (data.success) {
                 setIsAuthenticated(true);
                 setUser(data.user);
-                localStorage.setItem('auth_token', 'true');
-                localStorage.setItem('auth_user', JSON.stringify(data.user));
+                sessionStorage.setItem('auth_token', 'true');
+                sessionStorage.setItem('auth_user', JSON.stringify(data.user));
                 return { success: true, role: data.user.role, message: data.message };
             }
             return { success: false, message: data.message || 'Invalid or expired OTP' };
@@ -98,8 +112,12 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         setIsAuthenticated(false);
         setUser(null);
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('auth_user');
+        try {
+            sessionStorage.removeItem('auth_token');
+            sessionStorage.removeItem('auth_user');
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_user');
+        } catch (e) {}
     };
 
     return (

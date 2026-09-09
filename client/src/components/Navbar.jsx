@@ -94,7 +94,7 @@ const Navbar = () => {
                     </button>
 
                     {/* Solid White Pill Contact Button */}
-                    <a href="mailto:the.chaudhary.connect@gmail.com?subject=Enterprise%20Inquiry" className="zain-contact-white-pill">
+                    <a href="mailto:admin@cscorp.in?subject=Enterprise%20Inquiry" className="zain-contact-white-pill">
                         Contact
                     </a>
                 </div>
@@ -121,6 +121,15 @@ const Navbar = () => {
                         <ul className="dropdown-links-list">
                             <li>
                                 <NavLink to="/" end onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                    <div className="dropdown-item-icon"><Layers size={18} /></div>
+                                    <div className="dropdown-item-info">
+                                        <span className="dropdown-item-title">Chaudhary &amp; Sons</span>
+                                        <span className="dropdown-item-desc">Enterprise &amp; Holdings Hub</span>
+                                    </div>
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/ankit-chaudhary" onClick={() => setIsOpen(false)} className="dropdown-item-link">
                                     <div className="dropdown-item-icon"><Home size={18} /></div>
                                     <div className="dropdown-item-info">
                                         <span className="dropdown-item-title">Ankit Chaudhary</span>
@@ -134,15 +143,6 @@ const Navbar = () => {
                                     <div className="dropdown-item-info">
                                         <span className="dropdown-item-title">Anant Chaudhary</span>
                                         <span className="dropdown-item-desc">Supply Chain &amp; Logistics Leader</span>
-                                    </div>
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/chaudhary-and-sons" onClick={() => setIsOpen(false)} className="dropdown-item-link">
-                                    <div className="dropdown-item-icon"><Layers size={18} /></div>
-                                    <div className="dropdown-item-info">
-                                        <span className="dropdown-item-title">Chaudhary &amp; Sons</span>
-                                        <span className="dropdown-item-desc">Enterprise &amp; Holdings Hub</span>
                                     </div>
                                 </NavLink>
                             </li>
