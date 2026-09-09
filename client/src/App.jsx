@@ -21,6 +21,9 @@ import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
 
 function App() {
+  const isAnantSubdomain = typeof window !== 'undefined' && 
+    (window.location.hostname === 'anant.cscorp.in' || window.location.hostname.startsWith('anant.'));
+
   return (
     <Router>
       <ThemeProvider>
@@ -30,7 +33,7 @@ function App() {
               <Navbar />
               <main className="content">
                 <Routes>
-                  <Route path="/" element={<Home />} />
+                  <Route path="/" element={isAnantSubdomain ? <AnantPortfolio /> : <Home />} />
                   <Route path="/chaudhary-and-sons" element={<ChaudharySons />} />
                   <Route path="/anant-chaudhary" element={<AnantPortfolio />} />
                   <Route path="/docs" element={<Docs />} />
