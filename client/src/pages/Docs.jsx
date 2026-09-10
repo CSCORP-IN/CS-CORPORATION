@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { 
     BookOpen, Search, X, ChevronRight, ChevronDown, CheckCircle2, 
     Copy, Check, ArrowLeft, ArrowRight, ExternalLink, Sparkles, 
-    FileCode, Server, Terminal, Shield, Cpu, Layers, Menu, CornerDownRight
+    FileCode, Server, Terminal, Shield, Cpu, Layers, Menu, CornerDownRight,
+    Languages, Globe
 } from 'lucide-react';
 import { docsToc, docsPages } from '../data/docsData';
 import './Docs.css';
@@ -15,6 +16,7 @@ const sectionIcons = {
     'sectionPart4': Sparkles,
     'sectionPart5': Layers,
     'sectionPart6': Shield,
+    'sectionPart7': FileCode,
     'default': BookOpen
 };
 
@@ -32,16 +34,39 @@ const Docs = () => {
 
     const [activePageId, setActivePageId] = useState(getInitialPage);
     const [searchQuery, setSearchQuery] = useState('');
-    const [expandedSections, setExpandedSections] = useState({
-        'sectionPart1': true,
-        'sectionPart2': false,
-        'sectionPart3': false,
-        'sectionPart4': false,
-        'sectionPart5': false,
-        'sectionPart6': false
+    const [language, setLanguage] = useState(() => {
+        try {
+            return localStorage.getItem('chaudharydocs_lang') || 'en';
+        } catch (e) {
+            return 'en';
+        }
     });
+
+    const [expandedSections, setExpandedSections] = useState(() => {
+        const hash = window.location.hash.replace('#', '');
+        const initial = {
+            'sectionPart1': false,
+            'sectionPart2': false,
+            'sectionPart3': false,
+            'sectionPart4': false,
+            'sectionPart5': false,
+            'sectionPart6': false,
+            'sectionPart7': false
+        };
+        if (hash) {
+            docsToc.forEach(sec => {
+                if (sec.items.some(item => item.id === hash)) {
+                    initial[sec.id] = true;
+                }
+            });
+        } else {
+            initial['sectionPart1'] = true;
+            initial['sectionPart7'] = true;
+        }
+        return initial;
+    });
+
     const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-    const [copiedSnippet, setCopiedSnippet] = useState(false);
     const [checklistStatus, setChecklistStatus] = useState(() => {
         try {
             const saved = localStorage.getItem('chaudharydocs_checklist');
@@ -50,6 +75,13 @@ const Docs = () => {
             return {};
         }
     });
+
+    const handleSetLanguage = (newLang) => {
+        setLanguage(newLang);
+        try {
+            localStorage.setItem('chaudharydocs_lang', newLang);
+        } catch (e) {}
+    };
 
     // Listen to hash changes
     useEffect(() => {
@@ -108,7 +140,11 @@ const Docs = () => {
         const list = [];
         docsToc.forEach(sec => {
             sec.items.forEach(item => {
-                list.push({ ...item, sectionTitle: sec.title });
+                list.push({ 
+                    ...item, 
+                    sectionTitle: sec.title,
+                    sectionTitle_hi: sec.title_hi
+                });
             });
         });
         return list;
@@ -118,32 +154,46 @@ const Docs = () => {
     const prevPage = currentIndex > 0 ? flatPageList[currentIndex - 1] : null;
     const nextPage = currentIndex >= 0 && currentIndex < flatPageList.length - 1 ? flatPageList[currentIndex + 1] : null;
 
-    // Search results across all pages
+    // Search results across all pages (bilingual search)
     const searchResults = useMemo(() => {
         if (!searchQuery.trim()) return [];
         const q = searchQuery.toLowerCase();
         const results = [];
         Object.values(docsPages).forEach(p => {
-            const inTitle = p.title?.toLowerCase().includes(q);
-            const inSubtitle = p.subtitle?.toLowerCase().includes(q);
-            const inHtml = p.html?.toLowerCase().includes(q);
+            const inTitle = p.title?.toLowerCase().includes(q) || p.title_hi?.toLowerCase().includes(q);
+            const inSubtitle = p.subtitle?.toLowerCase().includes(q) || p.subtitle_hi?.toLowerCase().includes(q);
+            const inHtml = p.html?.toLowerCase().includes(q) || p.html_hi?.toLowerCase().includes(q);
             if (inTitle || inSubtitle || inHtml) {
+                const displayTitle = (language === 'hi' && p.title_hi) ? p.title_hi : p.title;
+                const displaySub = (language === 'hi' && p.subtitle_hi) ? p.subtitle_hi : p.subtitle;
                 results.push({
                     id: p.id,
-                    title: p.title,
-                    subtitle: p.subtitle,
+                    title: displayTitle,
+                    subtitle: displaySub,
                     score: inTitle ? 3 : (inSubtitle ? 2 : 1)
                 });
             }
         });
         return results.sort((a, b) => b.score - a.score);
-    }, [searchQuery]);
+    }, [searchQuery, language]);
 
-    // Active Page Data
-    const currentPageData = docsPages[activePageId] || docsPages['overview'] || {
+    // Active Page Data with bilingual resolution
+    const rawPageData = docsPages[activePageId] || docsPages['overview'] || {
         title: 'Enterprise Documentation',
         subtitle: 'Enterprise Architecture, Automation & OSLC Guides',
         html: '<p>Select a guide from the sidebar.</p>'
+    };
+
+    const hasTranslation = Boolean(rawPageData.html_hi || rawPageData.title_hi);
+    const isHinglishActive = language === 'hi' && hasTranslation;
+
+    const currentPageData = {
+        id: rawPageData.id,
+        title: isHinglishActive ? (rawPageData.title_hi || rawPageData.title) : rawPageData.title,
+        subtitle: isHinglishActive ? (rawPageData.subtitle_hi || rawPageData.subtitle) : rawPageData.subtitle,
+        html: isHinglishActive ? (rawPageData.html_hi || rawPageData.html) : rawPageData.html,
+        hasTranslation,
+        isHinglish: isHinglishActive
     };
 
     // Expose navigateToHash on window for inline HTML onclick handlers
@@ -204,7 +254,7 @@ const Docs = () => {
 
     return (
         <div className="docs-master-container animate-fade-in">
-            {/* Top Hub Banner: Focus on Architecture & Knowledge without repeating logo */}
+            {/* Top Hub Banner: Focus on Architecture & Knowledge */}
             <div className="docs-brand-topbar">
                 <div className="docs-brand-title-wrap">
                     <div className="docs-badge-icon">
@@ -218,12 +268,36 @@ const Docs = () => {
                     </div>
                 </div>
 
+                {/* Language Switcher Toggle Pill */}
+                <div className="docs-lang-selector-wrap">
+                    <div className="docs-lang-toggle-pill" role="radiogroup" aria-label="Documentation Language">
+                        <button 
+                            type="button"
+                            className={`docs-lang-btn ${language === 'en' ? 'active' : ''}`}
+                            onClick={() => handleSetLanguage('en')}
+                            title="English Edition (Default)"
+                        >
+                            <span className="lang-flag">🇬🇧</span>
+                            <span>English</span>
+                        </button>
+                        <button 
+                            type="button"
+                            className={`docs-lang-btn ${language === 'hi' ? 'active' : ''}`}
+                            onClick={() => handleSetLanguage('hi')}
+                            title="Hinglish Edition (Hindi/English mix)"
+                        >
+                            <span className="lang-flag">🇮🇳</span>
+                            <span>Hinglish</span>
+                        </button>
+                    </div>
+                </div>
+
                 {/* Search Bar Input */}
                 <div className="docs-search-shell">
                     <Search size={18} className="docs-search-icon" />
                     <input 
                         type="text" 
-                        placeholder="Search 31+ architecture guides, scripts, APIs..."
+                        placeholder={language === 'hi' ? "31+ guides, scripts, APIs me search karein..." : "Search 43+ architecture guides, scripts, APIs..."}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -313,6 +387,7 @@ const Docs = () => {
                             const IconComp = sectionIcons[sec.id] || sectionIcons['default'];
                             const isExpanded = expandedSections[sec.id];
                             const hasActive = sec.items.some(it => it.id === activePageId);
+                            const sectionDisplayTitle = (language === 'hi' && sec.title_hi) ? sec.title_hi : sec.title;
 
                             return (
                                 <div key={sec.id || sIdx} className={`toc-accordion-section ${isExpanded ? 'expanded' : 'collapsed'}`}>
@@ -323,7 +398,7 @@ const Docs = () => {
                                     >
                                         <div className="accordion-title-left">
                                             <IconComp size={16} className="accordion-icon" />
-                                            <span>{sec.title}</span>
+                                            <span>{sectionDisplayTitle}</span>
                                         </div>
                                         <ChevronRight size={16} className={`accordion-arrow ${isExpanded ? 'rotated' : ''}`} />
                                     </button>
@@ -332,6 +407,8 @@ const Docs = () => {
                                         <ul className="toc-accordion-items">
                                             {sec.items.map(item => {
                                                 const isActive = item.id === activePageId;
+                                                const itemDisplayLabel = (language === 'hi' && item.label_hi) ? item.label_hi : item.label;
+
                                                 return (
                                                     <li key={item.id}>
                                                         <button 
@@ -339,7 +416,10 @@ const Docs = () => {
                                                             onClick={() => handleSelectPage(item.id)}
                                                         >
                                                             <div className="link-indicator-dot"></div>
-                                                            <span className="link-label">{item.label}</span>
+                                                            <span className="link-label">{itemDisplayLabel}</span>
+                                                            {item.label_hi && (
+                                                                <span className="bilingual-indicator" title="Available in English & Hinglish">HI</span>
+                                                            )}
                                                         </button>
                                                     </li>
                                                 );
@@ -354,15 +434,36 @@ const Docs = () => {
 
                 {/* Right Main Documentation Reader Canvas */}
                 <main className="docs-reader-main" ref={contentRef}>
-                    <div className="docs-reader-inner docs-page-anim" key={activePageId}>
+                    <div className="docs-reader-inner docs-page-anim" key={`${activePageId}-${language}`}>
                         
-                        {/* Breadcrumbs Navigation */}
-                        <div className="docs-breadcrumbs">
-                            <span>ChaudharyDocs</span>
-                            <span className="breadcrumb-sep">/</span>
-                            <span>{currentSection?.title || 'Knowledge Base'}</span>
-                            <span className="breadcrumb-sep">/</span>
-                            <span className="breadcrumb-active">{currentPageData.title}</span>
+                        {/* Meta & Breadcrumbs Navigation Bar */}
+                        <div className="docs-article-meta-row">
+                            <div className="docs-breadcrumbs">
+                                <span>ChaudharyDocs</span>
+                                <span className="breadcrumb-sep">/</span>
+                                <span>{(language === 'hi' && currentSection?.title_hi) ? currentSection.title_hi : (currentSection?.title || 'Knowledge Base')}</span>
+                                <span className="breadcrumb-sep">/</span>
+                                <span className="breadcrumb-active">{currentPageData.title}</span>
+                            </div>
+
+                            {/* Live Language Active Status Badge */}
+                            {hasTranslation ? (
+                                <button 
+                                    type="button"
+                                    className="docs-lang-badge-pill dual-active" 
+                                    onClick={() => handleSetLanguage(language === 'en' ? 'hi' : 'en')}
+                                    title="Click to toggle language"
+                                >
+                                    <Languages size={14} />
+                                    <span>{language === 'hi' ? '🇮🇳 Hinglish Version' : '🇬🇧 English Version'}</span>
+                                    <span className="lang-badge-switch-action">Switch to {language === 'hi' ? 'English' : 'Hinglish'}</span>
+                                </button>
+                            ) : (
+                                <div className="docs-lang-badge-pill mono-active" title="This chapter is available in standard English">
+                                    <Globe size={14} />
+                                    <span>English Edition</span>
+                                </div>
+                            )}
                         </div>
 
                         {/* Page Header */}
@@ -388,8 +489,8 @@ const Docs = () => {
                                 >
                                     <ArrowLeft size={18} />
                                     <div>
-                                        <small>PREVIOUS TOPIC</small>
-                                        <span>{prevPage.label}</span>
+                                        <small>{language === 'hi' ? 'PICHHLA TOPIC' : 'PREVIOUS TOPIC'}</small>
+                                        <span>{(language === 'hi' && prevPage.label_hi) ? prevPage.label_hi : prevPage.label}</span>
                                     </div>
                                 </button>
                             ) : <div></div>}
@@ -400,8 +501,8 @@ const Docs = () => {
                                     onClick={() => handleSelectPage(nextPage.id)}
                                 >
                                     <div>
-                                        <small>NEXT TOPIC</small>
-                                        <span>{nextPage.label}</span>
+                                        <small>{language === 'hi' ? 'AGLA TOPIC' : 'NEXT TOPIC'}</small>
+                                        <span>{(language === 'hi' && nextPage.label_hi) ? nextPage.label_hi : nextPage.label}</span>
                                     </div>
                                     <ArrowRight size={18} />
                                 </button>
