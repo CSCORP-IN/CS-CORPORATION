@@ -73,18 +73,22 @@ const AnantPortfolio = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...contactForm,
-                    subject: `[Anant Supply Chain Portfolio] ${contactForm.subject}`
+                    subject: contactForm.subject ? `[Anant Supply Chain Portfolio] ${contactForm.subject}` : '[Anant Supply Chain Portfolio] Direct Message'
                 })
             });
-            if (response.ok) {
+            const data = await response.json().catch(() => ({}));
+            if (response.ok && data.success !== false) {
                 setContactStatus('success');
                 setContactForm({ name: '', email: '', subject: '', message: '' });
-                setTimeout(() => setContactStatus(null), 3500);
+                setTimeout(() => setContactStatus(null), 4000);
             } else {
                 setContactStatus('error');
+                setTimeout(() => setContactStatus(null), 5000);
             }
         } catch (err) {
+            console.error('Contact form error:', err);
             setContactStatus('error');
+            setTimeout(() => setContactStatus(null), 5000);
         }
     };
 
@@ -594,7 +598,10 @@ const AnantPortfolio = () => {
                             <ArrowRight size={16} />
                         </button>
                         {contactStatus === 'success' && (
-                            <p className="ap-form-success">Message sent successfully! Anant will respond promptly.</p>
+                            <p className="ap-form-success">✅ Message sent successfully! Anant will respond promptly.</p>
+                        )}
+                        {contactStatus === 'error' && (
+                            <p className="ap-form-error">❌ Unable to send message. Please email directly at <strong>admin@cscorp.in</strong>.</p>
                         )}
                     </form>
                 </div>

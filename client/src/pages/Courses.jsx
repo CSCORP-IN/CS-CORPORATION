@@ -1,5 +1,6 @@
 import API_BASE_URL from '../config';
 import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
     GraduationCap, CheckCircle2, Clock, Sparkles, ArrowRight, 
     BookOpen, Layers, Database, Terminal, Shield, Server, 
@@ -15,6 +16,17 @@ const Courses = () => {
     const [selectedCourseItem, setSelectedCourseItem] = useState({ title: 'Maximo Builder Bundle', type: 'combo' });
     const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
     const [submitStatus, setSubmitStatus] = useState(null); // 'submitting' | 'success' | 'error'
+
+    // Prevent background scrolling when modal is open
+    useEffect(() => {
+        if (enquiryModalOpen) {
+            const originalOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            return () => {
+                document.body.style.overflow = originalOverflow;
+            };
+        }
+    }, [enquiryModalOpen]);
 
     // Typewriter Rotating Taglines for Courses
     const courseTickers = [
@@ -622,15 +634,22 @@ const Courses = () => {
             </section>
 
             {/* Enrollment / Enquiry Modal */}
-            {enquiryModalOpen && (
-                <div className="modal-backdrop-blur animate-fade-in">
+            {enquiryModalOpen && typeof document !== 'undefined' && createPortal(
+                <div 
+                    className="modal-backdrop-blur animate-fade-in"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            setEnquiryModalOpen(false);
+                        }
+                    }}
+                >
                     <div className="modal-glass-card glass-card">
                         <div className="modal-head">
                             <div>
                                 <span className="badge-pill cyan">{selectedCourseItem.type.toUpperCase()} ENROLMENT</span>
                                 <h2 style={{ marginTop: '0.4rem' }}>{selectedCourseItem.title}</h2>
                             </div>
-                            <button className="modal-close-icon" onClick={() => setEnquiryModalOpen(false)}>
+                            <button className="modal-close-icon" onClick={() => setEnquiryModalOpen(false)} aria-label="Close modal">
                                 <X size={20} />
                             </button>
                         </div>
@@ -722,7 +741,8 @@ const Courses = () => {
                             </form>
                         )}
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

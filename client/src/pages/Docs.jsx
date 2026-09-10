@@ -4,10 +4,143 @@ import {
     BookOpen, Search, X, ChevronRight, ChevronDown, CheckCircle2, 
     Copy, Check, ArrowLeft, ArrowRight, ExternalLink, Sparkles, 
     FileCode, Server, Terminal, Shield, Cpu, Layers, Menu, CornerDownRight,
-    Languages, Globe
+    Languages, Globe, Lock, LogIn, UserPlus, Zap, ShieldCheck, Database
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { docsToc, docsPages } from '../data/docsData';
 import './Docs.css';
+
+/**
+ * Accurately truncates HTML to show 50% of the readable content on any page.
+ * Safely parses the DOM tree, preserves page headers, and trims inner sections/blocks.
+ */
+function truncateHtmlToFiftyPercent(rawHtml, ratio = 0.5) {
+    if (!rawHtml || typeof rawHtml !== 'string') return '';
+    if (typeof window === 'undefined' || typeof DOMParser === 'undefined') return rawHtml;
+
+    try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<div>${rawHtml}</div>`, 'text/html');
+        const container = doc.body.firstElementChild;
+        if (!container) return rawHtml;
+
+        // Helper to truncate a list of sibling nodes by text weight or element count
+        const truncateChildrenList = (parent, keepRatio = 0.5) => {
+            const children = Array.from(parent.children);
+            if (children.length <= 1) return false;
+
+            // Calculate weight of each child
+            const weights = children.map(c => Math.max(20, (c.textContent || '').trim().length));
+            const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+            const targetWeight = totalWeight * keepRatio;
+
+            let accumulated = 0;
+            let keepIndex = 1;
+
+            for (let i = 0; i < children.length; i++) {
+                accumulated += weights[i];
+                keepIndex = i + 1;
+                if (accumulated >= targetWeight) {
+                    break;
+                }
+            }
+
+            // Keep at least 1 element, at most children.length - 1
+            const finalCount = Math.max(1, Math.min(keepIndex, Math.ceil(children.length * keepRatio)));
+            
+            // Remove the remaining children
+            while (parent.children.length > finalCount) {
+                parent.removeChild(parent.lastElementChild);
+            }
+            return true;
+        };
+
+        // Case 1: Page has <section> tags
+        const sections = Array.from(container.querySelectorAll('section'));
+        if (sections.length > 1) {
+            const secWeights = sections.map(s => Math.max(50, (s.textContent || '').trim().length));
+            const totalSecWeight = secWeights.reduce((a, b) => a + b, 0);
+            const targetSecWeight = totalSecWeight * ratio;
+
+            let currentWeight = 0;
+            let keepSecIndex = 1;
+            for (let i = 0; i < sections.length; i++) {
+                currentWeight += secWeights[i];
+                keepSecIndex = i + 1;
+                if (currentWeight >= targetSecWeight) break;
+            }
+
+            const safeKeepSecs = Math.max(1, Math.min(keepSecIndex, Math.ceil(sections.length * ratio)));
+            
+            // If keeping only the first section of many, also truncate inside it if it's large
+            if (safeKeepSecs === 1 && sections[0].children.length > 4) {
+                truncateChildrenList(sections[0], 0.6);
+            }
+
+            // Remove subsequent sections
+            for (let i = safeKeepSecs; i < sections.length; i++) {
+                if (sections[i].parentNode) {
+                    sections[i].parentNode.removeChild(sections[i]);
+                }
+            }
+        } else if (sections.length === 1) {
+            // Single section containing all the page content: truncate its inner children
+            const sec = sections[0];
+            if (sec.children.length > 1) {
+                truncateChildrenList(sec, ratio);
+            }
+        } else {
+            // Case 2: No <section> tags (e.g. portal grid, raw div lists, tables)
+            // Filter out top-level header tags (h1, .page-subtitle) from truncation calculations
+            const directChildren = Array.from(container.children);
+            const contentChildren = directChildren.filter(el => 
+                !el.matches('h1, h2.page-title, p.page-subtitle')
+            );
+
+            if (contentChildren.length > 1) {
+                // Truncate content children
+                const weights = contentChildren.map(c => Math.max(20, (c.textContent || '').trim().length));
+                const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+                const targetWeight = totalWeight * ratio;
+
+                let acc = 0;
+                let keepIndex = 1;
+                for (let i = 0; i < contentChildren.length; i++) {
+                    acc += weights[i];
+                    keepIndex = i + 1;
+                    if (acc >= targetWeight) break;
+                }
+
+                const finalKeep = Math.max(1, Math.min(keepIndex, Math.ceil(contentChildren.length * ratio)));
+                for (let i = finalKeep; i < contentChildren.length; i++) {
+                    if (contentChildren[i].parentNode) {
+                        contentChildren[i].parentNode.removeChild(contentChildren[i]);
+                    }
+                }
+            } else if (contentChildren.length === 1 && contentChildren[0].children.length > 1) {
+                // Nested container (e.g. .portal-grid or .mif-doc-page)
+                truncateChildrenList(contentChildren[0], ratio);
+            }
+        }
+
+        // Special handling if a <table> is kept: also limit table rows to 50%
+        const tables = container.querySelectorAll('table.ibm-data-table, table');
+        tables.forEach(table => {
+            const tbody = table.querySelector('tbody');
+            if (tbody && tbody.children.length > 2) {
+                const keepRows = Math.max(1, Math.ceil(tbody.children.length * 0.5));
+                while (tbody.children.length > keepRows) {
+                    tbody.removeChild(tbody.lastElementChild);
+                }
+            }
+        });
+
+        return container.innerHTML;
+    } catch (err) {
+        console.error('Error truncating docs HTML:', err);
+        return rawHtml;
+    }
+}
 
 const sectionIcons = {
     'sectionPart1': Server,
@@ -17,6 +150,8 @@ const sectionIcons = {
     'sectionPart5': Layers,
     'sectionPart6': Shield,
     'sectionPart7': FileCode,
+    'sectionPart8': Zap,
+    'sectionPart9': Database,
     'default': BookOpen
 };
 
@@ -24,6 +159,7 @@ const Docs = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const contentRef = useRef(null);
+    const { isAuthenticated, user } = useAuth();
 
     // Initial page based on URL hash or default to 'overview'
     const getInitialPage = () => {
@@ -107,6 +243,7 @@ const Docs = () => {
         if (contentRef.current) {
             contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
         }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const toggleSection = (secId) => {
@@ -196,13 +333,53 @@ const Docs = () => {
         isHinglish: isHinglishActive
     };
 
-    // Expose navigateToHash on window for inline HTML onclick handlers
+    // Safe 50% Preview truncation for unauthenticated guests
+    const displayHtml = useMemo(() => {
+        if (isAuthenticated) {
+            return currentPageData.html;
+        }
+        return truncateHtmlToFiftyPercent(currentPageData.html, 0.5);
+    }, [currentPageData.html, isAuthenticated]);
+
+    // Expose helper functions on window for inline HTML onclick handlers
     useEffect(() => {
         window.navigateToHash = (hash) => {
             handleSelectPage(hash);
         };
+        window.copyText = (text, btnElement) => {
+            if (text && navigator.clipboard) {
+                navigator.clipboard.writeText(text);
+                if (btnElement) {
+                    const originalHtml = btnElement.innerHTML;
+                    btnElement.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                    btnElement.style.color = '#10b981';
+                    setTimeout(() => {
+                        btnElement.innerHTML = originalHtml;
+                        btnElement.style.color = '';
+                    }, 2000);
+                }
+            }
+        };
+        window.switchTab = (tabId, btnElement) => {
+            if (!btnElement) return;
+            const tabsContainer = btnElement.closest('.ibm-tabs') || btnElement.parentElement;
+            if (tabsContainer) {
+                tabsContainer.querySelectorAll('.ibm-tab-btn').forEach(btn => btn.classList.remove('active'));
+                btnElement.classList.add('active');
+            }
+            const container = btnElement.closest('section') || btnElement.closest('.docs-article-body') || document;
+            container.querySelectorAll('.ibm-tab-pane').forEach(pane => {
+                if (pane.id === `tab-${tabId}` || pane.id === tabId) {
+                    pane.classList.add('active');
+                } else if (pane.id.startsWith('tab-') || pane.classList.contains('ibm-tab-pane')) {
+                    pane.classList.remove('active');
+                }
+            });
+        };
         return () => {
             delete window.navigateToHash;
+            delete window.copyText;
+            delete window.switchTab;
         };
     }, []);
 
@@ -262,9 +439,8 @@ const Docs = () => {
                     </div>
                     <div>
                         <h1 className="docs-brand-name">
-                            Architecture &amp; Automation <span>Knowledge Base</span>
+                            Knowledge <span>Base</span>
                         </h1>
-                        <span className="docs-brand-sub">Curated Technical Blueprints, OSLC REST APIs &amp; Maximo Scripts</span>
                     </div>
                 </div>
 
@@ -446,24 +622,44 @@ const Docs = () => {
                                 <span className="breadcrumb-active">{currentPageData.title}</span>
                             </div>
 
-                            {/* Live Language Active Status Badge */}
-                            {hasTranslation ? (
-                                <button 
-                                    type="button"
-                                    className="docs-lang-badge-pill dual-active" 
-                                    onClick={() => handleSetLanguage(language === 'en' ? 'hi' : 'en')}
-                                    title="Click to toggle language"
-                                >
-                                    <Languages size={14} />
-                                    <span>{language === 'hi' ? '🇮🇳 Hinglish Version' : '🇬🇧 English Version'}</span>
-                                    <span className="lang-badge-switch-action">Switch to {language === 'hi' ? 'English' : 'Hinglish'}</span>
-                                </button>
-                            ) : (
-                                <div className="docs-lang-badge-pill mono-active" title="This chapter is available in standard English">
-                                    <Globe size={14} />
-                                    <span>English Edition</span>
-                                </div>
-                            )}
+                            <div className="docs-meta-actions-cluster">
+                                {/* Auth Access Status Pill */}
+                                {!isAuthenticated ? (
+                                    <button 
+                                        type="button"
+                                        className="docs-auth-status-pill locked"
+                                        onClick={() => navigate(`/login?redirect=${encodeURIComponent('/docs#' + activePageId)}`)}
+                                        title="Click to sign in and unlock 100% full content"
+                                    >
+                                        <Lock size={13} />
+                                        <span>50% Preview (Login to Unlock)</span>
+                                    </button>
+                                ) : (
+                                    <div className="docs-auth-status-pill unlocked" title={`Signed in as ${user?.username || 'Member'}`}>
+                                        <ShieldCheck size={14} />
+                                        <span>Full Access Unlocked</span>
+                                    </div>
+                                )}
+
+                                {/* Live Language Active Status Badge */}
+                                {hasTranslation ? (
+                                    <button 
+                                        type="button"
+                                        className="docs-lang-badge-pill dual-active" 
+                                        onClick={() => handleSetLanguage(language === 'en' ? 'hi' : 'en')}
+                                        title="Click to toggle language"
+                                    >
+                                        <Languages size={14} />
+                                        <span>{language === 'hi' ? '🇮🇳 Hinglish Version' : '🇬🇧 English Version'}</span>
+                                        <span className="lang-badge-switch-action">Switch to {language === 'hi' ? 'English' : 'Hinglish'}</span>
+                                    </button>
+                                ) : (
+                                    <div className="docs-lang-badge-pill mono-active" title="This chapter is available in standard English">
+                                        <Globe size={14} />
+                                        <span>English Edition</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Page Header */}
@@ -474,11 +670,98 @@ const Docs = () => {
                             )}
                         </div>
 
-                        {/* Rendered HTML Guide Content */}
-                        <div 
-                            className="docs-article-body"
-                            dangerouslySetInnerHTML={{ __html: currentPageData.html }}
-                        />
+                        {/* Rendered HTML Guide Content & 50% Preview Barrier */}
+                        <div className={`docs-article-body-wrapper ${!isAuthenticated ? 'has-preview-lock' : ''}`}>
+                            <div 
+                                className={`docs-article-body ${!isAuthenticated ? 'docs-preview-truncated' : ''}`}
+                                dangerouslySetInnerHTML={{ __html: displayHtml }}
+                            />
+
+                            {/* 50% Lock Barrier / Paywall Card for Non-Logged-In Users */}
+                            {!isAuthenticated && (
+                                <div className="docs-paywall-barrier">
+                                    <div className="docs-paywall-gradient-fade" />
+                                    
+                                    <div className="docs-paywall-card">
+                                        <div className="docs-paywall-badge">
+                                            <Lock size={14} />
+                                            <span>{language === 'hi' ? '50% FREE PREVIEW LIMIT' : '50% FREE PREVIEW LIMIT'}</span>
+                                        </div>
+
+                                        <div className="docs-paywall-progress-wrap">
+                                            <div className="docs-paywall-progress-info">
+                                                <span className="progress-label">
+                                                    {language === 'hi' ? '📖 50% Preview Read' : '📖 50% Preview Read'}
+                                                </span>
+                                                <span className="progress-lock-label">
+                                                    {language === 'hi' ? '🔒 Baki 50% Locked' : '🔒 Remaining 50% Locked'}
+                                                </span>
+                                            </div>
+                                            <div className="docs-paywall-progress-bar">
+                                                <div className="docs-paywall-progress-fill" style={{ width: '50%' }}></div>
+                                            </div>
+                                        </div>
+
+                                        <h3 className="docs-paywall-title">
+                                            {language === 'hi' 
+                                                ? 'Baki 50% Guide & Scripts Padhne Ke Liye Login Karein' 
+                                                : 'Sign In to Unlock the Complete Documentation'}
+                                        </h3>
+
+                                        <p className="docs-paywall-desc">
+                                            {language === 'hi'
+                                                ? 'Ye enterprise documentation hamare registered members ke liye completely free hai. Apne free CS Corporation / Chaudhary & Sons account se login karke complete blueprints, Maximo automation scripts aur OSLC REST APIs access karein.'
+                                                : 'This comprehensive technical blueprint is completely free for registered community members. Log in or create a free account to unlock full architecture guides, copy-paste automation scripts, and OSLC REST API specs.'}
+                                        </p>
+
+                                        <div className="docs-paywall-perks-grid">
+                                            <div className="paywall-perk-item">
+                                                <CheckCircle2 size={16} className="perk-icon" />
+                                                <span>{language === 'hi' ? '43+ Complete Architecture Guides' : '43+ Complete Technical Blueprints'}</span>
+                                            </div>
+                                            <div className="paywall-perk-item">
+                                                <CheckCircle2 size={16} className="perk-icon" />
+                                                <span>{language === 'hi' ? 'Maximo & OSLC Automation Scripts' : 'Ready-to-use Automation Scripts'}</span>
+                                            </div>
+                                            <div className="paywall-perk-item">
+                                                <CheckCircle2 size={16} className="perk-icon" />
+                                                <span>{language === 'hi' ? 'English & Hinglish Dual Editions' : 'English & Hinglish Dual Editions'}</span>
+                                            </div>
+                                            <div className="paywall-perk-item">
+                                                <CheckCircle2 size={16} className="perk-icon" />
+                                                <span>{language === 'hi' ? 'Interactive Diagnostic Trackers' : 'Interactive Diagnostic Checklists'}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="docs-paywall-cta-row">
+                                            <button 
+                                                type="button"
+                                                className="docs-paywall-btn-primary"
+                                                onClick={() => navigate(`/login?redirect=${encodeURIComponent('/docs#' + activePageId)}`)}
+                                            >
+                                                <LogIn size={18} />
+                                                <span>{language === 'hi' ? 'Login Karke Full Docs Unlock Karein' : 'Login to Unlock Full Guide'}</span>
+                                                <ArrowRight size={16} />
+                                            </button>
+                                            
+                                            <button 
+                                                type="button"
+                                                className="docs-paywall-btn-secondary"
+                                                onClick={() => navigate(`/login?mode=signup&redirect=${encodeURIComponent('/docs#' + activePageId)}`)}
+                                            >
+                                                <UserPlus size={18} />
+                                                <span>{language === 'hi' ? 'Naya Free Account Banayein' : 'Create Free Account'}</span>
+                                            </button>
+                                        </div>
+
+                                        <div className="docs-paywall-guarantee">
+                                            <Zap size={14} />
+                                            <span>{language === 'hi' ? '100% Free Access • No Credit Card Required • Instant Unlock' : '100% Free Access • Instant Unlock • No Credit Card Required'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
 
                         {/* Smart Next / Previous Footer Navigation */}
                         <div className="docs-footer-pagination">

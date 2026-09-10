@@ -175,25 +175,80 @@
     width: 16px;
 }
 
-/* Sunset Orange Pill Contact Button */
-.zain-contact-white-pill {
-    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
-    color: #ffffff !important;
-    font-size: 15px;
-    font-weight: 700;
-    text-decoration: none;
-    padding: 10px 26px;
-    border-radius: 9999px;
-    display: inline-flex;
+/* User Profile Circular Avatar Icon in Top Header */
+.nav-user-avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: #ffffff;
+    display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 1.05rem;
+    font-weight: 850;
+    text-transform: uppercase;
+    text-decoration: none;
+    user-select: none;
+    box-shadow: 0 3px 12px rgba(249, 115, 22, 0.3);
+    border: 2px solid #ffffff;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
-.zain-contact-white-pill:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(249, 115, 22, 0.45);
+.nav-user-avatar-circle:hover {
+    transform: translateY(-1px) scale(1.08);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.45);
+    border-color: #fed7aa;
+}
+
+/* Guest Pill (when unauthenticated) */
+.nav-user-pill.is-guest {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    font-size: 0.88rem;
+    font-weight: 750;
+    text-decoration: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+    user-select: none;
+    background: #ffffff;
+    border: 1.5px solid #e4e4e7;
+    color: #52525b;
+}
+
+.nav-user-pill.is-guest:hover {
+    border-color: #ea580c;
+    color: #ea580c;
+    background: #fff7ed;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.15);
+}
+
+.user-dot-guest {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #a1a1aa;
+    box-shadow: 0 0 4px rgba(161, 161, 170, 0.5);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.nav-user-pill.is-guest:hover .user-dot-guest {
+    background: #f97316;
+    box-shadow: 0 0 6px rgba(249, 115, 22, 0.6);
+}
+
+.user-pill-name {
+    font-size: 0.88rem;
+    font-weight: 750;
+    letter-spacing: -0.01em;
 }
 
 /* Navigation Menu: Desktop Floating Dropdown & Mobile Fullscreen Overlay */
@@ -335,44 +390,6 @@
 .dropdown-item-link.admin-highlight {
     background: rgba(234, 88, 12, 0.04);
     border: 1px dashed rgba(234, 88, 12, 0.3);
-}
-
-/* User Quick Status Pill in Header */
-.nav-user-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 6px 14px;
-    background: rgba(0, 0, 0, 0.04);
-    border: 1px solid #e4e4e7;
-    border-radius: 9999px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #09090b;
-}
-
-.user-dot-online {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #10b981;
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
-}
-
-.user-pill-name {
-    font-size: 0.82rem;
-    font-weight: 700;
-}
-
-.user-pill-admin-tag {
-    background: linear-gradient(135deg, #ea580c, #f97316);
-    color: #ffffff;
-    font-size: 0.60rem;
-    font-weight: 800;
-    padding: 2px 6px;
-    border-radius: 9999px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
 }
 
 /* Dropdown Auth Section (Login / Signup / Logout) */
@@ -630,9 +647,20 @@
         gap: 12px;
     }
 
-    .zain-contact-white-pill {
-        padding: 8px 16px;
-        font-size: 13px;
+    .nav-user-avatar-circle {
+        width: 36px;
+        height: 36px;
+        font-size: 0.95rem;
+    }
+
+    .nav-user-pill {
+        padding: 7px 14px;
+        font-size: 0.80rem;
+        gap: 6px;
+    }
+
+    .user-pill-name {
+        font-size: 0.80rem;
     }
 
     /* Mobile Fullscreen Overlay */
@@ -699,9 +727,20 @@
         gap: 8px;
     }
 
-    .zain-contact-white-pill {
+    .nav-user-avatar-circle {
+        width: 33px;
+        height: 33px;
+        font-size: 0.88rem;
+    }
+
+    .nav-user-pill {
         padding: 6px 12px;
-        font-size: 12px;
+        font-size: 0.76rem;
+        gap: 5px;
+    }
+
+    .user-pill-name {
+        font-size: 0.76rem;
     }
 
     .two-lines-icon {

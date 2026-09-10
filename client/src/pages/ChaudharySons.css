@@ -891,8 +891,24 @@
     font-size: 0.86rem;
     font-weight: 700;
     color: #059669;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+    padding: 10px 14px;
     text-align: center;
-    margin: 4px 0 0 0;
+    margin: 6px 0 0 0;
+}
+
+.cs-form-error {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #dc2626;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 10px 14px;
+    text-align: center;
+    margin: 6px 0 0 0;
 }
 
 /* --------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
     Lock, User, AlertCircle, Mail, Phone, UserPlus, 
@@ -9,7 +9,13 @@ import Logo from '../components/Logo';
 import './Login.css';
 
 const Login = () => {
-    const [isLogin, setIsLogin] = useState(true);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const searchParams = new URLSearchParams(location.search);
+    const redirectUrl = searchParams.get('redirect') || location.state?.from || '';
+    const initialMode = searchParams.get('mode');
+
+    const [isLogin, setIsLogin] = useState(initialMode !== 'signup');
     const [formData, setFormData] = useState({
         username: '',
         password: '',
@@ -28,7 +34,6 @@ const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const { login, signup, verifyOtp, resendOtp } = useAuth();
-    const navigate = useNavigate();
 
     // Countdown timer for Resend OTP
     useEffect(() => {
@@ -63,7 +68,10 @@ const Login = () => {
             if (isLogin) {
                 const res = await login(formData.username, formData.password);
                 if (res.success) {
-                    navigate(res.role === 'admin' ? '/admin' : '/');
+                    const target = res.role === 'admin' 
+                        ? '/admin' 
+                        : (redirectUrl ? (redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`) : '/');
+                    navigate(target);
                 } else if (res.requireOtp) {
                     // Account exists but unverified
                     setOtpEmail(res.email || formData.username);
@@ -121,7 +129,10 @@ const Login = () => {
         try {
             const res = await verifyOtp(otpEmail, otp);
             if (res.success) {
-                navigate(res.role === 'admin' ? '/admin' : '/');
+                const target = res.role === 'admin' 
+                    ? '/admin' 
+                    : (redirectUrl ? (redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`) : '/');
+                navigate(target);
             } else {
                 setError(res.message || 'Invalid or expired OTP');
             }

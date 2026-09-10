@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Articles from './pages/Articles';
 import ArticleDetail from './pages/ArticleDetail';
@@ -39,6 +40,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <ThemeProvider>
         <AuthProvider>
           <ArticleProvider>

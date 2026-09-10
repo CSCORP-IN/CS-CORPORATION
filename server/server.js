@@ -11,7 +11,7 @@ import bcrypt from 'bcryptjs';
 import Article from './models/Article.js';
 import User from './models/User.js';
 import Enquiry from './models/Enquiry.js';
-import { sendOTPEmail } from './utils/emailService.js';
+import { sendOTPEmail, sendContactEmail, sendEnquiryEmail } from './utils/emailService.js';
 
 dotenv.config();
 
@@ -89,12 +89,16 @@ app.use((req, res, next) => {
 });
 
 // MongoDB Connection
-mongoose.connect(MONGODB_URI)
-    .then(() => console.log('✅ Connected to MongoDB Atlas'))
-    .catch(err => {
-        console.error('❌ MongoDB Connection Error:', err);
-        console.error('Make sure you have replaced <db_password> in the .env file and your IP is whitelisted in Atlas.');
-    });
+if (MONGODB_URI) {
+    mongoose.connect(MONGODB_URI)
+        .then(() => console.log('✅ Connected to MongoDB Atlas'))
+        .catch(err => {
+            console.error('❌ MongoDB Connection Error:', err.message);
+            console.error('Make sure you have replaced <db_password> in the .env file and your IP is whitelisted in Atlas.');
+        });
+} else {
+    console.warn('⚠️ MONGODB_URI is not set in environment. Running in mock/stateless mode.');
+}
 
 // Create uploads directory if it doesn't exist
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
@@ -569,6 +573,60 @@ app.put('/api/user/change-password', async (req, res) => {
     }
 });
 
+// Contact Form Route (Connect with us & general inquiries)
+app.post('/api/contact', async (req, res) => {
+    try {
+        const { name, email, phone, subject, message } = req.body;
+        if (!name || !email || !message) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Name, email, and message are required.' 
+            });
+        }
+
+        const formattedSubject = subject || 'General Portal Connect';
+        let savedId = null;
+
+        // Persist message in MongoDB if connected
+        if (mongoose.connection.readyState === 1) {
+            try {
+                const savedEnquiry = await Enquiry.create({
+                    name: name.trim(),
+                    email: email.trim().toLowerCase(),
+                    phone: phone ? phone.trim() : undefined,
+                    selectedItem: formattedSubject,
+                    itemType: 'contact',
+                    message: message.trim()
+                });
+                savedId = savedEnquiry._id;
+            } catch (dbErr) {
+                console.error('Database write error (Enquiry.create):', dbErr.message);
+            }
+        }
+
+        // Trigger email dispatch to admin@cscorp.in and auto-confirmation to user
+        sendContactEmail({
+            name: name.trim(),
+            email: email.trim(),
+            phone: phone ? phone.trim() : undefined,
+            subject: formattedSubject,
+            message: message.trim()
+        }).catch(err => console.error('Background contact email error:', err));
+
+        res.status(200).json({
+            success: true,
+            message: 'Your message has been sent successfully! Our team will contact you soon.',
+            id: savedId
+        });
+    } catch (error) {
+        console.error('Contact submission error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error while sending message. Please try again later.' 
+        });
+    }
+});
+
 // Course Enquiry Routes
 app.post('/api/enquiries', async (req, res) => {
     try {
@@ -576,15 +634,38 @@ app.post('/api/enquiries', async (req, res) => {
         if (!name || !email || !selectedItem) {
             return res.status(400).json({ success: false, message: 'Name, email, and course selection are required.' });
         }
-        const newEnquiry = await Enquiry.create({
-            name,
-            email,
-            phone,
+
+        let newEnquiry = null;
+        if (mongoose.connection.readyState === 1) {
+            try {
+                newEnquiry = await Enquiry.create({
+                    name: name.trim(),
+                    email: email.trim().toLowerCase(),
+                    phone: phone ? phone.trim() : undefined,
+                    selectedItem,
+                    itemType: itemType || 'module',
+                    message: message ? message.trim() : undefined
+                });
+            } catch (dbErr) {
+                console.error('Database write error (Enquiry.create):', dbErr.message);
+            }
+        }
+
+        // Send email notification to admin & student
+        sendEnquiryEmail({
+            name: name.trim(),
+            email: email.trim(),
+            phone: phone ? phone.trim() : undefined,
             selectedItem,
             itemType: itemType || 'module',
-            message
+            message: message ? message.trim() : undefined
+        }).catch(err => console.error('Background enquiry email error:', err));
+
+        res.status(201).json({ 
+            success: true, 
+            enquiry: newEnquiry, 
+            message: 'Enquiry submitted successfully!' 
         });
-        res.status(201).json({ success: true, enquiry: newEnquiry, message: 'Enquiry submitted successfully!' });
     } catch (error) {
         console.error('Enquiry submission error:', error);
         res.status(500).json({ success: false, message: 'Server error while submitting enquiry.' });

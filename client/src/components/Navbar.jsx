@@ -62,22 +62,26 @@ const Navbar = () => {
                     <Logo />
                 </NavLink>
 
-                {/* Right: User Status + Hamburger + Contact Pill */}
+                {/* Right: User / Guest Status Pill + Hamburger Menu Button (Rightmost) */}
                 <div className="zain-right-group">
-                    {/* Logged-in User Quick Pill */}
-                    {isAuthenticated && (
-                        <NavLink to="/profile" className="nav-user-pill" title="My Profile & Purchases">
-                            <span className="user-dot-online"></span>
-                            <span className="user-pill-name">
-                                {user?.firstName || user?.name || user?.username || 'User'}
-                            </span>
-                            {user?.role === 'admin' && (
-                                <span className="user-pill-admin-tag">Admin</span>
-                            )}
+                    {/* User Profile Avatar Circle (if logged in) or Guest Pill (if logged off) */}
+                    {isAuthenticated ? (
+                        <NavLink 
+                            to="/profile" 
+                            className="nav-user-avatar-circle" 
+                            title={`My Profile (${user?.firstName || user?.name || user?.username || 'User'})`}
+                            aria-label="My Profile"
+                        >
+                            {(user?.firstName?.[0] || user?.name?.[0] || user?.username?.[0] || 'U').toUpperCase()}
+                        </NavLink>
+                    ) : (
+                        <NavLink to="/login" className="nav-user-pill is-guest" title="Sign In / Register">
+                            <span className="user-dot-guest"></span>
+                            <span className="user-pill-name">Guest</span>
                         </NavLink>
                     )}
 
-                    {/* Two-Bar Hamburger Button */}
+                    {/* Two-Bar Hamburger Menu Button (Rightmost) */}
                     <button
                         className={`zain-hamburger-two-bars ${isOpen ? 'active' : ''}`}
                         onClick={() => setIsOpen(!isOpen)}
@@ -92,11 +96,6 @@ const Navbar = () => {
                             </div>
                         )}
                     </button>
-
-                    {/* Solid White Pill Contact Button */}
-                    <a href="mailto:admin@cscorp.in?subject=Enterprise%20Inquiry" className="zain-contact-white-pill">
-                        Contact
-                    </a>
                 </div>
             </div>
 

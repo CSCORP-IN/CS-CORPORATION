@@ -1,5 +1,6 @@
 import API_BASE_URL from '../config';
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { useArticles } from '../context/ArticleContext';
 import { useAuth } from '../context/AuthContext';
@@ -632,7 +633,7 @@ const Admin = () => {
             )}
 
             {/* Create/Edit User Modal Dialog */}
-            {showUserModal && (
+            {showUserModal && typeof document !== 'undefined' && createPortal(
                 <div className="modal-backdrop-blur animate-fade-in" onClick={handleCloseModal}>
                     <div className="modal-glass-card glass-card" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-head">
@@ -725,7 +726,8 @@ const Admin = () => {
                             </div>
                         </form>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

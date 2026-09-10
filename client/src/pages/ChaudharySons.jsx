@@ -64,18 +64,22 @@ const ChaudharySons = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...contactForm,
-                    subject: `[Chaudhary & Sons Parent Portal] ${contactForm.subject}`
+                    subject: contactForm.subject ? `[Chaudhary & Sons Parent Portal] ${contactForm.subject}` : '[Chaudhary & Sons Parent Portal] General Inquiry'
                 })
             });
-            if (response.ok) {
+            const data = await response.json().catch(() => ({}));
+            if (response.ok && data.success !== false) {
                 setContactStatus('success');
                 setContactForm({ name: '', email: '', subject: '', message: '' });
-                setTimeout(() => setContactStatus(null), 3000);
+                setTimeout(() => setContactStatus(null), 4000);
             } else {
                 setContactStatus('error');
+                setTimeout(() => setContactStatus(null), 5000);
             }
         } catch (err) {
+            console.error('Contact form error:', err);
             setContactStatus('error');
+            setTimeout(() => setContactStatus(null), 5000);
         }
     };
 
@@ -467,7 +471,10 @@ const ChaudharySons = () => {
                             <span>{contactStatus === 'submitting' ? 'Sending...' : 'Send Message'}</span>
                         </button>
                         {contactStatus === 'success' && (
-                            <p className="cs-form-success">Thank you! Your message has been sent successfully.</p>
+                            <p className="cs-form-success">✅ Thank you! Your message has been sent successfully. We'll be in touch soon.</p>
+                        )}
+                        {contactStatus === 'error' && (
+                            <p className="cs-form-error">❌ Unable to submit right now. Please reach out directly to <strong>admin@cscorp.in</strong>.</p>
                         )}
                     </form>
                 </div>
