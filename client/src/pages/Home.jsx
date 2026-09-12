@@ -218,7 +218,7 @@ const Home = () => {
                     {/* Top Status & Availability Pill */}
                     <div className="hero-status-pill animate-fade-in-down">
                         <span className="pulsing-live-dot"></span>
-                        <span className="status-text">AVAILABLE FOR ENTERPRISE ARCHITECTURE &amp; MAXIMO CONSULTING</span>
+                        <span className="status-text">AVAILABLE FOR ENTERPRISE ARCHITECTURE & MAXIMO CONSULTING</span>
                         <span className="status-divider">•</span>
                         <span className="status-year">EST. 2020</span>
                     </div>
@@ -228,7 +228,7 @@ const Home = () => {
                         <span className="brand-flank-line left"></span>
                         <div className="brand-title-badge">
                             <span className="brand-title-text">
-                                CHAUDHARY <span className="brand-ampersand">&amp;</span> SONS
+                                CHAUDHARY <span className="brand-ampersand">&</span> SONS
                             </span>
                         </div>
                         <span className="brand-flank-line right"></span>
@@ -485,9 +485,9 @@ const Home = () => {
                     <div className="section-header-wrap">
                         <div className="section-eyebrow">
                             <Briefcase size={16} color="#06b6d4" />
-                            <span>MAXIMO ACCELERATORS &amp; AI</span>
+                            <span>MAXIMO ACCELERATORS & AI</span>
                         </div>
-                        <h2 className="section-main-heading">Developer Innovation &amp; Automation Tools</h2>
+                        <h2 className="section-main-heading">Developer Innovation & Automation Tools</h2>
                         <p className="section-sub-copy">
                             Specialized internal tools, AI chatbots, and database configuration generators built to accelerate IBM Maximo development.
                         </p>
@@ -572,16 +572,16 @@ const Home = () => {
                                 <h3>Associate Consultant – IBM Maximo Developer</h3>
                                 <h4>Infosys Limited • Enterprise Solutions</h4>
                                 <p>
-                                    Designing, developing, customizing, enhancing, and supporting enterprise-grade <strong>IBM Maximo (7.6 &amp; MAS 8.x)</strong> solutions. 
+                                    Designing, developing, customizing, enhancing, and supporting enterprise-grade <strong>IBM Maximo (7.6 & MAS 8.x)</strong> solutions. 
                                     Engineering custom Java MBO classes, Field Validations, Workflows, Domains, Database Configurations, Application Designer logic, 
-                                    and high-throughput MIF integration pipelines using REST APIs, XML, and JSON queues with Oracle PL/SQL &amp; IBM Db2 database performance optimization.
+                                    and high-throughput MIF integration pipelines using REST APIs, XML, and JSON queues with Oracle PL/SQL & IBM Db2 database performance optimization.
                                 </p>
                                 <div className="circuit-tags">
                                     <span>IBM Maximo 7.6 / MAS 8</span>
-                                    <span>Java MBOs &amp; Cron Tasks</span>
+                                    <span>Java MBOs & Cron Tasks</span>
                                     <span>Jython Automation Scripts</span>
                                     <span>MIF Integration Bus</span>
-                                    <span>Oracle PL/SQL &amp; Db2</span>
+                                    <span>Oracle PL/SQL & Db2</span>
                                     <span>BIRT Reports</span>
                                 </div>
                             </div>
@@ -592,7 +592,7 @@ const Home = () => {
                             <div className="circuit-dot-pulse"></div>
                             <div className="circuit-card">
                                 <div className="circuit-date-badge">WIPRO LIMITED</div>
-                                <h3>Project Engineer – Java &amp; IBM Maximo Developer</h3>
+                                <h3>Project Engineer – Java & IBM Maximo Developer</h3>
                                 <h4>Wipro Limited • Enterprise Application Services</h4>
                                 <p>
                                     Developed, customized, and maintained core IBM Maximo modules, work order management workflows, and inventory tracking for enterprise clients. 
@@ -604,7 +604,7 @@ const Home = () => {
                                     <span>Jython Scripting</span>
                                     <span>Application Designer</span>
                                     <span>Database Configuration</span>
-                                    <span>Workflows &amp; Domains</span>
+                                    <span>Workflows & Domains</span>
                                 </div>
                             </div>
                         </div>
@@ -649,7 +649,7 @@ const Home = () => {
                             <Cpu size={16} color="#6366f1" />
                             <span>TECHNICAL ARSENAL</span>
                         </div>
-                        <h2 className="section-main-heading">Skills &amp; Enterprise Stack</h2>
+                        <h2 className="section-main-heading">Skills & Enterprise Stack</h2>
                         <p className="section-sub-copy">
                             Comprehensive proficiency spanning enterprise EAM suites, core backend engineering, and cloud systems.
                         </p>
@@ -685,9 +685,9 @@ const Home = () => {
                             </div>
                             <div className="skill-pills-wrap">
                                 <span className="skill-tag-pill">Java EE / Core Java</span>
-                                <span className="skill-tag-pill">Custom MBOs &amp; MboSets</span>
+                                <span className="skill-tag-pill">Custom MBOs & MboSets</span>
                                 <span className="skill-tag-pill">Spring Boot</span>
-                                <span className="skill-tag-pill">RESTful &amp; SOAP APIs</span>
+                                <span className="skill-tag-pill">RESTful & SOAP APIs</span>
                                 <span className="skill-tag-pill">Microservices Architecture</span>
                                 <span className="skill-tag-pill">Hibernate / JPA</span>
                             </div>
@@ -699,7 +699,7 @@ const Home = () => {
                                 <div className="cat-icon-box emerald">
                                     <Terminal size={22} color="#10b981" />
                                 </div>
-                                <h4>Automation &amp; Scripting</h4>
+                                <h4>Automation & Scripting</h4>
                             </div>
                             <div className="skill-pills-wrap">
                                 <span className="skill-tag-pill">Jython Scripting</span>
@@ -717,12 +717,12 @@ const Home = () => {
                                 <div className="cat-icon-box violet">
                                     <Database size={22} color="#a855f7" />
                                 </div>
-                                <h4>Integration &amp; Databases</h4>
+                                <h4>Integration & Databases</h4>
                             </div>
                             <div className="skill-pills-wrap">
                                 <span className="skill-tag-pill">MIF Framework</span>
                                 <span className="skill-tag-pill">JMS Queues / MEA</span>
-                                <span className="skill-tag-pill">Oracle 19c &amp; SQL Tuning</span>
+                                <span className="skill-tag-pill">Oracle 19c & SQL Tuning</span>
                                 <span className="skill-tag-pill">IBM Db2</span>
                                 <span className="skill-tag-pill">Apache Kafka</span>
                                 <span className="skill-tag-pill">XML / JSON Data Pipelines</span>
@@ -775,7 +775,7 @@ const Home = () => {
                                 </div>
                                 <div className="meta-item">
                                     <Shield size={16} color="#10b981" />
-                                    <span>Enterprise Non-Disclosure &amp; Security Compliant</span>
+                                    <span>Enterprise Non-Disclosure & Security Compliant</span>
                                 </div>
                             </div>
                         </div>

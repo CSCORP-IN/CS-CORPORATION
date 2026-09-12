@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
     BookOpen, Search, X, ChevronRight, ChevronDown, CheckCircle2, 
@@ -11,131 +12,100 @@ import { docsToc, docsPages } from '../data/docsData';
 import './Docs.css';
 
 /**
- * Accurately truncates HTML to show 50% of the readable content on any page.
- * Safely parses the DOM tree, preserves page headers, and trims inner sections/blocks.
+ * Fine-grained content-aware HTML truncation for exact preview ratios.
+ * Measures block-level content elements (headings, code blocks, tables, lists, callouts, paragraphs)
+ * and keeps exactly 60% of total content weight (locking the remaining 40%).
  */
-function truncateHtmlToFiftyPercent(rawHtml, ratio = 0.5) {
+function truncateHtmlToPreviewRatio(rawHtml, ratio = 0.6) {
     if (!rawHtml || typeof rawHtml !== 'string') return '';
     if (typeof window === 'undefined' || typeof DOMParser === 'undefined') return rawHtml;
 
     try {
         const parser = new DOMParser();
         const doc = parser.parseFromString(`<div>${rawHtml}</div>`, 'text/html');
-        const container = doc.body.firstElementChild;
-        if (!container) return rawHtml;
+        const root = doc.body.firstElementChild;
+        if (!root) return rawHtml;
 
-        // Helper to truncate a list of sibling nodes by text weight or element count
-        const truncateChildrenList = (parent, keepRatio = 0.5) => {
-            const children = Array.from(parent.children);
-            if (children.length <= 1) return false;
-
-            // Calculate weight of each child
-            const weights = children.map(c => Math.max(20, (c.textContent || '').trim().length));
-            const totalWeight = weights.reduce((sum, w) => sum + w, 0);
-            const targetWeight = totalWeight * keepRatio;
-
-            let accumulated = 0;
-            let keepIndex = 1;
-
-            for (let i = 0; i < children.length; i++) {
-                accumulated += weights[i];
-                keepIndex = i + 1;
-                if (accumulated >= targetWeight) {
-                    break;
-                }
-            }
-
-            // Keep at least 1 element, at most children.length - 1
-            const finalCount = Math.max(1, Math.min(keepIndex, Math.ceil(children.length * keepRatio)));
-            
-            // Remove the remaining children
-            while (parent.children.length > finalCount) {
-                parent.removeChild(parent.lastElementChild);
-            }
+        // Content block elements that make up the reading substance
+        const blockSelector = 'p, pre, .ibm-code-block, table, ul, ol, .ibm-callout, blockquote, div.portal-card, h2, h3, h4';
+        const allBlocks = Array.from(root.querySelectorAll(blockSelector)).filter(el => {
+            // Exclude main page titles/subtitles at root
+            if (el.matches('h1, h2.page-title, p.page-subtitle')) return false;
+            // Exclude blocks that are children of other content blocks (e.g. pre inside .ibm-code-block, p inside .ibm-callout)
+            if (el.closest('.ibm-code-block') && el !== el.closest('.ibm-code-block')) return false;
+            if (el.closest('.ibm-callout') && el !== el.closest('.ibm-callout')) return false;
+            if (el.closest('table') && el !== el.closest('table')) return false;
             return true;
-        };
+        });
 
-        // Case 1: Page has <section> tags
-        const sections = Array.from(container.querySelectorAll('section'));
-        if (sections.length > 1) {
-            const secWeights = sections.map(s => Math.max(50, (s.textContent || '').trim().length));
-            const totalSecWeight = secWeights.reduce((a, b) => a + b, 0);
-            const targetSecWeight = totalSecWeight * ratio;
+        if (allBlocks.length <= 1) {
+            return rawHtml;
+        }
 
-            let currentWeight = 0;
-            let keepSecIndex = 1;
-            for (let i = 0; i < sections.length; i++) {
-                currentWeight += secWeights[i];
-                keepSecIndex = i + 1;
-                if (currentWeight >= targetSecWeight) break;
-            }
+        // Calculate individual block weights
+        const blockWeights = allBlocks.map(el => {
+            const textLen = (el.textContent || '').trim().length;
+            if (el.matches('.ibm-code-block, pre')) return Math.max(textLen, 160);
+            if (el.matches('table')) return Math.max(textLen, 200);
+            if (el.matches('.ibm-callout')) return Math.max(textLen, 90);
+            if (el.matches('h2, h3, h4')) return 30;
+            return Math.max(textLen, 25);
+        });
 
-            const safeKeepSecs = Math.max(1, Math.min(keepSecIndex, Math.ceil(sections.length * ratio)));
-            
-            // If keeping only the first section of many, also truncate inside it if it's large
-            if (safeKeepSecs === 1 && sections[0].children.length > 4) {
-                truncateChildrenList(sections[0], 0.6);
-            }
+        const totalWeight = blockWeights.reduce((sum, w) => sum + w, 0);
+        const targetWeight = totalWeight * ratio;
 
-            // Remove subsequent sections
-            for (let i = safeKeepSecs; i < sections.length; i++) {
-                if (sections[i].parentNode) {
-                    sections[i].parentNode.removeChild(sections[i]);
-                }
-            }
-        } else if (sections.length === 1) {
-            // Single section containing all the page content: truncate its inner children
-            const sec = sections[0];
-            if (sec.children.length > 1) {
-                truncateChildrenList(sec, ratio);
-            }
-        } else {
-            // Case 2: No <section> tags (e.g. portal grid, raw div lists, tables)
-            // Filter out top-level header tags (h1, .page-subtitle) from truncation calculations
-            const directChildren = Array.from(container.children);
-            const contentChildren = directChildren.filter(el => 
-                !el.matches('h1, h2.page-title, p.page-subtitle')
-            );
+        let accumulated = 0;
+        let cutoffIndex = allBlocks.length - 1;
 
-            if (contentChildren.length > 1) {
-                // Truncate content children
-                const weights = contentChildren.map(c => Math.max(20, (c.textContent || '').trim().length));
-                const totalWeight = weights.reduce((sum, w) => sum + w, 0);
-                const targetWeight = totalWeight * ratio;
-
-                let acc = 0;
-                let keepIndex = 1;
-                for (let i = 0; i < contentChildren.length; i++) {
-                    acc += weights[i];
-                    keepIndex = i + 1;
-                    if (acc >= targetWeight) break;
-                }
-
-                const finalKeep = Math.max(1, Math.min(keepIndex, Math.ceil(contentChildren.length * ratio)));
-                for (let i = finalKeep; i < contentChildren.length; i++) {
-                    if (contentChildren[i].parentNode) {
-                        contentChildren[i].parentNode.removeChild(contentChildren[i]);
-                    }
-                }
-            } else if (contentChildren.length === 1 && contentChildren[0].children.length > 1) {
-                // Nested container (e.g. .portal-grid or .mif-doc-page)
-                truncateChildrenList(contentChildren[0], ratio);
+        for (let i = 0; i < allBlocks.length; i++) {
+            accumulated += blockWeights[i];
+            if (accumulated >= targetWeight) {
+                cutoffIndex = i;
+                break;
             }
         }
 
-        // Special handling if a <table> is kept: also limit table rows to 50%
-        const tables = container.querySelectorAll('table.ibm-data-table, table');
-        tables.forEach(table => {
-            const tbody = table.querySelector('tbody');
-            if (tbody && tbody.children.length > 2) {
-                const keepRows = Math.max(1, Math.ceil(tbody.children.length * 0.5));
+        // Ensure we keep at least 1 content block and at most allBlocks.length - 1
+        cutoffIndex = Math.max(0, Math.min(cutoffIndex, allBlocks.length - 1));
+        const cutoffElement = allBlocks[cutoffIndex];
+
+        // For tables that are kept, if a table has many rows, trim its tbody rows proportionately
+        const keptTables = allBlocks.slice(0, cutoffIndex + 1).filter(el => el.matches('table'));
+        keptTables.forEach(tbl => {
+            const tbody = tbl.querySelector('tbody');
+            if (tbody && tbody.children.length > 3) {
+                const keepRows = Math.max(2, Math.ceil(tbody.children.length * ratio));
                 while (tbody.children.length > keepRows) {
                     tbody.removeChild(tbody.lastElementChild);
                 }
             }
         });
 
-        return container.innerHTML;
+        // Traverse upwards from cutoffElement and delete subsequent siblings at every level
+        let curr = cutoffElement;
+        while (curr && curr !== root) {
+            let next = curr.nextElementSibling;
+            while (next) {
+                const toRemove = next;
+                next = next.nextElementSibling;
+                if (toRemove.parentNode) {
+                    toRemove.parentNode.removeChild(toRemove);
+                }
+            }
+            curr = curr.parentElement;
+        }
+
+        // Clean up empty section containers or dangling headings at the end
+        const sections = Array.from(root.querySelectorAll('section'));
+        sections.forEach(sec => {
+            const hasContent = sec.querySelector('p, pre, .ibm-code-block, table, ul, ol, .ibm-callout');
+            if (!hasContent && sec.parentNode) {
+                sec.parentNode.removeChild(sec);
+            }
+        });
+
+        return root.innerHTML;
     } catch (err) {
         console.error('Error truncating docs HTML:', err);
         return rawHtml;
@@ -197,12 +167,31 @@ const Docs = () => {
             });
         } else {
             initial['sectionPart1'] = true;
-            initial['sectionPart7'] = true;
         }
         return initial;
     });
 
     const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+    // Prevent background body scroll and allow ESC key to close mobile drawer
+    useEffect(() => {
+        if (mobileDrawerOpen) {
+            document.body.style.overflow = 'hidden';
+            const handleKeyDown = (e) => {
+                if (e.key === 'Escape') {
+                    setMobileDrawerOpen(false);
+                }
+            };
+            window.addEventListener('keydown', handleKeyDown);
+            return () => {
+                document.body.style.overflow = '';
+                window.removeEventListener('keydown', handleKeyDown);
+            };
+        } else {
+            document.body.style.overflow = '';
+        }
+    }, [mobileDrawerOpen]);
+
     const [checklistStatus, setChecklistStatus] = useState(() => {
         try {
             const saved = localStorage.getItem('chaudharydocs_checklist');
@@ -224,12 +213,12 @@ const Docs = () => {
         const hash = window.location.hash.replace('#', '');
         if (hash && docsPages[hash]) {
             setActivePageId(hash);
-            // Auto expand the parent section if not expanded
+            // Auto expand the parent section and collapse all others
+            const nextState = {};
             docsToc.forEach(sec => {
-                if (sec.items.some(item => item.id === hash)) {
-                    setExpandedSections(prev => ({ ...prev, [sec.id]: true }));
-                }
+                nextState[sec.id] = sec.items.some(item => item.id === hash);
             });
+            setExpandedSections(nextState);
             if (contentRef.current) {
                 contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -240,17 +229,37 @@ const Docs = () => {
         setActivePageId(pageId);
         window.location.hash = pageId;
         setMobileDrawerOpen(false);
+        // Expand active section and collapse other sections
+        const nextState = {};
+        docsToc.forEach(sec => {
+            nextState[sec.id] = sec.items.some(item => item.id === pageId);
+        });
+        setExpandedSections(nextState);
         if (contentRef.current) {
             contentRef.current.scrollTo({ top: 0, behavior: 'smooth' });
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    // Single-expand Accordion: Opening one section collapses previously opened sections
     const toggleSection = (secId) => {
-        setExpandedSections(prev => ({
-            ...prev,
-            [secId]: !prev[secId]
-        }));
+        setExpandedSections(prev => {
+            const isCurrentlyExpanded = !!prev[secId];
+            if (isCurrentlyExpanded) {
+                // If user clicks the currently open section, collapse it
+                return {
+                    ...prev,
+                    [secId]: false
+                };
+            } else {
+                // Collapse all other sections and expand only this one
+                const nextState = {};
+                docsToc.forEach(sec => {
+                    nextState[sec.id] = (sec.id === secId);
+                });
+                return nextState;
+            }
+        });
     };
 
     const handleToggleAllSections = () => {
@@ -333,13 +342,15 @@ const Docs = () => {
         isHinglish: isHinglishActive
     };
 
-    // Safe 50% Preview truncation for unauthenticated guests
+    const isOverviewPage = activePageId === 'overview' || currentPageData.id === 'overview';
+
+    // Safe 60% Preview truncation for unauthenticated guests (overview landing page is 100% free)
     const displayHtml = useMemo(() => {
-        if (isAuthenticated) {
+        if (isAuthenticated || isOverviewPage) {
             return currentPageData.html;
         }
-        return truncateHtmlToFiftyPercent(currentPageData.html, 0.5);
-    }, [currentPageData.html, isAuthenticated]);
+        return truncateHtmlToPreviewRatio(currentPageData.html, 0.6);
+    }, [currentPageData.html, isAuthenticated, isOverviewPage]);
 
     // Expose helper functions on window for inline HTML onclick handlers
     useEffect(() => {
@@ -429,189 +440,216 @@ const Docs = () => {
 
     const isAllExpanded = Object.values(expandedSections).every(Boolean);
 
-    return (
-        <div className="docs-master-container animate-fade-in">
-            {/* Top Hub Banner: Focus on Architecture & Knowledge */}
-            <div className="docs-brand-topbar">
-                <div className="docs-brand-title-wrap">
-                    <div className="docs-badge-icon">
-                        <BookOpen size={24} color="#f97316" />
-                    </div>
-                    <div>
-                        <h1 className="docs-brand-name">
-                            Knowledge <span>Base</span>
-                        </h1>
-                    </div>
-                </div>
-
-                {/* Language Switcher Toggle Pill */}
-                <div className="docs-lang-selector-wrap">
-                    <div className="docs-lang-toggle-pill" role="radiogroup" aria-label="Documentation Language">
+    // Render TOC Sidebar Content (Shared between desktop aside and mobile modal dialog)
+    const renderSidebarTreeContent = (isMobile = false) => (
+        <>
+            <div className="sidebar-tree-header">
+                <span className="sidebar-tree-title">TABLE OF CONTENTS</span>
+                <div className="sidebar-header-actions">
+                    <button 
+                        type="button" 
+                        className="sidebar-expand-all-btn"
+                        onClick={handleToggleAllSections}
+                    >
+                        {isAllExpanded ? 'Collapse All' : 'Expand All'}
+                    </button>
+                    <span className="sidebar-tree-count">{flatPageList.length}</span>
+                    {isMobile && (
                         <button 
-                            type="button"
-                            className={`docs-lang-btn ${language === 'en' ? 'active' : ''}`}
-                            onClick={() => handleSetLanguage('en')}
-                            title="English Edition (Default)"
+                            type="button" 
+                            className="sidebar-mobile-close-btn"
+                            onClick={() => setMobileDrawerOpen(false)}
+                            aria-label="Close Navigation"
                         >
-                            <span className="lang-flag">🇬🇧</span>
-                            <span>English</span>
-                        </button>
-                        <button 
-                            type="button"
-                            className={`docs-lang-btn ${language === 'hi' ? 'active' : ''}`}
-                            onClick={() => handleSetLanguage('hi')}
-                            title="Hinglish Edition (Hindi/English mix)"
-                        >
-                            <span className="lang-flag">🇮🇳</span>
-                            <span>Hinglish</span>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Search Bar Input */}
-                <div className="docs-search-shell">
-                    <Search size={18} className="docs-search-icon" />
-                    <input 
-                        type="text" 
-                        placeholder={language === 'hi' ? "31+ guides, scripts, APIs me search karein..." : "Search 43+ architecture guides, scripts, APIs..."}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    {searchQuery && (
-                        <button className="docs-clear-btn" onClick={() => setSearchQuery('')}>
-                            <X size={16} />
+                            <X size={18} />
                         </button>
                     )}
-
-                    {/* Quick Search Results Dropdown */}
-                    {searchQuery && (
-                        <div className="docs-search-results-dropdown">
-                            <div className="search-results-head">
-                                <span>Found {searchResults.length} {searchResults.length === 1 ? 'Guide' : 'Guides'}</span>
-                            </div>
-                            <div className="search-results-list">
-                                {searchResults.length > 0 ? (
-                                    searchResults.map(res => (
-                                        <button 
-                                            key={res.id} 
-                                            className="search-res-item"
-                                            onClick={() => {
-                                                handleSelectPage(res.id);
-                                                setSearchQuery('');
-                                            }}
-                                        >
-                                            <div className="search-res-title">{res.title}</div>
-                                            {res.subtitle && <div className="search-res-sub">{res.subtitle}</div>}
-                                        </button>
-                                    ))
-                                ) : (
-                                    <div className="search-res-empty">No documentation guides match "{searchQuery}"</div>
-                                )}
-                            </div>
-                        </div>
-                    )}
                 </div>
-
-                {/* Mobile Sidebar Drawer Toggle */}
-                <button 
-                    className="docs-mobile-toc-toggle"
-                    onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
-                >
-                    <Menu size={20} />
-                    <span>Topics ({flatPageList.length})</span>
-                </button>
             </div>
 
-            {/* Mobile Drawer Backdrop */}
-            {mobileDrawerOpen && (
-                <div 
-                    className="docs-drawer-backdrop" 
-                    onClick={() => setMobileDrawerOpen(false)} 
-                    aria-hidden="true"
-                />
+            <div className="sidebar-tree-scroll">
+                {docsToc.map((sec, sIdx) => {
+                    const IconComp = sectionIcons[sec.id] || sectionIcons['default'];
+                    const isExpanded = expandedSections[sec.id];
+                    const hasActive = sec.items.some(it => it.id === activePageId);
+                    const sectionDisplayTitle = (language === 'hi' && sec.title_hi) ? sec.title_hi : sec.title;
+
+                    return (
+                        <div key={sec.id || sIdx} className={`toc-accordion-section ${isExpanded ? 'expanded' : 'collapsed'}`}>
+                            <button 
+                                type="button"
+                                className={`toc-accordion-header ${hasActive ? 'has-active' : ''}`}
+                                onClick={() => toggleSection(sec.id)}
+                            >
+                                <div className="accordion-title-left">
+                                    <IconComp size={16} className="accordion-icon" />
+                                    <span>{sectionDisplayTitle}</span>
+                                </div>
+                                <ChevronRight size={16} className={`accordion-arrow ${isExpanded ? 'rotated' : ''}`} />
+                            </button>
+
+                            {isExpanded && (
+                                <ul className="toc-accordion-items">
+                                    {sec.items.map(item => {
+                                        const isActive = item.id === activePageId;
+                                        const itemDisplayLabel = (language === 'hi' && item.label_hi) ? item.label_hi : item.label;
+
+                                        return (
+                                            <li key={item.id}>
+                                                <button 
+                                                    className={`toc-page-link ${isActive ? 'active' : ''}`}
+                                                    onClick={() => handleSelectPage(item.id)}
+                                                >
+                                                    <div className="link-indicator-dot"></div>
+                                                    <span className="link-label">{itemDisplayLabel}</span>
+                                                    {item.label_hi && (
+                                                        <span className="bilingual-indicator" title="Available in English & Hinglish">HI</span>
+                                                    )}
+                                                </button>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        </>
+    );
+
+    return (
+        <div className="docs-master-container animate-fade-in">
+            {/* Top Hub Banner: Ultra-Compact Responsive Architecture Header */}
+            <div className="docs-brand-topbar">
+                <div className="docs-brand-header-row">
+                    <div className="docs-brand-title-wrap">
+                        <div className="docs-badge-icon">
+                            <BookOpen size={20} color="#f97316" />
+                        </div>
+                        <div>
+                            <h1 className="docs-brand-name">
+                                Knowledge <span>Base</span>
+                            </h1>
+                        </div>
+                    </div>
+
+                    {/* Language Switcher Toggle Pill */}
+                    <div className="docs-lang-selector-wrap">
+                        <div className="docs-lang-toggle-pill" role="radiogroup" aria-label="Documentation Language">
+                            <button 
+                                type="button"
+                                className={`docs-lang-btn ${language === 'en' ? 'active' : ''}`}
+                                onClick={() => handleSetLanguage('en')}
+                                title="English Edition (Default)"
+                            >
+                                <span className="lang-flag">🇬🇧</span>
+                                <span className="lang-text-desktop">English</span>
+                                <span className="lang-text-mobile">EN</span>
+                            </button>
+                            <button 
+                                type="button"
+                                className={`docs-lang-btn ${language === 'hi' ? 'active' : ''}`}
+                                onClick={() => handleSetLanguage('hi')}
+                                title="Hinglish Edition (Hindi/English mix)"
+                            >
+                                <span className="lang-flag">🇮🇳</span>
+                                <span className="lang-text-desktop">Hinglish</span>
+                                <span className="lang-text-mobile">HI</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Search Bar & Mobile Topics Trigger Action Row */}
+                <div className="docs-brand-action-row">
+                    <div className="docs-search-shell">
+                        <Search size={16} className="docs-search-icon" />
+                        <input 
+                            type="text" 
+                            placeholder={language === 'hi' ? "Guides me search karein..." : "Search documentation guides..."}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        {searchQuery && (
+                            <button className="docs-clear-btn" onClick={() => setSearchQuery('')}>
+                                <X size={14} />
+                            </button>
+                        )}
+
+                        {/* Quick Search Results Dropdown */}
+                        {searchQuery && (
+                            <div className="docs-search-results-dropdown">
+                                <div className="search-results-head">
+                                    <span>Found {searchResults.length} {searchResults.length === 1 ? 'Guide' : 'Guides'}</span>
+                                </div>
+                                <div className="search-results-list">
+                                    {searchResults.length > 0 ? (
+                                        searchResults.map(res => (
+                                            <button 
+                                                key={res.id} 
+                                                className="search-res-item"
+                                                onClick={() => {
+                                                    handleSelectPage(res.id);
+                                                    setSearchQuery('');
+                                                }}
+                                            >
+                                                <div className="search-res-title">{res.title}</div>
+                                                {res.subtitle && <div className="search-res-sub">{res.subtitle}</div>}
+                                            </button>
+                                        ))
+                                    ) : (
+                                        <div className="search-res-empty">No documentation guides match "{searchQuery}"</div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Mobile Sidebar Drawer Toggle */}
+                    <button 
+                        type="button"
+                        className="docs-mobile-toc-toggle"
+                        onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
+                        aria-label="Open Topics"
+                    >
+                        <Menu size={16} />
+                        <span>Topics ({flatPageList.length})</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Mobile Drawer Rendered with createPortal at Body Level to ensure it is above Navbar & Stacking Contexts */}
+            {mobileDrawerOpen && typeof document !== 'undefined' && createPortal(
+                <div className="docs-mobile-drawer-portal">
+                    <div 
+                        className="docs-drawer-backdrop" 
+                        onClick={() => setMobileDrawerOpen(false)} 
+                        aria-hidden="true"
+                    />
+                    <aside 
+                        className="docs-sidebar-tree mobile-open mobile-drawer-dialog"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Table of Contents"
+                    >
+                        {renderSidebarTreeContent(true)}
+                    </aside>
+                </div>,
+                document.body
             )}
 
             {/* Layout: Left Dynamic-Height Sticky TOC Tree + Right Documentation Content Canvas */}
             <div className="docs-layout-grid">
                 
-                {/* Left Sticky Sidebar Tree */}
-                <aside className={`docs-sidebar-tree ${mobileDrawerOpen ? 'mobile-open' : ''}`}>
-                    <div className="sidebar-tree-header">
-                        <span className="sidebar-tree-title">TABLE OF CONTENTS</span>
-                        <div className="sidebar-header-actions">
-                            <button 
-                                type="button" 
-                                className="sidebar-expand-all-btn"
-                                onClick={handleToggleAllSections}
-                            >
-                                {isAllExpanded ? 'Collapse All' : 'Expand All'}
-                            </button>
-                            <span className="sidebar-tree-count">{flatPageList.length}</span>
-                            <button 
-                                type="button" 
-                                className="sidebar-mobile-close-btn"
-                                onClick={() => setMobileDrawerOpen(false)}
-                                aria-label="Close Navigation"
-                            >
-                                <X size={18} />
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="sidebar-tree-scroll">
-                        {docsToc.map((sec, sIdx) => {
-                            const IconComp = sectionIcons[sec.id] || sectionIcons['default'];
-                            const isExpanded = expandedSections[sec.id];
-                            const hasActive = sec.items.some(it => it.id === activePageId);
-                            const sectionDisplayTitle = (language === 'hi' && sec.title_hi) ? sec.title_hi : sec.title;
-
-                            return (
-                                <div key={sec.id || sIdx} className={`toc-accordion-section ${isExpanded ? 'expanded' : 'collapsed'}`}>
-                                    <button 
-                                        type="button"
-                                        className={`toc-accordion-header ${hasActive ? 'has-active' : ''}`}
-                                        onClick={() => toggleSection(sec.id)}
-                                    >
-                                        <div className="accordion-title-left">
-                                            <IconComp size={16} className="accordion-icon" />
-                                            <span>{sectionDisplayTitle}</span>
-                                        </div>
-                                        <ChevronRight size={16} className={`accordion-arrow ${isExpanded ? 'rotated' : ''}`} />
-                                    </button>
-
-                                    {isExpanded && (
-                                        <ul className="toc-accordion-items">
-                                            {sec.items.map(item => {
-                                                const isActive = item.id === activePageId;
-                                                const itemDisplayLabel = (language === 'hi' && item.label_hi) ? item.label_hi : item.label;
-
-                                                return (
-                                                    <li key={item.id}>
-                                                        <button 
-                                                            className={`toc-page-link ${isActive ? 'active' : ''}`}
-                                                            onClick={() => handleSelectPage(item.id)}
-                                                        >
-                                                            <div className="link-indicator-dot"></div>
-                                                            <span className="link-label">{itemDisplayLabel}</span>
-                                                            {item.label_hi && (
-                                                                <span className="bilingual-indicator" title="Available in English & Hinglish">HI</span>
-                                                            )}
-                                                        </button>
-                                                    </li>
-                                                );
-                                            })}
-                                        </ul>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
+                {/* Left Sticky Sidebar Tree (Desktop View) */}
+                <aside className="docs-sidebar-tree desktop-tree" aria-label="Table of Contents">
+                    {renderSidebarTreeContent(false)}
                 </aside>
 
                 {/* Right Main Documentation Reader Canvas */}
                 <main className="docs-reader-main" ref={contentRef}>
                     <div className="docs-reader-inner docs-page-anim" key={`${activePageId}-${language}`}>
-                        
                         {/* Meta & Breadcrumbs Navigation Bar */}
                         <div className="docs-article-meta-row">
                             <div className="docs-breadcrumbs">
@@ -620,45 +658,6 @@ const Docs = () => {
                                 <span>{(language === 'hi' && currentSection?.title_hi) ? currentSection.title_hi : (currentSection?.title || 'Knowledge Base')}</span>
                                 <span className="breadcrumb-sep">/</span>
                                 <span className="breadcrumb-active">{currentPageData.title}</span>
-                            </div>
-
-                            <div className="docs-meta-actions-cluster">
-                                {/* Auth Access Status Pill */}
-                                {!isAuthenticated ? (
-                                    <button 
-                                        type="button"
-                                        className="docs-auth-status-pill locked"
-                                        onClick={() => navigate(`/login?redirect=${encodeURIComponent('/docs#' + activePageId)}`)}
-                                        title="Click to sign in and unlock 100% full content"
-                                    >
-                                        <Lock size={13} />
-                                        <span>50% Preview (Login to Unlock)</span>
-                                    </button>
-                                ) : (
-                                    <div className="docs-auth-status-pill unlocked" title={`Signed in as ${user?.username || 'Member'}`}>
-                                        <ShieldCheck size={14} />
-                                        <span>Full Access Unlocked</span>
-                                    </div>
-                                )}
-
-                                {/* Live Language Active Status Badge */}
-                                {hasTranslation ? (
-                                    <button 
-                                        type="button"
-                                        className="docs-lang-badge-pill dual-active" 
-                                        onClick={() => handleSetLanguage(language === 'en' ? 'hi' : 'en')}
-                                        title="Click to toggle language"
-                                    >
-                                        <Languages size={14} />
-                                        <span>{language === 'hi' ? '🇮🇳 Hinglish Version' : '🇬🇧 English Version'}</span>
-                                        <span className="lang-badge-switch-action">Switch to {language === 'hi' ? 'English' : 'Hinglish'}</span>
-                                    </button>
-                                ) : (
-                                    <div className="docs-lang-badge-pill mono-active" title="This chapter is available in standard English">
-                                        <Globe size={14} />
-                                        <span>English Edition</span>
-                                    </div>
-                                )}
                             </div>
                         </div>
 
@@ -670,42 +669,42 @@ const Docs = () => {
                             )}
                         </div>
 
-                        {/* Rendered HTML Guide Content & 50% Preview Barrier */}
-                        <div className={`docs-article-body-wrapper ${!isAuthenticated ? 'has-preview-lock' : ''}`}>
+                        {/* Rendered HTML Guide Content & 60% Preview Barrier (40% Locked, bypassed on Overview landing) */}
+                        <div className={`docs-article-body-wrapper ${!isAuthenticated && !isOverviewPage ? 'has-preview-lock' : ''}`}>
                             <div 
-                                className={`docs-article-body ${!isAuthenticated ? 'docs-preview-truncated' : ''}`}
+                                className={`docs-article-body ${!isAuthenticated && !isOverviewPage ? 'docs-preview-truncated' : ''}`}
                                 dangerouslySetInnerHTML={{ __html: displayHtml }}
                             />
 
-                            {/* 50% Lock Barrier / Paywall Card for Non-Logged-In Users */}
-                            {!isAuthenticated && (
+                            {/* 60% Free / 40% Lock Barrier / Paywall Card for Non-Logged-In Users (Not shown on overview landing) */}
+                            {!isAuthenticated && !isOverviewPage && (
                                 <div className="docs-paywall-barrier">
                                     <div className="docs-paywall-gradient-fade" />
                                     
                                     <div className="docs-paywall-card">
                                         <div className="docs-paywall-badge">
                                             <Lock size={14} />
-                                            <span>{language === 'hi' ? '50% FREE PREVIEW LIMIT' : '50% FREE PREVIEW LIMIT'}</span>
+                                            <span>{language === 'hi' ? '60% FREE PREVIEW LIMIT' : '60% FREE PREVIEW LIMIT'}</span>
                                         </div>
 
                                         <div className="docs-paywall-progress-wrap">
                                             <div className="docs-paywall-progress-info">
                                                 <span className="progress-label">
-                                                    {language === 'hi' ? '📖 50% Preview Read' : '📖 50% Preview Read'}
+                                                    {language === 'hi' ? '📖 60% Preview Read' : '📖 60% Preview Read'}
                                                 </span>
                                                 <span className="progress-lock-label">
-                                                    {language === 'hi' ? '🔒 Baki 50% Locked' : '🔒 Remaining 50% Locked'}
+                                                    {language === 'hi' ? '🔒 Baki 40% Locked' : '🔒 Remaining 40% Locked'}
                                                 </span>
                                             </div>
                                             <div className="docs-paywall-progress-bar">
-                                                <div className="docs-paywall-progress-fill" style={{ width: '50%' }}></div>
+                                                <div className="docs-paywall-progress-fill" style={{ width: '60%' }}></div>
                                             </div>
                                         </div>
 
                                         <h3 className="docs-paywall-title">
                                             {language === 'hi' 
-                                                ? 'Baki 50% Guide & Scripts Padhne Ke Liye Login Karein' 
-                                                : 'Sign In to Unlock the Complete Documentation'}
+                                                ? 'Baki 40% Guide & Scripts Padhne Ke Liye Login Karein' 
+                                                : 'Sign In to Unlock the Remaining 40% Documentation'}
                                         </h3>
 
                                         <p className="docs-paywall-desc">

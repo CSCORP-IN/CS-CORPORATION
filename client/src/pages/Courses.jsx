@@ -336,7 +336,7 @@ const Courses = () => {
                         <span className="trust-item"><CheckCircle2 size={16} color="#10b981" /> 100% Live Instructor-Led</span>
                         <span className="trust-item"><CheckCircle2 size={16} color="#10b981" /> Small Focused Batches</span>
                         <span className="trust-item"><CheckCircle2 size={16} color="#10b981" /> Hands-On Enterprise Labs</span>
-                        <span className="trust-item"><CheckCircle2 size={16} color="#10b981" /> 1-on-1 Q&amp;A Mentorship</span>
+                        <span className="trust-item"><CheckCircle2 size={16} color="#10b981" /> 1-on-1 Q&A Mentorship</span>
                     </div>
                 </div>
 

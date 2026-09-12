@@ -204,14 +204,14 @@ const ChaudharySons = () => {
                     {/* Status Pill */}
                     <div className="cs-status-pill">
                         <span className="cs-live-dot"></span>
-                        <span>CS CORPORATION • CHAUDHARY &amp; SONS • cscorp.in</span>
+                        <span>CS CORPORATION • CHAUDHARY & SONS • cscorp.in</span>
                         <span className="cs-status-sep">•</span>
                         <span>EST. 2020</span>
                     </div>
 
                     {/* Giant Headline */}
                     <h1 className="cs-hero-title">
-                        CHAUDHARY <span className="cs-ampersand">&amp;</span> SONS
+                        CHAUDHARY <span className="cs-ampersand">&</span> SONS
                     </h1>
 
                     {/* Dynamic Typewriter Badge */}
@@ -235,7 +235,7 @@ const ChaudharySons = () => {
                         </a>
                         <a href="#leadership" className="cs-btn cs-btn-secondary">
                             <Users size={18} />
-                            <span>Family &amp; Leadership</span>
+                            <span>Family & Leadership</span>
                         </a>
                         <a href="#contact" className="cs-btn cs-btn-glass">
                             <Mail size={18} />
@@ -245,10 +245,10 @@ const ChaudharySons = () => {
 
                     {/* Trust Badges Strip */}
                     <div className="cs-trust-strip">
-                        <span className="cs-trust-item"><CheckCircle2 size={16} color="#f97316" /> Generational Values &amp; Public Service</span>
+                        <span className="cs-trust-item"><CheckCircle2 size={16} color="#f97316" /> Generational Values & Public Service</span>
                         <span className="cs-trust-item"><CheckCircle2 size={16} color="#f97316" /> Multi-Domain Professional Mastery</span>
                         <span className="cs-trust-item"><CheckCircle2 size={16} color="#f97316" /> 4 Flagship Digital Ecosystems</span>
-                        <span className="cs-trust-item"><CheckCircle2 size={16} color="#f97316" /> Family Heritage &amp; Integrity</span>
+                        <span className="cs-trust-item"><CheckCircle2 size={16} color="#f97316" /> Family Heritage & Integrity</span>
                     </div>
                 </div>
             </section>
@@ -312,8 +312,8 @@ const ChaudharySons = () => {
                 ========================================================================= */}
             <section id="leadership" className="cs-section-spacer">
                 <div className="cs-section-head">
-                    <div className="cs-badge-pill orange">HERITAGE &amp; LEADERSHIP</div>
-                    <h2 className="cs-section-heading">Shyamdev Chaudhary &amp; His Sons</h2>
+                    <div className="cs-badge-pill orange">HERITAGE & LEADERSHIP</div>
+                    <h2 className="cs-section-heading">Shyamdev Chaudhary & His Sons</h2>
                     <p className="cs-section-subheading">
                         Founded on public service, integrity, and generational dedication, spanning enterprise technology, supply chain leadership, and education.
                     </p>
@@ -344,7 +344,7 @@ const ChaudharySons = () => {
                                 </blockquote>
 
                                 <div className="cs-expertise-cluster">
-                                    <span className="cs-expertise-head">PILLARS &amp; DOMAINS:</span>
+                                    <span className="cs-expertise-head">PILLARS & DOMAINS:</span>
                                     <div className="cs-expertise-tags">
                                         {member.expertise.map((exp, eIdx) => (
                                             <span key={eIdx} className="cs-exp-pill">{exp}</span>
@@ -376,12 +376,12 @@ const ChaudharySons = () => {
                 <div className="cs-values-grid">
                     <div className="cs-val-card">
                         <div className="cs-val-icon"><Shield size={24} color="#f97316" /></div>
-                        <h3>Integrity &amp; Public Trust</h3>
+                        <h3>Integrity & Public Trust</h3>
                         <p>Upholding the highest standards of honesty, ethical governance, and dedication across all public service and professional endeavors.</p>
                     </div>
                     <div className="cs-val-card">
                         <div className="cs-val-icon"><BookOpen size={24} color="#f97316" /></div>
-                        <h3>Knowledge &amp; Education</h3>
+                        <h3>Knowledge & Education</h3>
                         <p>Committed to knowledge sharing, academic enablement, and professional mentorship that uplifts communities and empowers learners.</p>
                     </div>
                     <div className="cs-val-card">
@@ -399,7 +399,7 @@ const ChaudharySons = () => {
                 <div className="cs-contact-card">
                     <div className="cs-contact-left">
                         <div className="cs-badge-pill orange">CONNECT WITH US</div>
-                        <h2>Get in Touch with Chaudhary &amp; Sons</h2>
+                        <h2>Get in Touch with Chaudhary & Sons</h2>
                         <p>For general inquiries, strategic collaborations, educational initiatives, or platform partnerships, reach out directly.</p>
 
                         <div className="cs-contact-methods">
@@ -416,8 +416,8 @@ const ChaudharySons = () => {
                             <div className="cs-contact-item">
                                 <Phone size={20} color="#f97316" />
                                 <div>
-                                    <small>LOCATION &amp; PRESENCE</small>
-                                    <strong>India • Open to Global &amp; Institutional Collaborations</strong>
+                                    <small>LOCATION & PRESENCE</small>
+                                    <strong>India • Open to Global & Institutional Collaborations</strong>
                                 </div>
                             </div>
                         </div>

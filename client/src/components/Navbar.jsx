@@ -122,8 +122,8 @@ const Navbar = () => {
                                 <NavLink to="/" end onClick={() => setIsOpen(false)} className="dropdown-item-link">
                                     <div className="dropdown-item-icon"><Layers size={18} /></div>
                                     <div className="dropdown-item-info">
-                                        <span className="dropdown-item-title">Chaudhary &amp; Sons</span>
-                                        <span className="dropdown-item-desc">Enterprise &amp; Holdings Hub</span>
+                                        <span className="dropdown-item-title">Chaudhary & Sons</span>
+                                        <span className="dropdown-item-desc">Enterprise & Holdings Hub</span>
                                     </div>
                                 </NavLink>
                             </li>
@@ -132,7 +132,7 @@ const Navbar = () => {
                                     <div className="dropdown-item-icon"><Home size={18} /></div>
                                     <div className="dropdown-item-info">
                                         <span className="dropdown-item-title">Ankit Chaudhary</span>
-                                        <span className="dropdown-item-desc">Maximo EAM &amp; Architecture</span>
+                                        <span className="dropdown-item-desc">Maximo EAM & Architecture</span>
                                     </div>
                                 </NavLink>
                             </li>
@@ -141,7 +141,7 @@ const Navbar = () => {
                                     <div className="dropdown-item-icon"><Truck size={18} /></div>
                                     <div className="dropdown-item-info">
                                         <span className="dropdown-item-title">Anant Chaudhary</span>
-                                        <span className="dropdown-item-desc">Supply Chain &amp; Logistics Leader</span>
+                                        <span className="dropdown-item-desc">Supply Chain & Logistics Leader</span>
                                     </div>
                                 </NavLink>
                             </li>
@@ -162,7 +162,7 @@ const Navbar = () => {
                                     <div className="dropdown-item-icon"><BookOpen size={18} /></div>
                                     <div className="dropdown-item-info">
                                         <span className="dropdown-item-title">ChaudharyDocs</span>
-                                        <span className="dropdown-item-desc">Architecture &amp; Script Guides</span>
+                                        <span className="dropdown-item-desc">Architecture & Script Guides</span>
                                     </div>
                                 </NavLink>
                             </li>
@@ -210,7 +210,7 @@ const Navbar = () => {
                                     <div className="auth-actions-row">
                                         <NavLink to="/profile" onClick={() => setIsOpen(false)} className="auth-profile-nav-btn">
                                             <User size={14} />
-                                            <span>My Profile &amp; Purchases</span>
+                                            <span>My Profile & Purchases</span>
                                         </NavLink>
                                         {user?.role === 'admin' && (
                                             <NavLink to="/admin" onClick={() => setIsOpen(false)} className="auth-admin-btn">
@@ -232,7 +232,7 @@ const Navbar = () => {
                                         </div>
                                         <div className="auth-signin-text">
                                             <span className="auth-signin-title">Sign In / Register</span>
-                                            <span className="auth-signin-sub">Write articles &amp; manage account</span>
+                                            <span className="auth-signin-sub">Write articles & manage account</span>
                                         </div>
                                         <ArrowUpRight size={16} className="auth-signin-arrow" />
                                     </NavLink>

@@ -115,7 +115,7 @@ const Resume = () => {
                             <div className="experience-entry">
                                 <div className="entry-head">
                                     <div>
-                                        <h4 className="entry-role">Project Engineer – Java &amp; IBM Maximo Developer</h4>
+                                        <h4 className="entry-role">Project Engineer – Java & IBM Maximo Developer</h4>
                                         <h5 className="entry-company">Wipro Limited</h5>
                                     </div>
                                     <span className="entry-period">Enterprise Application Services</span>
@@ -146,7 +146,7 @@ const Resume = () => {
 
                             <div className="project-entry">
                                 <div className="entry-head">
-                                    <h4 className="entry-role">Maximo DBC &amp; SQL Insert Script Generators</h4>
+                                    <h4 className="entry-role">Maximo DBC & SQL Insert Script Generators</h4>
                                     <span className="tech-badge">Python • Java • Database Config • SQL</span>
                                 </div>
                                 <p className="entry-desc">
@@ -156,17 +156,17 @@ const Resume = () => {
 
                             <div className="project-entry">
                                 <div className="entry-head">
-                                    <h4 className="entry-role">Chaudhary &amp; Sons – Enterprise Maximo Suite &amp; Hubs</h4>
+                                    <h4 className="entry-role">Chaudhary & Sons – Enterprise Maximo Suite & Hubs</h4>
                                     <span className="tech-badge">IBM Maximo • Java EE • MIF • Jython</span>
                                 </div>
                                 <p className="entry-desc">
-                                    Enterprise Asset Management architecture and digital ecosystem (ChaudharyDocs &amp; ChaudharyConnect) delivering custom Java MBO business rules, MIF REST/JMS integration buses, and live technical mentorship.
+                                    Enterprise Asset Management architecture and digital ecosystem (ChaudharyDocs & ChaudharyConnect) delivering custom Java MBO business rules, MIF REST/JMS integration buses, and live technical mentorship.
                                 </p>
                             </div>
 
                             <div className="project-entry">
                                 <div className="entry-head">
-                                    <h4 className="entry-role">Enterprise HR &amp; Talent Lifecycle Suite</h4>
+                                    <h4 className="entry-role">Enterprise HR & Talent Lifecycle Suite</h4>
                                     <span className="tech-badge">Java • Spring Boot • React</span>
                                 </div>
                                 <p className="entry-desc">

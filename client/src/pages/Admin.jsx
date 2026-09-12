@@ -209,7 +209,7 @@ const Admin = () => {
                 <div className="admin-status-pill">
                     <span className="admin-live-dot"></span>
                     <Shield size={13} />
-                    <span>CHAUDHARY &amp; SONS ADMIN HUB</span>
+                    <span>CHAUDHARY & SONS ADMIN HUB</span>
                 </div>
                 <h1 className="admin-hero-title">
                     Manage <span className="text-gradient-primary">Dashboard</span>
@@ -375,7 +375,7 @@ const Admin = () => {
                         <div className="mod-section-header">
                             <div className="section-title-wrap">
                                 <ShieldCheck size={18} className="section-icon-emerald" />
-                                <h2>Published &amp; Live Articles ({approvedArticles.length})</h2>
+                                <h2>Published & Live Articles ({approvedArticles.length})</h2>
                             </div>
                         </div>
 

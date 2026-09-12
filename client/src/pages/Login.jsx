@@ -361,7 +361,7 @@ const Login = () => {
                             <button type="submit" className="btn-primary auth-submit-btn" disabled={loading || otp.length !== 6}>
                                 {loading ? 'Verifying...' : (
                                     <>
-                                        <span>Verify &amp; Activate Account</span>
+                                        <span>Verify & Activate Account</span>
                                         <ArrowRight size={16} />
                                     </>
                                 )}

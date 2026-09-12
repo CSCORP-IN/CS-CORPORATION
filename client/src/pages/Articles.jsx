@@ -59,7 +59,7 @@ const Articles = () => {
                 </div>
 
                 <h1 className="page-title articles-shine-title">
-                    Read &amp; <span className="shine-gradient-text">Publish Article</span>
+                    Read & <span className="shine-gradient-text">Publish Article</span>
                 </h1>
 
                 <p className="page-subtitle">
@@ -80,7 +80,7 @@ const Articles = () => {
                     </Link>
                     <Link to="/" className="eco-nav-chip">
                         <Building2 size={14} />
-                        <span>Chaudhary &amp; Sons</span>
+                        <span>Chaudhary & Sons</span>
                         <ArrowUpRight size={12} className="eco-arrow" />
                     </Link>
                     <Link to="/post" className="eco-nav-chip highlight">

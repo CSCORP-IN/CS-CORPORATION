@@ -261,7 +261,7 @@ const Profile = () => {
                             onClick={() => { setActiveTab('security'); setFeedback({ type: '', message: '' }); }}
                         >
                             <Lock size={16} />
-                            <span className="tab-text-full">Security &amp; Password</span>
+                            <span className="tab-text-full">Security & Password</span>
                             <span className="tab-text-short">Security</span>
                         </button>
                     </div>
@@ -351,7 +351,7 @@ const Profile = () => {
                     <div className="profile-tab-content animate-fade-in">
                         <div className="tab-section-header">
                             <div>
-                                <h2>Purchased Modules &amp; Enrolled Courses ({purchases.length})</h2>
+                                <h2>Purchased Modules & Enrolled Courses ({purchases.length})</h2>
                                 <p>Modules, training bundles, and advisory sessions associated with your account.</p>
                             </div>
                             <Link to="/courses" className="btn-primary post-new-btn">
@@ -411,7 +411,7 @@ const Profile = () => {
                     <div className="profile-tab-content animate-fade-in">
                         <div className="tab-section-header">
                             <div>
-                                <h2>Profile &amp; Author Information</h2>
+                                <h2>Profile & Author Information</h2>
                                 <p>Update your technical credentials, public designation, and community social links.</p>
                             </div>
                         </div>
@@ -465,7 +465,7 @@ const Profile = () => {
                                     />
                                 </div>
                                 <div className="form-input-group full-width">
-                                    <label>Bio &amp; Technical Background</label>
+                                    <label>Bio & Technical Background</label>
                                     <textarea
                                         rows="3"
                                         value={formData.bio}
@@ -509,7 +509,7 @@ const Profile = () => {
                     <div className="profile-tab-content animate-fade-in">
                         <div className="tab-section-header">
                             <div>
-                                <h2>Security &amp; Password Management</h2>
+                                <h2>Security & Password Management</h2>
                                 <p>Ensure your account is protected with a strong, unique password.</p>
                             </div>
                         </div>

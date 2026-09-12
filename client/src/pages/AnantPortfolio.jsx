@@ -132,7 +132,7 @@ const AnantPortfolio = () => {
                     {/* Status Pill */}
                     <div className="ap-status-pill">
                         <span className="ap-live-dot"></span>
-                        <span>SENIOR MANAGER • SUPPLY CHAIN &amp; LOGISTICS</span>
+                        <span>SENIOR MANAGER • SUPPLY CHAIN & LOGISTICS</span>
                         <span className="ap-status-sep">•</span>
                         <span>DELHIVERY LIMITED</span>
                     </div>
@@ -142,7 +142,7 @@ const AnantPortfolio = () => {
                         <span className="ap-brand-flank-line left"></span>
                         <div className="ap-brand-title-badge">
                             <span className="ap-brand-title-text">
-                                CHAUDHARY <span className="ap-brand-ampersand">&amp;</span> SONS
+                                CHAUDHARY <span className="ap-brand-ampersand">&</span> SONS
                             </span>
                         </div>
                         <span className="ap-brand-flank-line right"></span>
@@ -163,7 +163,7 @@ const AnantPortfolio = () => {
 
                     {/* Role & Tagline */}
                     <p className="ap-hero-lead">
-                        Results-driven <strong>Supply Chain &amp; 3PL Warehousing Leader</strong> with <strong>8+ years</strong> of comprehensive operational mastery across large-scale fulfillment centers, multi-client logistics, and e-commerce distribution.
+                        Results-driven <strong>Supply Chain & 3PL Warehousing Leader</strong> with <strong>8+ years</strong> of comprehensive operational mastery across large-scale fulfillment centers, multi-client logistics, and e-commerce distribution.
                     </p>
 
                     {/* Hero Direct Action CTA Cluster */}
@@ -175,7 +175,7 @@ const AnantPortfolio = () => {
                         </a>
                         <a href="#contact" className="ap-cta-btn ap-cta-secondary">
                             <Mail size={18} color="#ea580c" />
-                            <span>Connect &amp; Inquire</span>
+                            <span>Connect & Inquire</span>
                             <ArrowRight size={14} />
                         </a>
                     </div>
@@ -237,7 +237,7 @@ const AnantPortfolio = () => {
             <section id="experience" className="ap-section-spacer">
                 <div className="ap-section-head">
                     <div className="ap-badge-pill">8+ YEARS PROFESSIONAL JOURNEY</div>
-                    <h2 className="ap-section-heading">Career Timeline &amp; Experience</h2>
+                    <h2 className="ap-section-heading">Career Timeline & Experience</h2>
                     <p className="ap-section-sub">Proven track record of high-impact leadership across Tier-1 logistics organizations.</p>
                 </div>
 
@@ -286,7 +286,7 @@ const AnantPortfolio = () => {
                                 <div className="ap-exp-head-main">
                                     <span className="ap-role-badge">CURRENT LEADERSHIP ROLE</span>
                                     <h3 className="ap-exp-title">Senior Manager</h3>
-                                    <span className="ap-exp-company">Delhivery Limited • Supply Chain &amp; 3PL Operations</span>
+                                    <span className="ap-exp-company">Delhivery Limited • Supply Chain & 3PL Operations</span>
                                 </div>
                                 <span className="ap-exp-dates">Apr 2025 – Present</span>
                             </div>
@@ -294,23 +294,23 @@ const AnantPortfolio = () => {
                             <ul className="ap-exp-bullets">
                                 <li>
                                     <CheckCircle2 size={16} className="ap-bullet-icon" />
-                                    <div><strong>Multi-Fulfillment Center Oversight:</strong> Managing multiple FCs averaging 80,000+ sq. ft. each with over 20,000+ SKUs across marquee accounts including Volvo Eicher, Voltas, Hitachi, Mahindra &amp; Mahindra (M&M), Jubilant FoodWorks (JFL), Discover Pilgrim, and Mylo.</div>
+                                    <div><strong>Multi-Fulfillment Center Oversight:</strong> Managing multiple FCs averaging 80,000+ sq. ft. each with over 20,000+ SKUs across marquee accounts including Volvo Eicher, Voltas, Hitachi, Mahindra & Mahindra (M&M), Jubilant FoodWorks (JFL), Discover Pilgrim, and Mylo.</div>
                                 </li>
                                 <li>
                                     <CheckCircle2 size={16} className="ap-bullet-icon" />
-                                    <div><strong>Transportation &amp; Logistics Planning:</strong> Leading comprehensive logistics routing, multi-stakeholder synchronization, and carrier capacity planning.</div>
+                                    <div><strong>Transportation & Logistics Planning:</strong> Leading comprehensive logistics routing, multi-stakeholder synchronization, and carrier capacity planning.</div>
                                 </li>
                                 <li>
                                     <CheckCircle2 size={16} className="ap-bullet-icon" />
-                                    <div><strong>Metric &amp; KPI Adherence (100% SLA):</strong> Tracking end-to-end performance metrics with comprehensive Root Cause Analysis (RCA) on deviations.</div>
+                                    <div><strong>Metric & KPI Adherence (100% SLA):</strong> Tracking end-to-end performance metrics with comprehensive Root Cause Analysis (RCA) on deviations.</div>
                                 </li>
                                 <li>
                                     <CheckCircle2 size={16} className="ap-bullet-icon" />
-                                    <div><strong>Cost Optimization &amp; Lean Productivity:</strong> Monitoring Load vs. Resource modeling, eliminating waste time &amp; motion, controlling overtime (OT), daily operating expenses, and R&amp;M budgets.</div>
+                                    <div><strong>Cost Optimization & Lean Productivity:</strong> Monitoring Load vs. Resource modeling, eliminating waste time & motion, controlling overtime (OT), daily operating expenses, and R&M budgets.</div>
                                 </li>
                                 <li>
                                     <CheckCircle2 size={16} className="ap-bullet-icon" />
-                                    <div><strong>Inventory Accuracy &amp; Zero-Debit Audits:</strong> Spearheading rigorous inventory control using Cycle Counts, Daily FTP fail &amp; Put audits, Quarterly Wall-to-Wall (W2W) Audits, and 5S Bin Hygiene.</div>
+                                    <div><strong>Inventory Accuracy & Zero-Debit Audits:</strong> Spearheading rigorous inventory control using Cycle Counts, Daily FTP fail & Put audits, Quarterly Wall-to-Wall (W2W) Audits, and 5S Bin Hygiene.</div>
                                 </li>
                             </ul>
                         </div>
@@ -334,11 +334,11 @@ const AnantPortfolio = () => {
                                 </li>
                                 <li>
                                     <CheckCircle2 size={16} className="ap-bullet-icon" />
-                                    <div><strong>Loss Prevention &amp; Safety Compliance:</strong> Spearheaded scrap management, administrative oversight for the Loss Prevention team, and fire, health &amp; safety inspections.</div>
+                                    <div><strong>Loss Prevention & Safety Compliance:</strong> Spearheaded scrap management, administrative oversight for the Loss Prevention team, and fire, health & safety inspections.</div>
                                 </li>
                                 <li>
                                     <CheckCircle2 size={16} className="ap-bullet-icon" />
-                                    <div><strong>Strategic MIS &amp; Performance Reporting:</strong> Crafted executive KPI dashboards capturing productivity, workflow velocity, and operational SLA tracking.</div>
+                                    <div><strong>Strategic MIS & Performance Reporting:</strong> Crafted executive KPI dashboards capturing productivity, workflow velocity, and operational SLA tracking.</div>
                                 </li>
                             </ul>
                         </div>
@@ -350,7 +350,7 @@ const AnantPortfolio = () => {
                                 <div className="ap-exp-head-main">
                                     <span className="ap-role-badge">RAPID 6.5-YEAR PROMOTION TRACK</span>
                                     <h3 className="ap-exp-title">Manager ➔ Deputy Manager ➔ Assistant Manager</h3>
-                                    <span className="ap-exp-company">Reliance Retail Limited • Supply Chain &amp; E-Commerce</span>
+                                    <span className="ap-exp-company">Reliance Retail Limited • Supply Chain & E-Commerce</span>
                                 </div>
                                 <span className="ap-exp-dates">Sep 2017 – Feb 2024</span>
                             </div>
@@ -361,7 +361,7 @@ const AnantPortfolio = () => {
                                     <div className="ap-prog-content">
                                         <div className="ap-step-head">
                                             <h4>Manager (Apr 2023 – Feb 2024)</h4>
-                                            <span className="ap-step-tag">Outbound, Transport &amp; E-Commerce</span>
+                                            <span className="ap-step-tag">Outbound, Transport & E-Commerce</span>
                                         </div>
                                         <p>Directed warehouse operations, cost control, 5S practices, damage mitigation, and led the PPMP module for Myntra, Nykaa, Zivame, TIRA, and Amazon JIT marketplace.</p>
                                     </div>
@@ -372,9 +372,9 @@ const AnantPortfolio = () => {
                                     <div className="ap-prog-content">
                                         <div className="ap-step-head">
                                             <h4>Deputy Manager (Oct 2021 – Mar 2023)</h4>
-                                            <span className="ap-step-tag">Marketplace Returns &amp; Lean CIP</span>
+                                            <span className="ap-step-tag">Marketplace Returns & Lean CIP</span>
                                         </div>
-                                        <p>Orchestrated end-to-end returns across Myntra, Amazon, Flipkart, B2C M&amp;S, and Retail. Pioneered Continuous Improvement Projects (CIP) for space optimization, FIFO, and physical inventory reconciliations.</p>
+                                        <p>Orchestrated end-to-end returns across Myntra, Amazon, Flipkart, B2C M&S, and Retail. Pioneered Continuous Improvement Projects (CIP) for space optimization, FIFO, and physical inventory reconciliations.</p>
                                     </div>
                                 </div>
 
@@ -393,8 +393,8 @@ const AnantPortfolio = () => {
                                     <div className="ap-prog-badge">4</div>
                                     <div className="ap-prog-content">
                                         <div className="ap-step-head">
-                                            <h4>Transport Assistant Manager &amp; GET (Sep 2017 – Feb 2020)</h4>
-                                            <span className="ap-step-tag">Dispatch Planning &amp; PAN-India E-Waybill</span>
+                                            <h4>Transport Assistant Manager & GET (Sep 2017 – Feb 2020)</h4>
+                                            <span className="ap-step-tag">Dispatch Planning & PAN-India E-Waybill</span>
                                         </div>
                                         <p>Managed loading/dispatch operations, daily MIS reporting, PAN India E-waybill compliance, warehouse relocation, vehicle rotation, and picker motion optimization.</p>
                                     </div>
@@ -426,8 +426,8 @@ const AnantPortfolio = () => {
 
                     {/* Right: Technical Systems & Software */}
                     <div className="ap-skills-col">
-                        <div className="ap-badge-pill">DIGITAL &amp; WMS TOOLS</div>
-                        <h3 className="ap-col-heading">Systems &amp; Software</h3>
+                        <div className="ap-badge-pill">DIGITAL & WMS TOOLS</div>
+                        <h3 className="ap-col-heading">Systems & Software</h3>
                         <div className="ap-tools-list">
                             <div className="ap-tool-item">
                                 <Package size={18} color="#ea580c" />
@@ -446,14 +446,14 @@ const AnantPortfolio = () => {
                             <div className="ap-tool-item">
                                 <BarChart3 size={18} color="#ea580c" />
                                 <div>
-                                    <strong>Data Analytics &amp; Advanced Excel</strong>
+                                    <strong>Data Analytics & Advanced Excel</strong>
                                     <small>MTD/YTD MIS Reporting, Load vs Resource Modeling, Forecasting</small>
                                 </div>
                             </div>
                             <div className="ap-tool-item">
                                 <ShieldCheck size={18} color="#ea580c" />
                                 <div>
-                                    <strong>Quality Control &amp; Lean 5S Systems</strong>
+                                    <strong>Quality Control & Lean 5S Systems</strong>
                                     <small>Continuous Improvement (CIP), RCA on TAT Breaches, Zero Debit</small>
                                 </div>
                             </div>
@@ -482,7 +482,7 @@ const AnantPortfolio = () => {
                         <div>
                             <span className="ap-edu-level">BACHELOR OF TECHNOLOGY</span>
                             <h3 className="ap-edu-title">B.Tech in Mechanical Engineering</h3>
-                            <p className="ap-edu-inst">G. L. Bajaj Institute of Technology &amp; Management • 2013 – 2017</p>
+                            <p className="ap-edu-inst">G. L. Bajaj Institute of Technology & Management • 2013 – 2017</p>
                         </div>
                     </div>
 
@@ -542,7 +542,7 @@ const AnantPortfolio = () => {
                         {/* Navigation back to ecosystem */}
                         <div className="ap-ecosystem-links">
                             <Link to="/" className="ap-eco-btn">
-                                <span>Chaudhary &amp; Sons Enterprise</span>
+                                <span>Chaudhary & Sons Enterprise</span>
                                 <ArrowRight size={14} />
                             </Link>
                             <Link to="/ankit-chaudhary" className="ap-eco-btn">
