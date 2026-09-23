@@ -466,23 +466,16 @@
     <div class="app-wrapper">
         
         <header class="mobile-app-bar">
-            <div class="brand-group">
-                <a href="/" style="text-decoration:none; display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.08); border:1px solid var(--cs-border-glass); color:#e2e8f0; padding:4px 12px; border-radius:9999px; font-size:0.75rem; font-weight:700;">
+            <div class="brand-group" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <a href="/" style="text-decoration:none; display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.08); border:1px solid var(--cs-border-glass); color:#e2e8f0; padding:5px 12px; border-radius:9999px; font-size:0.75rem; font-weight:700; flex-shrink:0;">
                     <i class="fa-solid fa-arrow-left"></i> CS Corp
                 </a>
-                <div style="display:flex; flex-direction:column; line-height:1.1;">
-                    <span style="font-family:'Outfit',sans-serif; font-size:1.05rem; font-weight:900; background:var(--cs-brand-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Chaudhary<span style="color:#fbbf24; -webkit-text-fill-color:#fbbf24;">Thanks</span></span>
-                    <span style="font-size:0.62rem; font-weight:800; color:#94a3b8; letter-spacing:1.5px;">CS CORP CELEBRATION</span>
+                <div class="compact-two-row-logo" style="display:inline-flex; flex-direction:column; align-items:flex-end; line-height:1;">
+                    <span id="logo-row-top" class="logo-row-top english-cursive" style="font-family:'Playfair Display','Cormorant Garamond',serif; font-style:italic; font-size:1.35rem; font-weight:850; color:#ffffff; text-shadow:0 0 14px rgba(255,255,255,0.35); min-height:24px;">
+                        <span id="logo-type-text">Chaudhary</span>
+                    </span>
+                    <span id="logo-row-bottom" style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.65rem; font-weight:900; letter-spacing:0.18em; text-transform:uppercase; color:#f59e0b; margin-top:2px; text-shadow:0 0 10px rgba(245,158,11,0.6); transition:opacity 0.28s ease;">THANKS</span>
                 </div>
-            </div>
-            <div class="app-bar-actions">
-                <button id="bgm-btn" class="icon-toggle-btn" title="Toggle Party Music" aria-label="Toggle Music">
-                    <i class="fa-solid fa-music"></i>
-                </button>
-                <button id="confetti-cannon-btn" class="glow-pill-btn" title="Blast Confetti!">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <span>Party 💥</span>
-                </button>
             </div>
         </header>
 
@@ -897,6 +890,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            initTypewriterLogo();
             initFloatingDecorations();
             initStatsCounters();
             initReactionWall();
@@ -908,6 +902,60 @@
                 startCelebrationSequence();
             }, 600);
         });
+
+        function initTypewriterLogo() {
+            const words = ['Chaudhary', 'cscorp.in', 'चौधरी'];
+            let wordIdx = 0;
+            let charIdx = 0;
+            let isDeleting = false;
+            const topEl = document.getElementById('logo-row-top');
+            const textEl = document.getElementById('logo-type-text');
+            const bottomEl = document.getElementById('logo-row-bottom');
+
+            if (!textEl || !bottomEl || !topEl) return;
+
+            function typeStep() {
+                const currentWord = words[wordIdx % words.length];
+                const isHindi = /[\u0900-\u097F]/.test(currentWord);
+
+                if (isHindi) {
+                    topEl.style.fontFamily = "'Kalam', 'Amita', cursive";
+                    topEl.style.fontSize = '1.30rem';
+                } else {
+                    topEl.style.fontFamily = "'Playfair Display', 'Cormorant Garamond', serif";
+                    topEl.style.fontSize = '1.35rem';
+                }
+
+                // Hide bottom when cscorp.in is active
+                if (currentWord === 'cscorp.in') {
+                    bottomEl.style.opacity = '0';
+                } else {
+                    bottomEl.style.opacity = '1';
+                }
+
+                if (!isDeleting) {
+                    charIdx++;
+                    textEl.textContent = currentWord.substring(0, charIdx);
+                    if (charIdx === currentWord.length) {
+                        setTimeout(() => { isDeleting = true; typeStep(); }, 2400);
+                        return;
+                    }
+                    setTimeout(typeStep, 110);
+                } else {
+                    charIdx--;
+                    textEl.textContent = currentWord.substring(0, charIdx);
+                    if (charIdx === 0) {
+                        isDeleting = false;
+                        wordIdx++;
+                        setTimeout(typeStep, 350);
+                        return;
+                    }
+                    setTimeout(typeStep, 60);
+                }
+            }
+
+            typeStep();
+        }
 
         function initFloatingDecorations() {
             const container = document.getElementById('floating-decorations');

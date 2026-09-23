@@ -541,28 +541,6 @@ export default function ThankYou() {
                         </Link>
                         <Logo variant="thanks" className="thankyou-navbar-logo" />
                     </div>
-                    <div className="thankyou-app-bar-actions">
-                        <button 
-                            onClick={toggleBgm} 
-                            className={`thankyou-icon-toggle-btn ${isBgmPlaying ? 'playing' : ''}`} 
-                            title={isBgmPlaying ? "Mute BGM" : "Play Party Music"} 
-                            aria-label="Toggle Music"
-                        >
-                            <Music size={18} />
-                        </button>
-                        <button 
-                            onClick={() => {
-                                playFirecrackerBoom();
-                                launchMultiFireworksConfetti();
-                                triggerToast("🎊 Pataka Blasted!");
-                            }} 
-                            className="thankyou-glow-pill-btn" 
-                            title="Blast Confetti & Pataka!"
-                        >
-                            <Wand2 size={16} />
-                            <span>Party 💥</span>
-                        </button>
-                    </div>
                 </header>
 
                 {/* =========================================================

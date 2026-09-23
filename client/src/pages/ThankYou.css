@@ -127,19 +127,22 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 16px;
-    background: rgba(14, 16, 32, 0.88);
-    backdrop-filter: blur(16px);
+    padding: 8px 16px;
+    background: rgba(14, 16, 32, 0.9);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     border: 1px solid var(--cs-border-glass);
     border-radius: var(--cs-radius-full);
-    margin-bottom: 20px;
+    margin-bottom: 22px;
     box-shadow: 0 6px 24px rgba(0,0,0,0.35);
 }
 
 .thankyou-brand-group {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: space-between;
+    width: 100%;
+    gap: 14px;
 }
 
 .thankyou-home-pill {
@@ -150,11 +153,12 @@
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--cs-border-glass);
     color: #e2e8f0;
-    padding: 4px 12px;
+    padding: 5px 12px;
     border-radius: var(--cs-radius-full);
     font-size: 0.75rem;
     font-weight: 700;
     transition: var(--cs-transition);
+    flex-shrink: 0;
 }
 
 .thankyou-home-pill:hover {
@@ -168,7 +172,7 @@
 .thankyou-page-container .compact-two-row-logo {
     display: inline-flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-end;
     justify-content: center;
     line-height: 1;
     gap: 0px;
@@ -186,7 +190,7 @@
 .thankyou-page-container .logo-row-top.english-cursive {
     font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
     font-style: italic;
-    font-size: 1.32rem;
+    font-size: 1.35rem;
     font-weight: 850;
     color: #ffffff !important;
     text-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
@@ -196,7 +200,7 @@
 .thankyou-page-container .logo-row-top.hindi-cursive {
     font-family: 'Kalam', 'Amita', 'Caveat', cursive;
     font-style: normal;
-    font-size: 1.28rem;
+    font-size: 1.30rem;
     font-weight: 800;
     color: #ffffff !important;
     text-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
@@ -211,7 +215,7 @@
 .thankyou-navbar-logo .logo-row-bottom,
 .thankyou-page-container .logo-row-bottom {
     font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-    font-size: 0.64rem;
+    font-size: 0.65rem;
     font-weight: 900;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -219,53 +223,6 @@
     line-height: 1;
     margin-top: 2px;
     text-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
-}
-
-.thankyou-app-bar-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.thankyou-icon-toggle-btn {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid var(--cs-border-glass);
-    color: #fff;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: var(--cs-transition);
-}
-
-.thankyou-icon-toggle-btn.playing {
-    background: var(--cs-brand-gradient);
-    border-color: transparent;
-    box-shadow: 0 0 16px rgba(249, 115, 22, 0.6);
-}
-
-.thankyou-glow-pill-btn {
-    background: var(--cs-brand-gradient);
-    border: none;
-    color: #fff;
-    padding: 8px 16px;
-    border-radius: var(--cs-radius-full);
-    font-size: 0.84rem;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 0 4px 16px rgba(236, 72, 153, 0.45);
-    transition: var(--cs-transition);
-}
-
-.thankyou-glow-pill-btn:active {
-    transform: scale(0.95);
 }
 
 /* ==========================================================

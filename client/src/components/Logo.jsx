@@ -27,11 +27,11 @@ const BRAND_CONFIGS = {
         bottom: 'ARTICLES'
     },
     'thanks': {
-        words: ['Chaudhary', 'चौधरी'],
+        words: ['Chaudhary', 'cscorp.in', 'चौधरी'],
         bottom: 'THANKS'
     },
     'chaudharythanks': {
-        words: ['Chaudhary', 'चौधरी'],
+        words: ['Chaudhary', 'cscorp.in', 'चौधरी'],
         bottom: 'THANKS'
     },
     'default': {
