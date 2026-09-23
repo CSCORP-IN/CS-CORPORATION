@@ -13,6 +13,12 @@
   flex-direction: column;
 }
 
+.content.thankyou-clean-layout {
+  padding: 0;
+  margin: 0;
+  min-height: 100vh;
+}
+
 /* Ambient glow blobs positioned in the background */
 .ambient-glow-1 {
   position: absolute;

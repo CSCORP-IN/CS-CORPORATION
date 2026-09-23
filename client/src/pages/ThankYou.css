@@ -1,0 +1,1290 @@
+/* ==========================================================
+   CHAUDHARY & SONS (CS CORP) OFFICIAL BIRTHDAY CELEBRATION
+   Celebrant: ANKIT CHAUDHARY
+   Features: Spotlight Cake Ceremony -> Sweet Reveal of Thank You Message
+   ========================================================== */
+
+:root {
+    --cs-bg-dark: #070814;
+    --cs-bg-surface: rgba(15, 17, 34, 0.82);
+    --cs-bg-card: rgba(20, 24, 46, 0.72);
+    --cs-border-glass: rgba(255, 255, 255, 0.14);
+    
+    --cs-primary: #f97316;
+    --cs-gold: #f59e0b;
+    --cs-pink: #ec4899;
+    --cs-purple: #8b5cf6;
+    --cs-brand-gradient: linear-gradient(135deg, #ff5722 0%, #ec4899 50%, #8b5cf6 100%);
+    --cs-gold-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #fef08a 100%);
+    --cs-wa-gradient: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    
+    --cs-text-main: #f8fafc;
+    --cs-text-muted: #94a3b8;
+    --cs-text-dim: #64748b;
+    
+    --cs-radius-sm: 10px;
+    --cs-radius-md: 18px;
+    --cs-radius-lg: 24px;
+    --cs-radius-full: 9999px;
+    
+    --cs-shadow-card: 0 12px 35px -10px rgba(0, 0, 0, 0.7);
+    --cs-transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.thankyou-page-container {
+    min-height: 100vh;
+    background-color: var(--cs-bg-dark);
+    color: var(--cs-text-main);
+    position: relative;
+    overflow-x: hidden;
+    line-height: 1.55;
+    padding-bottom: 95px;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Background Animated Gradient Mesh */
+.thankyou-bg-mesh {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.thankyou-glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(85px);
+    opacity: 0.38;
+    animation: floatOrb 16s ease-in-out infinite alternate;
+}
+
+.thankyou-orb-1 { width: 340px; height: 340px; background: radial-gradient(circle, #ff5722, #8b5cf6); top: -50px; left: -50px; }
+.thankyou-orb-2 { width: 360px; height: 360px; background: radial-gradient(circle, #3b82f6, #06b6d4); bottom: -50px; right: -50px; animation-delay: -5s; }
+.thankyou-orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, #f59e0b, #ec4899); top: 45%; left: 50%; animation-delay: -8s; }
+
+@keyframes floatOrb {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, 40px) scale(1.1); }
+    100% { transform: translate(-20px, 60px) scale(0.95); }
+}
+
+/* Floating Decorative Elements */
+.thankyou-floating-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.thankyou-floating-item {
+    position: absolute;
+    bottom: -60px;
+    animation: floatUpwards 14s linear infinite;
+    opacity: 0.22;
+    filter: blur(0.5px);
+    user-select: none;
+}
+
+@keyframes floatUpwards {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    15% { opacity: 0.25; }
+    85% { opacity: 0.25; }
+    100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}
+
+/* Main Content Wrapper */
+.thankyou-app-wrapper {
+    position: relative;
+    z-index: 2;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 16px 16px 40px;
+}
+
+/* Glass Card */
+.thankyou-glass-card {
+    background: var(--cs-bg-card);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--cs-border-glass);
+    border-radius: var(--cs-radius-lg);
+    padding: 24px 20px;
+    box-shadow: var(--cs-shadow-card);
+    margin-bottom: 24px;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* CS Corp Header App Bar */
+.thankyou-mobile-app-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: rgba(14, 16, 32, 0.88);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--cs-border-glass);
+    border-radius: var(--cs-radius-full);
+    margin-bottom: 20px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+}
+
+.thankyou-brand-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.thankyou-home-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--cs-border-glass);
+    color: #e2e8f0;
+    padding: 4px 12px;
+    border-radius: var(--cs-radius-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: var(--cs-transition);
+}
+
+.thankyou-home-pill:hover {
+    background: rgba(249, 115, 22, 0.2);
+    border-color: rgba(249, 115, 22, 0.5);
+    color: #fff;
+}
+
+/* CS Corp Logo styling inside ThankYou Header */
+.thankyou-navbar-logo.compact-two-row-logo,
+.thankyou-page-container .compact-two-row-logo {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    line-height: 1;
+    gap: 0px;
+}
+
+.thankyou-navbar-logo .logo-row-top,
+.thankyou-page-container .logo-row-top {
+    min-height: 24px;
+    display: inline-flex;
+    align-items: baseline;
+    line-height: 1.05;
+}
+
+.thankyou-navbar-logo .logo-row-top.english-cursive,
+.thankyou-page-container .logo-row-top.english-cursive {
+    font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 1.32rem;
+    font-weight: 850;
+    color: #ffffff !important;
+    text-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
+}
+
+.thankyou-navbar-logo .logo-row-top.hindi-cursive,
+.thankyou-page-container .logo-row-top.hindi-cursive {
+    font-family: 'Kalam', 'Amita', 'Caveat', cursive;
+    font-style: normal;
+    font-size: 1.28rem;
+    font-weight: 800;
+    color: #ffffff !important;
+    text-shadow: 0 0 14px rgba(255, 255, 255, 0.35);
+}
+
+.thankyou-navbar-logo .logo-type-text,
+.thankyou-page-container .logo-type-text {
+    color: #ffffff !important;
+    display: inline-block;
+}
+
+.thankyou-navbar-logo .logo-row-bottom,
+.thankyou-page-container .logo-row-bottom {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    font-size: 0.64rem;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #f59e0b !important;
+    line-height: 1;
+    margin-top: 2px;
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+}
+
+.thankyou-app-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.thankyou-icon-toggle-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--cs-border-glass);
+    color: #fff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--cs-transition);
+}
+
+.thankyou-icon-toggle-btn.playing {
+    background: var(--cs-brand-gradient);
+    border-color: transparent;
+    box-shadow: 0 0 16px rgba(249, 115, 22, 0.6);
+}
+
+.thankyou-glow-pill-btn {
+    background: var(--cs-brand-gradient);
+    border: none;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: var(--cs-radius-full);
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 16px rgba(236, 72, 153, 0.45);
+    transition: var(--cs-transition);
+}
+
+.thankyou-glow-pill-btn:active {
+    transform: scale(0.95);
+}
+
+/* ==========================================================
+   SWEET REVEAL ANIMATION FOR HERO THANK YOU CARD
+   ========================================================== */
+.thankyou-hero-card {
+    text-align: center;
+    padding: 34px 20px 28px;
+    position: relative;
+    overflow: hidden;
+}
+
+.thankyou-hero-card.sweet-bloom-enter {
+    animation: sweetBloomIn 0.95s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    border: 1px solid rgba(249, 115, 22, 0.5);
+    box-shadow: 0 16px 45px -10px rgba(249, 115, 22, 0.35), 0 0 30px rgba(236, 72, 153, 0.25);
+}
+
+@keyframes sweetBloomIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-40px) scale(0.88);
+        filter: blur(10px);
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(8px) scale(1.03);
+        filter: blur(0px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0px);
+    }
+}
+
+.thankyou-avatar-ring {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thankyou-avatar-halo {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--cs-brand-gradient);
+    animation: rotateGradient 4s linear infinite;
+    padding: 3px;
+}
+
+@keyframes rotateGradient {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.thankyou-avatar-badge {
+    position: relative;
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
+    background: #0d0f22;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.thankyou-avatar-crown { font-size: 1.6rem; line-height: 1; }
+.thankyou-avatar-initials {
+    font-size: 0.95rem;
+    font-weight: 900;
+    background: var(--cs-gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+}
+
+.thankyou-sparkle {
+    position: absolute;
+    font-size: 1.35rem;
+    z-index: 3;
+    animation: bounce 2s infinite ease-in-out;
+}
+.thankyou-s-left { top: -6px; left: -6px; }
+.thankyou-s-right { bottom: -4px; right: -6px; animation-delay: 0.5s; }
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-6px) scale(1.15); }
+}
+
+.thankyou-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(249, 115, 22, 0.15);
+    border: 1px solid rgba(249, 115, 22, 0.45);
+    color: #fb923c;
+    padding: 5px 16px;
+    border-radius: var(--cs-radius-full);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+}
+
+.thankyou-hero-title {
+    font-size: 2.1rem;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+.thankyou-name-highlight {
+    color: #ffffff;
+    font-weight: 900;
+    display: block;
+    font-size: 1.85rem;
+    margin-bottom: 4px;
+}
+
+.thankyou-gradient-text {
+    background: var(--cs-brand-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.thankyou-hero-subtitle {
+    font-size: 0.96rem;
+    color: var(--cs-text-muted);
+    margin-bottom: 22px;
+    line-height: 1.6;
+}
+
+.thankyou-hero-host {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #facc15;
+    background: rgba(245, 158, 11, 0.12);
+    padding: 4px 14px;
+    border-radius: var(--cs-radius-full);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.thankyou-quick-pills {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.thankyou-pill-chip {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--cs-border-glass);
+    color: #f1f5f9;
+    padding: 8px 15px;
+    border-radius: var(--cs-radius-full);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--cs-transition);
+}
+
+.thankyou-pill-chip:active {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.95);
+}
+
+/* ==========================================================
+   CARTOON MASCOT & CAKE CEREMONY (CENTER SPOTLIGHT)
+   ========================================================== */
+.thankyou-cake-section {
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Initial Spotlight Cake Mode (Highlighted when first loading) */
+.thankyou-cake-section.spotlight-mode {
+    border: 2px solid rgba(249, 115, 22, 0.55);
+    box-shadow: 0 0 50px rgba(249, 115, 22, 0.3), 0 20px 45px rgba(0,0,0,0.7);
+    padding: 30px 20px 26px;
+}
+
+/* Pataka Blast Screen Sparks */
+.pataka-blast-banner {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    background: linear-gradient(135deg, #ff4500 0%, #ff1493 50%, #ffd700 100%);
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: var(--cs-radius-full);
+    font-weight: 900;
+    font-size: 0.88rem;
+    box-shadow: 0 0 30px rgba(255, 69, 0, 0.8), 0 0 15px #ffd700;
+    z-index: 50;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pataka-blast-banner.active {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+    animation: patakaPulse 1.2s infinite alternate;
+}
+
+@keyframes patakaPulse {
+    0% { transform: translateX(-50%) scale(1); box-shadow: 0 0 25px rgba(255, 69, 0, 0.7); }
+    100% { transform: translateX(-50%) scale(1.08); box-shadow: 0 0 45px rgba(255, 215, 0, 0.9); }
+}
+
+.thankyou-section-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #fb923c;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.thankyou-section-title {
+    font-size: 1.55rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+    color: #fff;
+}
+
+.thankyou-section-desc {
+    color: var(--cs-text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.thankyou-cake-stage {
+    position: relative;
+    height: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    margin: 10px 0 26px;
+}
+
+/* ====================
+   CARTOON MASCOT CHARACTER
+   ==================== */
+.cartoon-mascot {
+    position: absolute;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    user-select: none;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.cartoon-mascot.mascot-entering {
+    left: 8px;
+    bottom: 90px;
+    animation: mascotBounce 2s infinite ease-in-out;
+}
+
+.cartoon-mascot.mascot-blowing {
+    left: 28%;
+    bottom: 125px;
+    transform: scale(1.15) rotate(12deg);
+}
+
+.cartoon-mascot.mascot-slicing {
+    left: 36%;
+    bottom: 110px;
+    transform: scale(1.2) rotate(-8deg);
+}
+
+.cartoon-mascot.mascot-celebrating {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 160px;
+    animation: mascotVictoryDance 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes mascotBounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-12px) scale(1.05); }
+}
+
+@keyframes mascotVictoryDance {
+    0% { transform: translateX(-50%) translateY(0) scale(1.25) rotate(-10deg); }
+    100% { transform: translateX(-50%) translateY(-24px) scale(1.35) rotate(10deg); }
+}
+
+.mascot-body-wrapper {
+    position: relative;
+    width: 68px;
+    height: 68px;
+    background: linear-gradient(135deg, #ffd166 0%, #f77f00 100%);
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 8px 24px rgba(247, 127, 0, 0.5), inset 0 3px 6px rgba(255,255,255,0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.mascot-party-hat {
+    position: absolute;
+    top: -24px;
+    right: 4px;
+    font-size: 1.5rem;
+    transform: rotate(18deg);
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    animation: hatWiggle 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes hatWiggle {
+    0% { transform: rotate(14deg); }
+    100% { transform: rotate(26deg) scale(1.1); }
+}
+
+.mascot-face {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    margin-top: 4px;
+}
+
+.mascot-eyes {
+    display: flex;
+    gap: 14px;
+    font-size: 0.95rem;
+}
+
+.mascot-mouth {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.mascot-blowing .mascot-body-wrapper {
+    animation: puffCheeks 0.4s infinite alternate;
+}
+
+@keyframes puffCheeks {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.18); }
+}
+
+.mascot-wind-gust {
+    position: absolute;
+    right: -32px;
+    top: 20px;
+    font-size: 1.5rem;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.mascot-blowing .mascot-wind-gust {
+    opacity: 1;
+    animation: shootWind 0.6s infinite linear;
+}
+
+@keyframes shootWind {
+    0% { transform: translateX(0) scale(0.6); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateX(35px) scale(1.3); opacity: 0; }
+}
+
+.mascot-knife-hand {
+    position: absolute;
+    left: -18px;
+    bottom: 6px;
+    font-size: 1.6rem;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.4));
+}
+
+.mascot-slicing .mascot-knife-hand {
+    animation: knifeChop 0.4s infinite alternate ease-in;
+}
+
+@keyframes knifeChop {
+    0% { transform: rotate(0deg) translate(0, 0); }
+    100% { transform: rotate(45deg) translate(15px, 15px); }
+}
+
+.mascot-label {
+    margin-top: 6px;
+    background: rgba(0, 0, 0, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffd166;
+    padding: 2px 10px;
+    border-radius: var(--cs-radius-full);
+    font-size: 0.68rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* 3D Cake Elements */
+.thankyou-cake-wrapper {
+    position: relative;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    z-index: 10;
+}
+
+.thankyou-candle {
+    position: absolute;
+    top: -46px;
+    width: 12px;
+    height: 42px;
+    background: repeating-linear-gradient(45deg, #f43f5e, #f43f5e 5px, #ffffff 5px, #ffffff 10px);
+    border-radius: 3px;
+    z-index: 15;
+}
+
+.thankyou-flame {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 22px;
+    background: radial-gradient(circle, #fef08a 20%, #f97316 70%, #ef4444 100%);
+    border-radius: 50% 50% 35% 35%;
+    box-shadow: 0 0 20px #f97316, 0 0 35px #f59e0b;
+    animation: flicker 0.6s infinite alternate;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.thankyou-flame.extinguished {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.2);
+}
+
+.candle-smoke-puff {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.3rem;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.candle-smoke-puff.active {
+    animation: smokeFloatUp 1.4s forwards ease-out;
+}
+
+@keyframes smokeFloatUp {
+    0% { transform: translateX(-50%) scale(0.4) translateY(0); opacity: 0.9; }
+    100% { transform: translateX(-50%) scale(1.6) translateY(-40px); opacity: 0; }
+}
+
+@keyframes flicker {
+    0% { transform: translateX(-50%) scale(0.95); opacity: 0.9; }
+    100% { transform: translateX(-50%) scale(1.05); opacity: 1; }
+}
+
+.thankyou-cake-layer {
+    width: 100%;
+    position: relative;
+    border-radius: 12px;
+    box-shadow: inset 0 3px 5px rgba(255, 255, 255, 0.2), 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.thankyou-layer-top {
+    width: 150px;
+    height: 52px;
+    background: linear-gradient(180deg, #fbcfe8 0%, #f472b6 100%);
+    z-index: 3;
+    display: flex;
+    justify-content: space-around;
+    padding-top: 4px;
+}
+
+.thankyou-strawberry {
+    font-size: 1.2rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.thankyou-cream-drip {
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 100%;
+    height: 12px;
+    background: radial-gradient(circle, #fff 50%, transparent 60%);
+    background-size: 16px 12px;
+    opacity: 0.9;
+}
+
+.thankyou-layer-middle {
+    width: 185px;
+    height: 55px;
+    margin-top: -6px;
+    background: linear-gradient(180deg, #f97316 0%, #ea580c 100%);
+    z-index: 2;
+}
+
+.thankyou-layer-bottom {
+    width: 220px;
+    height: 65px;
+    margin-top: -6px;
+    background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thankyou-cake-text {
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    font-size: 0.92rem;
+    color: #ffffff;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.thankyou-cake-plate {
+    width: 260px;
+    height: 15px;
+    background: linear-gradient(180deg, #e2e8f0 0%, #94a3b8 100%);
+    border-radius: 50%;
+    margin-top: -5px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+}
+
+.thankyou-cake-slice-cut {
+    position: absolute;
+    right: -45px;
+    top: 35px;
+    font-size: 3.2rem;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 20;
+    pointer-events: none;
+}
+
+.thankyou-cake-slice-cut.active {
+    opacity: 1;
+    transform: scale(1.25) translate(18px, -18px) rotate(12deg);
+    filter: drop-shadow(0 0 20px #ffd700);
+}
+
+.pataka-sparks-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 25;
+}
+
+.pataka-spark {
+    position: absolute;
+    font-size: 1.8rem;
+    animation: sparkExplode 1.2s forwards cubic-bezier(0.1, 0.8, 0.3, 1);
+}
+
+@keyframes sparkExplode {
+    0% { transform: translate(0, 0) scale(0.2); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(1.5) rotate(180deg); opacity: 0; }
+}
+
+.thankyou-cake-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 30;
+}
+
+.thankyou-tap-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid var(--cs-border-glass);
+    padding: 10px 18px;
+    border-radius: var(--cs-radius-full);
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--cs-transition);
+}
+
+.thankyou-tap-btn:active { transform: scale(0.95); }
+
+.thankyou-tap-btn.primary-glow {
+    background: var(--cs-brand-gradient);
+    border: none;
+    box-shadow: 0 4px 16px rgba(249, 115, 22, 0.45);
+}
+
+.thankyou-cake-status {
+    display: inline-block;
+    padding: 8px 18px;
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: var(--cs-radius-full);
+    font-size: 0.84rem;
+    color: var(--cs-text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================================================
+   STATS GRID (CASCADING ENTRANCE)
+   ========================================================== */
+.thankyou-stats-section {
+    margin-bottom: 24px;
+    animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.thankyou-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.thankyou-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    margin-bottom: 0;
+}
+
+.thankyou-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--cs-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.stat-love { background: rgba(236, 72, 153, 0.18); color: #f472b6; }
+.stat-cake { background: rgba(249, 115, 22, 0.18); color: #fb923c; }
+.stat-smile { background: rgba(250, 204, 21, 0.18); color: #facc15; }
+.stat-party { background: rgba(139, 92, 246, 0.18); color: #c084fc; }
+
+.thankyou-stat-info h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+}
+
+.thankyou-stat-info p {
+    font-size: 0.75rem;
+    color: var(--cs-text-muted);
+}
+
+@keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================
+   REACTIONS & WISHES BOARD
+   ========================================================== */
+.thankyou-reactions-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.thankyou-reaction-bubble {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--cs-border-glass);
+    border-radius: var(--cs-radius-md);
+    padding: 12px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: var(--cs-transition);
+    user-select: none;
+}
+
+.thankyou-reaction-bubble:active {
+    transform: scale(0.9);
+    background: rgba(249, 115, 22, 0.25);
+}
+
+.thankyou-reaction-emoji {
+    font-size: 1.6rem;
+    margin-bottom: 4px;
+}
+
+.thankyou-reaction-title {
+    font-size: 0.7rem;
+    color: var(--cs-text-muted);
+    margin-bottom: 4px;
+    white-space: nowrap;
+}
+
+.thankyou-reaction-count {
+    font-size: 0.8rem;
+    font-weight: 800;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2px 8px;
+    border-radius: var(--cs-radius-full);
+}
+
+.thankyou-burst-emoji {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+    font-size: 2.2rem;
+    animation: burstFloat 1.2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes burstFloat {
+    0% { transform: translate(-50%, -50%) scale(0.4); opacity: 1; }
+    100% { transform: translate(calc(-50% + (var(--rand-x) * 1px)), calc(-100px + (var(--rand-y) * 1px))) scale(1.4); opacity: 0; }
+}
+
+.thankyou-toast-board {
+    background: rgba(8, 9, 20, 0.65);
+    border-radius: var(--cs-radius-md);
+    padding: 16px;
+    border: 1px solid var(--cs-border-glass);
+}
+
+.thankyou-toast-heading {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #f1f5f9;
+}
+
+.thankyou-wall-input-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.thankyou-wall-input-bar input {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--cs-border-glass);
+    border-radius: var(--cs-radius-sm);
+    color: #fff;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    box-sizing: border-box;
+}
+
+.thankyou-wall-input-name { width: 35%; }
+.thankyou-wall-input-msg { width: 50%; }
+
+.thankyou-wall-btn {
+    width: 15%;
+    background: var(--cs-brand-gradient);
+    border: none;
+    color: #fff;
+    border-radius: var(--cs-radius-sm);
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thankyou-wishes-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 230px;
+    overflow-y: auto;
+}
+
+.thankyou-wish-item {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: var(--cs-radius-sm);
+    padding: 10px 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.thankyou-wish-avatar {
+    font-size: 1.1rem;
+}
+
+.thankyou-wish-content strong {
+    color: #fb923c;
+    font-size: 0.84rem;
+    margin-right: 4px;
+}
+
+.thankyou-wish-content p {
+    font-size: 0.84rem;
+    display: inline;
+    color: #e2e8f0;
+}
+
+.thankyou-wishes-empty {
+    text-align: center;
+    padding: 24px 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    border-radius: var(--cs-radius-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.thankyou-wishes-empty-icon {
+    font-size: 1.8rem;
+    margin-bottom: 2px;
+}
+
+.thankyou-wishes-empty-text {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #f1f5f9;
+}
+
+.thankyou-wishes-empty-sub {
+    font-size: 0.78rem;
+    color: var(--cs-text-muted);
+}
+
+/* Share Section */
+.thankyou-share-card {
+    text-align: center;
+    padding: 24px 16px;
+}
+
+.thankyou-share-card h2 {
+    font-size: 1.35rem;
+    margin-bottom: 8px;
+    font-weight: 800;
+}
+
+.thankyou-share-card p {
+    font-size: 0.88rem;
+    color: var(--cs-text-muted);
+    margin-bottom: 16px;
+}
+
+.thankyou-action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.thankyou-m-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--cs-radius-full);
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    transition: var(--cs-transition);
+}
+
+.thankyou-m-btn:active { transform: scale(0.96); }
+.thankyou-copy-btn { background: rgba(255, 255, 255, 0.12); color: #ffffff; }
+.thankyou-wa-btn { background: var(--cs-wa-gradient); color: #ffffff; box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35); }
+
+/* CS Corp Footer */
+.thankyou-footer {
+    text-align: center;
+    color: var(--cs-text-dim);
+    font-size: 0.84rem;
+    padding-top: 12px;
+}
+
+.thankyou-cs-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    color: #fb923c;
+    font-size: 0.88rem;
+    margin-bottom: 6px;
+}
+
+.thankyou-footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 10px;
+}
+
+.thankyou-footer-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.78rem;
+    transition: var(--cs-transition);
+}
+
+.thankyou-footer-links a:hover {
+    color: #fb923c;
+}
+
+.thankyou-footer-small {
+    display: block;
+    font-size: 0.74rem;
+    margin-top: 4px;
+    color: #64748b;
+}
+
+/* Sticky Mobile Bottom Bar */
+.thankyou-sticky-bottom-bar {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 28px);
+    max-width: 480px;
+    background: rgba(18, 20, 42, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--cs-radius-full);
+    padding: 6px 12px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 999;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7);
+}
+
+.thankyou-sticky-nav-item {
+    background: transparent;
+    border: none;
+    color: var(--cs-text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: var(--cs-radius-full);
+    cursor: pointer;
+    transition: var(--cs-transition);
+}
+
+.thankyou-sticky-nav-item:active { transform: scale(0.9); color: #fff; }
+
+.thankyou-sticky-nav-item.center-highlight {
+    background: var(--cs-brand-gradient);
+    color: #ffffff;
+    padding: 8px 18px;
+    margin-top: -14px;
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+}
+
+/* Toast */
+.thankyou-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 10px 22px;
+    border-radius: var(--cs-radius-full);
+    font-size: 0.88rem;
+    font-weight: 700;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    z-index: 99999;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    max-width: 90%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.thankyou-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}

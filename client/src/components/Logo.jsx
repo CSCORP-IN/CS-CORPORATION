@@ -26,6 +26,14 @@ const BRAND_CONFIGS = {
         words: ['Chaudhary', 'चौधरी'],
         bottom: 'ARTICLES'
     },
+    'thanks': {
+        words: ['Chaudhary', 'चौधरी'],
+        bottom: 'THANKS'
+    },
+    'chaudharythanks': {
+        words: ['Chaudhary', 'चौधरी'],
+        bottom: 'THANKS'
+    },
     'default': {
         words: ['Chaudhary', 'cscorp.in', 'चौधरी'],
         bottom: '& SONS'
@@ -41,6 +49,7 @@ const Logo = ({ className = "", variant }) => {
     }
 
     const currentVariant = variant || (
+        (location?.pathname === '/thankyou' || location?.pathname === '/thank-you') ? 'thanks' :
         (location?.pathname === '/anant-chaudhary' || location?.pathname === '/anant') ? 'anant' :
         (location?.pathname === '/ankit-chaudhary' || location?.pathname === '/ankit' || location?.pathname === '/resume') ? 'ankit' :
         (location?.pathname === '/chaudhary-and-sons' || location?.pathname === '/' || location?.pathname === '/profile' || location?.pathname.startsWith('/admin')) ? 'sons' :

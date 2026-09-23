@@ -92,6 +92,18 @@
     color: #09090b;
 }
 
+.dark .logo-row-top.english-cursive,
+.dark .logo-row-top.hindi-cursive,
+.dark .logo-type-text,
+[data-theme="dark"] .logo-row-top.english-cursive,
+[data-theme="dark"] .logo-row-top.hindi-cursive,
+[data-theme="dark"] .logo-type-text,
+.dark-theme .logo-row-top.english-cursive,
+.dark-theme .logo-row-top.hindi-cursive,
+.dark-theme .logo-type-text {
+    color: #ffffff;
+}
+
 /* Row 2: Secondary Word (Tracked Subtitle Accent) */
 .logo-row-bottom {
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;

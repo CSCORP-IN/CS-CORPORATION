@@ -11,6 +11,7 @@ import bcrypt from 'bcryptjs';
 import Article from './models/Article.js';
 import User from './models/User.js';
 import Enquiry from './models/Enquiry.js';
+import ThankYouWish from './models/ThankYouWish.js';
 import { sendOTPEmail, sendContactEmail, sendEnquiryEmail } from './utils/emailService.js';
 
 dotenv.config();
@@ -718,6 +719,167 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
         : `${req.protocol}://${req.get('host')}`;
     const imageUrl = `${serverBase}/uploads/images/${req.file.filename}`;
     res.json({ success: true, url: imageUrl });
+});
+
+// ==========================================================
+// BIRTHDAY THANK YOU API & CELEBRATION PORTAL (/thankyou)
+// ==========================================================
+const THANK_YOU_MESSAGES = {
+    friends: {
+        id: "friends",
+        tabLabel: "Dosti 🍻",
+        label: "🍻 Yaaron Ke Group Ke Liye (Cool & Fun)",
+        text: `Bas ek notification check karne gaya tha, aur yahan inbox me pyaar ka toofan aaya hua hai! 🌪️❤️\n\nBirthday wishes, bezzati bhare stickers aur warm messages ke liye dil se shukriya sabhi ko! 🎉\n\nP.S. Cake to main akele kha gaya, par party ka venue decide karne ke liye meeting kal rakhte hain! 🍻🥳`
+    },
+    stats: {
+        id: "stats",
+        tabLabel: "Tech & Funky 📊",
+        label: "📊 Tech & Funky Stats Style",
+        text: `📊 TODAY'S BIRTHDAY REPORT:\n• Wishes received: 100% Pure Love ❤️\n• Smile level: Maxed out 😄\n• Age: +1 (Wisdom level still buffering... ⏳🧠)\n\nThank you everyone for making my day super special with your lovely wishes and calls! Aap sab rock karte ho! 🥂🎂✨`
+    },
+    shayari: {
+        id: "shayari",
+        tabLabel: "Shayari 🎭",
+        label: "🎭 Filmy / Shayari Style",
+        text: `"Alfaaz kam pad gaye shukriya kehne ko,\nItna pyaar diya aap sab ne mere is khaas din ko." 💖\n\nSaal me ek din aata hai, par aap sab ke messages ne ise hamesha ke liye yaadgar bana diya! Dil ki gehraiyon se thank you so much dosto! 🙌🎈`
+    },
+    family: {
+        id: "family",
+        tabLabel: "Family 🙏",
+        label: "🙏 Family & Relatives (Warm & Respectful)",
+        text: `Aap sab ki pyaari wishes, duayein aur aashirwad ne mera janamdin sach me bohot khaas bana diya hai! 🙏✨\n\nItne sundar shabdon aur pyaar ke liye aap sabhi ka tahe dil se shukriya. Hamesha aise hi apna aashirwad banaye rakhein! 🌸❤️`
+    },
+    office: {
+        id: "office",
+        tabLabel: "Office 💼",
+        label: "💼 Office / Formal Colleague Group",
+        text: `Thank you everyone for the warm and wonderful birthday wishes! 🌟\n\nWorking with such an amazing team makes every year even more special. Truly grateful for your kind words and support! ☕🎉`
+    }
+};
+
+let thankYouReactions = {
+    love: 142,
+    cake: 98,
+    cheers: 120,
+    fire: 86,
+    crown: 74
+};
+
+// In-memory fallback wishes (populated only when users submit wishes)
+let inMemoryThankYouWishes = [];
+
+// Helper to get wishes
+async function getThankYouWishes() {
+    if (mongoose.connection.readyState === 1) {
+        try {
+            const dbWishes = await ThankYouWish.find().sort({ createdAt: -1 }).limit(50);
+            return dbWishes || [];
+        } catch (e) {
+            console.error('Error fetching wishes from MongoDB:', e.message);
+        }
+    }
+    return inMemoryThankYouWishes;
+}
+
+// 1. GET /api/thankyou & /thankyou (Full Data Endpoint)
+app.get(['/api/thankyou', '/thankyou'], async (req, res) => {
+    const wantsJson = req.xhr || (req.headers.accept && req.headers.accept.includes('application/json')) || req.path.startsWith('/api/');
+    
+    const wishes = await getThankYouWishes();
+    const data = {
+        success: true,
+        brand: "Chaudhary & Sons (CS Corp)",
+        celebrant: "Ankit Chaudhary",
+        title: "A Big THANK YOU from Ankit Chaudhary! 🎉 | CS Corp Birthday Special",
+        tagline: "OFFICIAL BIRTHDAY THANKS • ANKIT CHAUDHARY",
+        hero: {
+            title: "Ankit Chaudhary Ki Taraf Se Dil Se Thank You! ❤️",
+            subtitle: "Aap sabke messages, phone calls, warm blessings aur stickers ne mere is birthday ko bohot khaas aur memorable bana diya! ✨",
+            signature: "Ankit Chaudhary ⭐"
+        },
+        stats: {
+            lovePercent: 100,
+            sweetCalories: 999,
+            happinessLevel: 100,
+            partyMode: "Active 🍻"
+        },
+        messages: THANK_YOU_MESSAGES,
+        reactions: thankYouReactions,
+        wishes: wishes
+    };
+
+    if (wantsJson) {
+        return res.json(data);
+    }
+
+    // Direct browser hit: if FRONTEND_URL configured, redirect to frontend /thankyou
+    if (process.env.FRONTEND_URL) {
+        const primaryFrontend = process.env.FRONTEND_URL.split(',')[0].trim().replace(/\/$/, '');
+        return res.redirect(`${primaryFrontend}/thankyou`);
+    }
+    return res.json(data);
+});
+
+// 2. POST /api/thankyou/react (Increment reactions)
+app.post(['/api/thankyou/react', '/thankyou/react'], (req, res) => {
+    const { reaction } = req.body;
+    if (reaction && thankYouReactions[reaction] !== undefined) {
+        thankYouReactions[reaction] += 1;
+        return res.json({
+            success: true,
+            reaction,
+            count: thankYouReactions[reaction],
+            reactions: thankYouReactions
+        });
+    }
+    return res.status(400).json({ success: false, message: 'Invalid reaction type. Valid types: love, cake, cheers, fire, crown' });
+});
+
+// 3. POST /api/thankyou/wish (Post wish)
+app.post(['/api/thankyou/wish', '/thankyou/wish'], async (req, res) => {
+    const { name, message } = req.body;
+    if (!message || !message.trim()) {
+        return res.status(400).json({ success: false, message: 'Wish message is required.' });
+    }
+
+    const avatars = ['🎉', '✨', '🕶️', '👑', '🎂', '🥳', '🌟', '🥂', '💖'];
+    const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+
+    let newWish = {
+        id: 'w_' + Date.now(),
+        name: (name && name.trim()) ? name.trim() : 'Dost',
+        message: message.trim(),
+        avatar: randomAvatar,
+        createdAt: new Date()
+    };
+
+    if (mongoose.connection.readyState === 1) {
+        try {
+            const saved = await ThankYouWish.create({
+                name: newWish.name,
+                message: newWish.message,
+                avatar: newWish.avatar
+            });
+            newWish = saved;
+        } catch (dbErr) {
+            console.error('Error saving wish to MongoDB:', dbErr.message);
+            inMemoryThankYouWishes.unshift(newWish);
+        }
+    } else {
+        inMemoryThankYouWishes.unshift(newWish);
+    }
+
+    return res.status(201).json({
+        success: true,
+        wish: newWish,
+        message: 'Wish added successfully! 🎉'
+    });
+});
+
+// 4. GET /api/thankyou/wishes
+app.get(['/api/thankyou/wishes', '/thankyou/wishes'], async (req, res) => {
+    const wishes = await getThankYouWishes();
+    res.json({ success: true, wishes });
 });
 
 app.listen(PORT, () => {
