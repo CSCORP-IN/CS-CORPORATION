@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { 
     X, BookOpen, PenTool, LayoutDashboard, Home, GraduationCap, 
-    FileText, ArrowUpRight, Truck, Layers, LogIn, LogOut, User, ShieldCheck
+    FileText, ArrowUpRight, Truck, Layers, LogIn, LogOut, User, ShieldCheck, Wallet
 } from 'lucide-react';
 import Logo from './Logo';
 import { useAuth } from '../context/AuthContext';
@@ -184,6 +184,20 @@ const Navbar = () => {
                                     </div>
                                 </NavLink>
                             </li>
+                            {isAuthenticated && (
+                                <li>
+                                    <NavLink to="/khatakit" onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                        <div className="dropdown-item-icon"><Wallet size={18} /></div>
+                                        <div className="dropdown-item-info">
+                                            <div className="dropdown-title-row">
+                                                <span className="dropdown-item-title">ChaudharyKhataKit</span>
+                                                <span className="live-pill-tag">Personal</span>
+                                            </div>
+                                            <span className="dropdown-item-desc">My Card EMIs, Statements &amp; Expense Manager</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                            )}
                         </ul>
 
                         {/* Authentication & User Session Management */}
@@ -212,6 +226,10 @@ const Navbar = () => {
                                             <User size={14} />
                                             <span>My Profile & Purchases</span>
                                         </NavLink>
+                                        <NavLink to="/khatakit" onClick={() => setIsOpen(false)} className="auth-profile-nav-btn">
+                                            <Wallet size={14} />
+                                            <span>My KhataKit Expenses</span>
+                                        </NavLink>
                                         {user?.role === 'admin' && (
                                             <NavLink to="/admin" onClick={() => setIsOpen(false)} className="auth-admin-btn">
                                                 <LayoutDashboard size={14} />
@@ -232,7 +250,7 @@ const Navbar = () => {
                                         </div>
                                         <div className="auth-signin-text">
                                             <span className="auth-signin-title">Sign In / Register</span>
-                                            <span className="auth-signin-sub">Write articles & manage account</span>
+                                            <span className="auth-signin-sub">Access KhataKit expenses &amp; write articles</span>
                                         </div>
                                         <ArrowUpRight size={16} className="auth-signin-arrow" />
                                     </NavLink>
