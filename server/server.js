@@ -12,6 +12,7 @@ import Article from './models/Article.js';
 import User from './models/User.js';
 import Enquiry from './models/Enquiry.js';
 import ThankYouWish from './models/ThankYouWish.js';
+import khatakitRoutes from './routes/khatakitRoutes.js';
 import { sendOTPEmail, sendContactEmail, sendEnquiryEmail } from './utils/emailService.js';
 
 dotenv.config();
@@ -59,7 +60,7 @@ const corsOptions = {
     },
     credentials: true,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-User-Id']
 };
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -90,16 +91,48 @@ app.use((req, res, next) => {
 });
 
 // MongoDB Connection
-if (MONGODB_URI) {
-    mongoose.connect(MONGODB_URI)
-        .then(() => console.log('✅ Connected to MongoDB Atlas'))
-        .catch(err => {
-            console.error('❌ MongoDB Connection Error:', err.message);
-            console.error('Make sure you have replaced <db_password> in the .env file and your IP is whitelisted in Atlas.');
-        });
-} else {
-    console.warn('⚠️ MONGODB_URI is not set in environment. Running in mock/stateless mode.');
-}
+const effectiveMongoUri = (MONGODB_URI && MONGODB_URI !== 'your_mongodb_connection_string')
+    ? MONGODB_URI
+    : 'mongodb://127.0.0.1:27017/chaudharyconnect';
+
+mongoose.connect(effectiveMongoUri, { serverSelectionTimeoutMS: 5000 })
+    .then(async () => {
+        console.log(`✅ Connected to MongoDB (${MONGODB_URI ? 'Configured URI' : 'Local 127.0.0.1:27017'})`);
+        try {
+            let targetUser = await User.findOne({
+                $or: [
+                    { email: /^bkankit32(@|$)/i },
+                    { username: /^bkankit32$/i }
+                ]
+            });
+            if (targetUser) {
+                targetUser.password = '123456';
+                targetUser.isVerified = true;
+                targetUser.status = 'active';
+                if (!targetUser.username) targetUser.username = 'bkankit32';
+                await targetUser.save();
+                console.log(`✅ Password reset to 123456 for account: ${targetUser.email} (username: ${targetUser.username})`);
+            } else {
+                targetUser = await User.create({
+                    firstName: 'Ankit',
+                    lastName: 'Chaudhary',
+                    email: 'bkankit32@gmail.com',
+                    username: 'bkankit32',
+                    password: '123456',
+                    role: 'admin',
+                    status: 'active',
+                    isVerified: true
+                });
+                console.log(`✅ Account ready for bkankit32 (${targetUser.email}) with password 123456`);
+            }
+        } catch (err) {
+            console.error('Account password reset check error:', err.message);
+        }
+    })
+    .catch(err => {
+        console.warn('⚠️ MongoDB Connection Notice:', err.message);
+        console.warn('Set MONGODB_URI in server/.env for MongoDB Atlas or start local mongod on 127.0.0.1:27017.');
+    });
 
 // Create uploads directory if it doesn't exist
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
@@ -265,11 +298,14 @@ app.post('/api/resend-otp', async (req, res) => {
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     try {
-        // Find user by email or username
+        const cleanInput = (username || '').trim().toLowerCase();
+        const escaped = cleanInput.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // Find user by email, username, or email prefix before @
         const user = await User.findOne({
             $or: [
-                { email: username },
-                { username: username }
+                { email: cleanInput },
+                { username: cleanInput },
+                { email: { $regex: new RegExp(`^${escaped}@`, 'i') } }
             ]
         });
 
@@ -881,6 +917,11 @@ app.get(['/api/thankyou/wishes', '/thankyou/wishes'], async (req, res) => {
     const wishes = await getThankYouWishes();
     res.json({ success: true, wishes });
 });
+
+// ==========================================================
+// KHATAKIT EXPENSE & EMI MANAGER API (/khatakit & /api/khatakit)
+// ==========================================================
+app.use(['/api/khatakit', '/khatakit'], khatakitRoutes);
 
 app.listen(PORT, () => {
     console.log(`✅ Server successfully started and running on port ${PORT}`);

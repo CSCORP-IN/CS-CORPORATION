@@ -17,6 +17,7 @@ import EditArticle from './pages/EditArticle';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
 import ThankYou from './pages/ThankYou';
+import KhataKit from './pages/KhataKit';
 import { ArticleProvider } from './context/ArticleContext';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -30,6 +31,7 @@ function AppRoutes() {
   const isDocsSubdomain = hostname === 'docs.cscorp.in' || hostname.startsWith('docs.');
   const isConnectSubdomain = hostname === 'connect.cscorp.in' || hostname === 'courses.cscorp.in' || hostname.startsWith('connect.') || hostname.startsWith('courses.');
   const isArticlesSubdomain = hostname === 'articles.cscorp.in' || hostname === 'blog.cscorp.in' || hostname.startsWith('articles.') || hostname.startsWith('blog.');
+  const isKhataKitSubdomain = hostname === 'khatakit.cscorp.in' || hostname.startsWith('khatakit.');
 
   const isThankYouPage = location.pathname === '/thankyou' || location.pathname === '/thank-you';
 
@@ -39,6 +41,7 @@ function AppRoutes() {
     if (isDocsSubdomain) return <Docs />;
     if (isConnectSubdomain) return <Courses />;
     if (isArticlesSubdomain) return <Articles />;
+    if (isKhataKitSubdomain) return <KhataKit />;
     return <ChaudharySons />;
   };
 
@@ -67,6 +70,7 @@ function AppRoutes() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/thankyou" element={<ThankYou />} />
           <Route path="/thank-you" element={<Navigate to="/thankyou" replace />} />
+          <Route path="/khatakit" element={<KhataKit />} />
         </Routes>
       </main>
       {!isThankYouPage && <Footer />}

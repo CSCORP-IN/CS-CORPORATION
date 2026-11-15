@@ -68,9 +68,9 @@ const Login = () => {
             if (isLogin) {
                 const res = await login(formData.username, formData.password);
                 if (res.success) {
-                    const target = res.role === 'admin' 
-                        ? '/admin' 
-                        : (redirectUrl ? (redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`) : '/');
+                    const target = redirectUrl
+                        ? (redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`)
+                        : (res.role === 'admin' ? '/admin' : '/');
                     navigate(target);
                 } else if (res.requireOtp) {
                     // Account exists but unverified
@@ -129,9 +129,9 @@ const Login = () => {
         try {
             const res = await verifyOtp(otpEmail, otp);
             if (res.success) {
-                const target = res.role === 'admin' 
-                    ? '/admin' 
-                    : (redirectUrl ? (redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`) : '/');
+                const target = redirectUrl
+                    ? (redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`)
+                    : (res.role === 'admin' ? '/admin' : '/');
                 navigate(target);
             } else {
                 setError(res.message || 'Invalid or expired OTP');
