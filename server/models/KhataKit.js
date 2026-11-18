@@ -80,10 +80,11 @@ const khataKitFixedExpenseSchema = new mongoose.Schema({
     toJSON: toJsonConfig
 });
 
-// 5. One-Off Card Spends Schema (Per User)
+// 5. One-Off / One-Time Spends Schema (Per User - supports UPI/Cash/Bank or Credit Card)
 const khataKitCardSpendSchema = new mongoose.Schema({
     user_id: { type: String, required: true, index: true, trim: true },
-    card_id: { type: String, required: true },
+    card_id: { type: String, default: null },
+    payment_method: { type: String, default: 'UPI / Cash / Bank' },
     title: { type: String, required: true, trim: true },
     category: { type: String, default: 'Shopping' },
     amount: { type: Number, required: true, default: 0 },
@@ -96,7 +97,23 @@ const khataKitCardSpendSchema = new mongoose.Schema({
     toJSON: toJsonConfig
 });
 
-// 6. Monthly Payments Status Schema (Per User)
+// 6. One-Time / Monthly Incomes Schema (Per User)
+const khataKitIncomeSchema = new mongoose.Schema({
+    user_id: { type: String, required: true, index: true, trim: true },
+    title: { type: String, required: true, trim: true },
+    category: { type: String, default: 'Salary / Business' },
+    amount: { type: Number, required: true, default: 0 },
+    month: { type: String, required: true },
+    income_date: { type: String, default: '' },
+    payment_mode: { type: String, default: 'Bank / UPI' },
+    notes: { type: String, default: '' }
+}, {
+    collection: 'khatakit_incomes',
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+    toJSON: toJsonConfig
+});
+
+// 7. Monthly Payments Status Schema (Per User)
 const khataKitMonthlyPaymentSchema = new mongoose.Schema({
     user_id: { type: String, required: true, index: true, trim: true },
     month: { type: String, required: true },
@@ -119,4 +136,5 @@ export const KhataKitCard = mongoose.model('KhataKitCard', khataKitCardSchema);
 export const KhataKitEmi = mongoose.model('KhataKitEmi', khataKitEmiSchema);
 export const KhataKitFixedExpense = mongoose.model('KhataKitFixedExpense', khataKitFixedExpenseSchema);
 export const KhataKitCardSpend = mongoose.model('KhataKitCardSpend', khataKitCardSpendSchema);
+export const KhataKitIncome = mongoose.model('KhataKitIncome', khataKitIncomeSchema);
 export const KhataKitMonthlyPayment = mongoose.model('KhataKitMonthlyPayment', khataKitMonthlyPaymentSchema);

@@ -123,9 +123,10 @@ const KhataKit = () => {
     const [emiModalOpen, setEmiModalOpen] = useState(false);
     const [fixedModalOpen, setFixedModalOpen] = useState(false);
     const [spendModalOpen, setSpendModalOpen] = useState(false);
+    const [incomeModalOpen, setIncomeModalOpen] = useState(false);
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
 
-    const anyModalOpen = cardModalOpen || emiModalOpen || fixedModalOpen || spendModalOpen || settingsModalOpen;
+    const anyModalOpen = cardModalOpen || emiModalOpen || fixedModalOpen || spendModalOpen || incomeModalOpen || settingsModalOpen;
 
     // Lock background body scroll when any dialog is open
     useEffect(() => {
@@ -186,11 +187,22 @@ const KhataKit = () => {
 
     const [spendForm, setSpendForm] = useState({
         card_id: '',
+        payment_method: 'UPI / Cash / Bank',
         title: '',
         amount: '',
         category: 'Shopping',
         month: '2026-11',
         spend_date: '2026-11-10'
+    });
+
+    const [incomeForm, setIncomeForm] = useState({
+        title: '',
+        amount: '',
+        category: 'Salary / Business',
+        payment_mode: 'Bank / UPI',
+        month: '2026-11',
+        income_date: '2026-11-10',
+        notes: ''
     });
 
     const [settingsForm, setSettingsForm] = useState({
@@ -381,20 +393,31 @@ const KhataKit = () => {
     };
 
     const openAddSpendModal = (preselectedCardId = '') => {
-        if (!data?.cards?.length) {
-            showToastMsg('Please add a Credit Card first!');
-            openAddCardModal();
-            return;
-        }
+        const todayStr = new Date().toISOString().slice(0, 10);
         setSpendForm({
-            card_id: preselectedCardId || data.cards[0].id,
+            card_id: preselectedCardId || '',
+            payment_method: preselectedCardId ? 'Credit Card' : 'UPI / Cash / Bank',
             title: '',
             amount: '',
             category: 'Shopping',
             month: selectedMonth,
-            spend_date: `${selectedMonth}-10`
+            spend_date: todayStr.startsWith(selectedMonth) ? todayStr : `${selectedMonth}-10`
         });
         setSpendModalOpen(true);
+    };
+
+    const openAddIncomeModal = () => {
+        const todayStr = new Date().toISOString().slice(0, 10);
+        setIncomeForm({
+            title: '',
+            amount: '',
+            category: 'Salary / Business',
+            payment_mode: 'Bank / UPI',
+            month: selectedMonth,
+            income_date: todayStr.startsWith(selectedMonth) ? todayStr : `${selectedMonth}-01`,
+            notes: ''
+        });
+        setIncomeModalOpen(true);
     };
 
     const openSettings = () => {
@@ -527,9 +550,12 @@ const KhataKit = () => {
         try {
             await khataFetch('/spends', {
                 method: 'POST',
-                body: JSON.stringify(spendForm)
+                body: JSON.stringify({
+                    ...spendForm,
+                    card_id: spendForm.card_id || null
+                })
             });
-            showToastMsg('Card spend added to statement!');
+            showToastMsg('One-time spend added!');
             setSpendModalOpen(false);
             await loadDashboard();
         } catch (err) {
@@ -540,10 +566,35 @@ const KhataKit = () => {
     const handleDeleteSpend = async (id) => {
         try {
             await khataFetch(`/spends/${id}`, { method: 'DELETE' });
-            showToastMsg('Card spend removed');
+            showToastMsg('Spend removed');
             await loadDashboard();
         } catch (err) {
             showToastMsg('Error removing spend: ' + err.message);
+        }
+    };
+
+    const handleSaveIncome = async (ev) => {
+        ev.preventDefault();
+        try {
+            await khataFetch('/incomes', {
+                method: 'POST',
+                body: JSON.stringify(incomeForm)
+            });
+            showToastMsg('Income added!');
+            setIncomeModalOpen(false);
+            await loadDashboard();
+        } catch (err) {
+            showToastMsg('Error adding income: ' + err.message);
+        }
+    };
+
+    const handleDeleteIncome = async (id) => {
+        try {
+            await khataFetch(`/incomes/${id}`, { method: 'DELETE' });
+            showToastMsg('Income entry removed');
+            await loadDashboard();
+        } catch (err) {
+            showToastMsg('Error removing income: ' + err.message);
         }
     };
 
@@ -708,10 +759,12 @@ const KhataKit = () => {
     const emis = data?.emis || [];
     const fixedExpenses = data?.fixed_expenses || [];
     const cardSpends = data?.card_spends || [];
+    const incomes = data?.incomes || [];
     const checklist = data?.checklist || [];
     const projection = data?.projection || [];
 
-    const income = Number(settings.monthly_income) || 0;
+    const totalOneTimeIncome = Number(summary.total_one_time_income) || incomes.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+    const income = (Number(settings.monthly_income) || 0) + totalOneTimeIncome;
     const incomePct = income > 0 ? Math.round((summary.total_monthly_outflow / income) * 100) : null;
     const paidPct = summary.total_monthly_outflow > 0
         ? Math.min(100, Math.round((summary.total_paid / (summary.total_paid + summary.total_unpaid || 1)) * 100))
@@ -842,23 +895,26 @@ const KhataKit = () => {
 
                 {/* Quick Actions */}
                 <div className="kk-topbar-actions">
-                    <button type="button" className="kk-btn kk-btn-primary" onClick={openAddEmiModal}>
+                    <button type="button" className="kk-btn kk-btn-primary" onClick={() => openAddSpendModal()}>
+                        <Plus size={15} /> One-Time Spend
+                    </button>
+                    <button type="button" className="kk-btn kk-btn-emerald" onClick={openAddIncomeModal}>
+                        <Plus size={15} /> One-Time Income
+                    </button>
+                    <button type="button" className="kk-btn kk-btn-secondary" onClick={openAddEmiModal}>
                         <Plus size={15} /> Add EMI
                     </button>
-                    <button type="button" className="kk-btn kk-btn-emerald" onClick={openAddFixedModal}>
+                    <button type="button" className="kk-btn kk-btn-secondary" onClick={openAddFixedModal}>
                         <Plus size={15} /> Fixed Expense
                     </button>
                     <button type="button" className="kk-btn kk-btn-secondary" onClick={openAddCardModal}>
                         <CreditCard size={15} /> Add Card
                     </button>
-                    <button type="button" className="kk-btn kk-btn-secondary" onClick={() => openAddSpendModal()}>
-                        <Plus size={15} /> Card Spend
-                    </button>
                     <button
                         type="button"
                         className="kk-icon-btn kk-desktop-settings-btn"
                         onClick={openSettings}
-                        title="Currency, Budget & MongoDB Backup Settings"
+                        title="Settings & Backup"
                     >
                         <Settings size={17} />
                     </button>
@@ -934,6 +990,18 @@ const KhataKit = () => {
                         {income > 0 && (
                             <span>Left: <strong>{formatMoney(Math.max(0, income - summary.total_monthly_outflow))}</strong></span>
                         )}
+                    </div>
+                </div>
+
+                <div className="kk-kpi-card" style={{ '--kpi-color': '#10b981', cursor: 'pointer' }} onClick={openAddIncomeModal}>
+                    <div className="kk-kpi-top">
+                        <span className="kk-kpi-label">Total Month Income</span>
+                        <span className="kk-badge kk-badge-paid">+ Add Income</span>
+                    </div>
+                    <div className="kk-kpi-value">{formatMoney(income)}</div>
+                    <div className="kk-kpi-sub">
+                        <span>One-Time: {formatMoney(totalOneTimeIncome)}</span>
+                        <span>Balance: <strong>{formatMoney(income - summary.total_monthly_outflow)}</strong></span>
                     </div>
                 </div>
 
@@ -1147,6 +1215,89 @@ const KhataKit = () => {
                                 <span><i className="kk-dot" style={{ background: '#f97316' }}></i> EMIs</span>
                                 <span><i className="kk-dot" style={{ background: '#10b981' }}></i> Fixed Expenses</span>
                                 <span><i className="kk-dot" style={{ background: '#0284c7' }}></i> Card Spends</span>
+                            </div>
+                        </div>
+
+                        {/* One-Time Spends & One-Time Incomes This Month */}
+                        <div className="kk-panel">
+                            <div className="kk-panel-header">
+                                <div>
+                                    <h2 className="kk-panel-title">💸 One-Time Spends ({formatMonthDisplay(selectedMonth, true)})</h2>
+                                    <p className="kk-panel-subtitle">All non-EMI spends via UPI, Cash, Bank, or Credit Card</p>
+                                </div>
+                                <button type="button" className="kk-btn kk-btn-primary kk-btn-sm" onClick={() => openAddSpendModal()}>
+                                    + Add Spend
+                                </button>
+                            </div>
+                            <div className="kk-quick-checklist">
+                                {!cardSpends.length ? (
+                                    <p className="kk-text-muted">No one-time spends logged for {formatMonthDisplay(selectedMonth)}.</p>
+                                ) : (
+                                    cardSpends.map(sp => (
+                                        <div key={sp.id} className="kk-quick-item">
+                                            <div className="kk-quick-item-left">
+                                                <span className="kk-color-dot" style={{ background: sp.card_color || '#f97316' }}></span>
+                                                <div>
+                                                    <div className="kk-quick-item-title">{sp.title}</div>
+                                                    <div className="kk-quick-item-sub">
+                                                        {sp.category} • {sp.card_name || sp.payment_method || 'UPI / Cash'} • {sp.spend_date}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="kk-quick-item-right">
+                                                <strong>{formatMoney(sp.amount)}</strong>
+                                                <button
+                                                    type="button"
+                                                    className="kk-btn kk-btn-danger-ghost kk-btn-sm"
+                                                    onClick={() => handleDeleteSpend(sp.id)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="kk-panel">
+                            <div className="kk-panel-header">
+                                <div>
+                                    <h2 className="kk-panel-title">💰 One-Time Incomes ({formatMonthDisplay(selectedMonth, true)})</h2>
+                                    <p className="kk-panel-subtitle">Salary, freelance, bonus, refund, or other income received</p>
+                                </div>
+                                <button type="button" className="kk-btn kk-btn-emerald kk-btn-sm" onClick={openAddIncomeModal}>
+                                    + Add Income
+                                </button>
+                            </div>
+                            <div className="kk-quick-checklist">
+                                {!incomes.length ? (
+                                    <p className="kk-text-muted">No one-time income entries logged for {formatMonthDisplay(selectedMonth)}.</p>
+                                ) : (
+                                    incomes.map(inc => (
+                                        <div key={inc.id} className="kk-quick-item">
+                                            <div className="kk-quick-item-left">
+                                                <span className="kk-color-dot" style={{ background: '#10b981' }}></span>
+                                                <div>
+                                                    <div className="kk-quick-item-title">{inc.title}</div>
+                                                    <div className="kk-quick-item-sub">
+                                                        {inc.category} • {inc.payment_mode || 'Bank / UPI'} • {inc.income_date}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="kk-quick-item-right">
+                                                <strong style={{ color: '#059669' }}>+{formatMoney(inc.amount)}</strong>
+                                                <button
+                                                    type="button"
+                                                    className="kk-btn kk-btn-danger-ghost kk-btn-sm"
+                                                    onClick={() => handleDeleteIncome(inc.id)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
 
@@ -2129,36 +2280,22 @@ const KhataKit = () => {
                 </div>
             )}
 
-            {/* MODAL 4: ADD ONE-OFF CARD SPEND */}
+            {/* MODAL 4: ADD ONE-TIME SPEND (UPI / CASH / BANK OR CREDIT CARD) */}
             {spendModalOpen && (
                 <div className="kk-modal-backdrop" onClick={() => setSpendModalOpen(false)}>
                     <div className="kk-modal-card" onClick={(e) => e.stopPropagation()}>
                         <div className="kk-modal-header">
-                            <h3>Log Card Spend (Non-EMI)</h3>
+                            <h3>Add One-Time Spend</h3>
                             <button type="button" className="kk-modal-close" onClick={() => setSpendModalOpen(false)}>&times;</button>
                         </div>
                         <form onSubmit={handleSaveSpend}>
                             <div className="kk-form-grid">
                                 <div className="kk-form-group span-2">
-                                    <label>Card *</label>
-                                    <select
-                                        required
-                                        value={spendForm.card_id}
-                                        onChange={(e) => setSpendForm({ ...spendForm, card_id: e.target.value })}
-                                    >
-                                        {cards.map(c => (
-                                            <option key={c.id} value={c.id}>
-                                                {c.name} ({c.bank})
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="kk-form-group span-2">
                                     <label>Spend Description *</label>
                                     <input
                                         type="text"
                                         required
-                                        placeholder="e.g. Monthly Groceries, Fuel, Dining Out"
+                                        placeholder="e.g. Groceries, Fuel, Shopping, Dinner"
                                         value={spendForm.title}
                                         onChange={(e) => setSpendForm({ ...spendForm, title: e.target.value })}
                                     />
@@ -2169,7 +2306,7 @@ const KhataKit = () => {
                                         type="number"
                                         step="any"
                                         required
-                                        placeholder="e.g. 3500"
+                                        placeholder="e.g. 1500"
                                         value={spendForm.amount}
                                         onChange={(e) => setSpendForm({ ...spendForm, amount: e.target.value })}
                                     />
@@ -2184,12 +2321,34 @@ const KhataKit = () => {
                                         <option value="Groceries">Groceries</option>
                                         <option value="Dining">Dining &amp; Food</option>
                                         <option value="Fuel & Travel">Fuel &amp; Travel</option>
+                                        <option value="Bills & Recharge">Bills &amp; Recharge</option>
                                         <option value="Medical">Medical</option>
                                         <option value="Other">Other</option>
                                     </select>
                                 </div>
+                                <div className="kk-form-group span-2">
+                                    <label>Paid Via (UPI / Cash / Bank or Credit Card)</label>
+                                    <select
+                                        value={spendForm.card_id || ''}
+                                        onChange={(e) => {
+                                            const cid = e.target.value;
+                                            setSpendForm({
+                                                ...spendForm,
+                                                card_id: cid,
+                                                payment_method: cid ? 'Credit Card' : 'UPI / Cash / Bank'
+                                            });
+                                        }}
+                                    >
+                                        <option value="">UPI / Cash / Bank Transfer (Direct)</option>
+                                        {cards.map(c => (
+                                            <option key={c.id} value={c.id}>
+                                                Credit Card: {c.name} ({c.bank})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                                 <div className="kk-form-group">
-                                    <label>Billing Month *</label>
+                                    <label>Month *</label>
                                     <input
                                         type="month"
                                         required
@@ -2208,7 +2367,99 @@ const KhataKit = () => {
                             </div>
                             <div className="kk-modal-footer">
                                 <button type="button" className="kk-btn kk-btn-ghost" onClick={() => setSpendModalOpen(false)}>Cancel</button>
-                                <button type="submit" className="kk-btn kk-btn-primary">Add to Card Statement</button>
+                                <button type="submit" className="kk-btn kk-btn-primary">Save One-Time Spend</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL 4B: ADD ONE-TIME INCOME */}
+            {incomeModalOpen && (
+                <div className="kk-modal-backdrop" onClick={() => setIncomeModalOpen(false)}>
+                    <div className="kk-modal-card" onClick={(e) => e.stopPropagation()}>
+                        <div className="kk-modal-header">
+                            <h3>Add One-Time Income</h3>
+                            <button type="button" className="kk-modal-close" onClick={() => setIncomeModalOpen(false)}>&times;</button>
+                        </div>
+                        <form onSubmit={handleSaveIncome}>
+                            <div className="kk-form-grid">
+                                <div className="kk-form-group span-2">
+                                    <label>Income Source / Title *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="e.g. Monthly Salary, Freelance Project, Bonus, Refund"
+                                        value={incomeForm.title}
+                                        onChange={(e) => setIncomeForm({ ...incomeForm, title: e.target.value })}
+                                    />
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Amount *</label>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        required
+                                        placeholder="e.g. 50000"
+                                        value={incomeForm.amount}
+                                        onChange={(e) => setIncomeForm({ ...incomeForm, amount: e.target.value })}
+                                    />
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Category</label>
+                                    <select
+                                        value={incomeForm.category}
+                                        onChange={(e) => setIncomeForm({ ...incomeForm, category: e.target.value })}
+                                    >
+                                        <option value="Salary / Business">Salary / Business</option>
+                                        <option value="Freelance / Consulting">Freelance / Consulting</option>
+                                        <option value="Bonus / Incentive">Bonus / Incentive</option>
+                                        <option value="Refund / Cashback">Refund / Cashback</option>
+                                        <option value="Investment / Dividend">Investment / Dividend</option>
+                                        <option value="Gift / Other">Gift / Other</option>
+                                    </select>
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Received In</label>
+                                    <select
+                                        value={incomeForm.payment_mode}
+                                        onChange={(e) => setIncomeForm({ ...incomeForm, payment_mode: e.target.value })}
+                                    >
+                                        <option value="Bank / UPI">Bank Account / UPI</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Wallet / Card">Wallet / Card</option>
+                                    </select>
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Month *</label>
+                                    <input
+                                        type="month"
+                                        required
+                                        value={incomeForm.month}
+                                        onChange={(e) => setIncomeForm({ ...incomeForm, month: e.target.value })}
+                                    />
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Date</label>
+                                    <input
+                                        type="date"
+                                        value={incomeForm.income_date}
+                                        onChange={(e) => setIncomeForm({ ...incomeForm, income_date: e.target.value })}
+                                    />
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Notes (Optional)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Optional note"
+                                        value={incomeForm.notes}
+                                        onChange={(e) => setIncomeForm({ ...incomeForm, notes: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="kk-modal-footer">
+                                <button type="button" className="kk-btn kk-btn-ghost" onClick={() => setIncomeModalOpen(false)}>Cancel</button>
+                                <button type="submit" className="kk-btn kk-btn-emerald">Save Income</button>
                             </div>
                         </form>
                     </div>

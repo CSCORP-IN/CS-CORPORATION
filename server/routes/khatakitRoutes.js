@@ -9,6 +9,7 @@ import {
     KhataKitEmi,
     KhataKitFixedExpense,
     KhataKitCardSpend,
+    KhataKitIncome,
     KhataKitMonthlyPayment
 } from '../models/KhataKit.js';
 
@@ -60,9 +61,13 @@ function getUserFallback(userId) {
             emis: [],
             fixed_expenses: [],
             card_spends: [],
+            incomes: [],
             monthly_payments: []
         };
         saveLocalStore();
+    }
+    if (!Array.isArray(fallbackUsers[key].incomes)) {
+        fallbackUsers[key].incomes = [];
     }
     return fallbackUsers[key];
 }
@@ -160,12 +165,13 @@ async function getRawStateForMonth(userId, selectedMonth) {
     await ensureUserSettings(userId);
 
     if (isMongoConnected()) {
-        const [settingsDocs, cardsDocs, emisDocs, fixedDocs, spendsDocs, paymentsDocs] = await Promise.all([
+        const [settingsDocs, cardsDocs, emisDocs, fixedDocs, spendsDocs, incomesDocs, paymentsDocs] = await Promise.all([
             KhataKitSetting.find({ user_id: userId }),
             KhataKitCard.find({ user_id: userId }).sort({ created_at: 1 }),
             KhataKitEmi.find({ user_id: userId }).sort({ due_day: 1, created_at: 1 }),
             KhataKitFixedExpense.find({ user_id: userId }).sort({ due_day: 1, created_at: 1 }),
             KhataKitCardSpend.find({ user_id: userId, month: selectedMonth }).sort({ spend_date: -1, created_at: -1 }),
+            KhataKitIncome.find({ user_id: userId, month: selectedMonth }).sort({ income_date: -1, created_at: -1 }),
             KhataKitMonthlyPayment.find({ user_id: userId, month: selectedMonth })
         ]);
 
@@ -178,6 +184,7 @@ async function getRawStateForMonth(userId, selectedMonth) {
             emisRaw: emisDocs.map(d => d.toJSON()),
             fixedRaw: fixedDocs.map(d => d.toJSON()),
             spendsRaw: spendsDocs.map(d => d.toJSON()),
+            incomesRaw: incomesDocs.map(d => d.toJSON()),
             paymentsRaw: paymentsDocs.map(d => d.toJSON())
         };
     }
@@ -189,13 +196,14 @@ async function getRawStateForMonth(userId, selectedMonth) {
         emisRaw: [...userStore.emis],
         fixedRaw: [...userStore.fixed_expenses],
         spendsRaw: userStore.card_spends.filter(s => s.month === selectedMonth),
+        incomesRaw: (userStore.incomes || []).filter(inc => inc.month === selectedMonth),
         paymentsRaw: userStore.monthly_payments.filter(p => p.month === selectedMonth)
     };
 }
 
 // Build complete dashboard payload for userId and selectedMonth (YYYY-MM)
 async function buildMonthPayload(userId, selectedMonth) {
-    const { settings, cards, emisRaw, fixedRaw, spendsRaw, paymentsRaw } = await getRawStateForMonth(userId, selectedMonth);
+    const { settings, cards, emisRaw, fixedRaw, spendsRaw, incomesRaw, paymentsRaw } = await getRawStateForMonth(userId, selectedMonth);
 
     const cardMap = new Map(cards.map(c => [String(c.id), c]));
     const paymentMap = new Map();
@@ -408,14 +416,28 @@ async function buildMonthPayload(userId, selectedMonth) {
     const totalVariableSpends = spendsRaw.reduce((s, sp) => s + Number(sp.amount), 0);
     const totalMonthlyOutflow = totalEmiOutflow + totalFixedOutflow + totalVariableSpends;
 
+    const totalOneTimeIncome = (incomesRaw || []).reduce((s, inc) => s + (Number(inc.amount) || 0), 0);
+    const baseMonthlyIncome = Number(settings.monthly_income) || 0;
+    const totalIncomeThisMonth = baseMonthlyIncome + totalOneTimeIncome;
+
     const totalPaidChecklist = checklist.filter(c => c.is_paid).reduce((s, c) => s + c.amount, 0);
     const totalUnpaidChecklist = checklist.filter(c => !c.is_paid).reduce((s, c) => s + c.amount, 0);
+
+    const enrichedSpends = spendsRaw.map(s => {
+        const card = s.card_id ? cardMap.get(String(s.card_id)) : null;
+        return {
+            ...s,
+            id: String(s.id),
+            card_id: s.card_id ? String(s.card_id) : null,
+            card_name: card ? card.name : (s.payment_method || 'UPI / Cash / Bank'),
+            card_color: card ? card.color : '#0284c7'
+        };
+    });
 
     return {
         success: true,
         brand: 'Chaudhary & Sons (CS Corp) • KhataKit',
         user_id: userId,
-        database: isMongoConnected() ? 'MongoDB' : 'Local Persistent DB',
         selected_month: selectedMonth,
         settings,
         summary: {
@@ -423,6 +445,9 @@ async function buildMonthPayload(userId, selectedMonth) {
             total_emi_outflow: totalEmiOutflow,
             total_fixed_outflow: totalFixedOutflow,
             total_variable_spends: totalVariableSpends,
+            total_one_time_income: totalOneTimeIncome,
+            total_income_this_month: totalIncomeThisMonth,
+            net_balance: totalIncomeThisMonth - totalMonthlyOutflow,
             total_cards_statement: cardSummaries.reduce((s, c) => s + c.statement_total, 0),
             total_paid: totalPaidChecklist,
             total_unpaid: totalUnpaidChecklist,
@@ -434,7 +459,8 @@ async function buildMonthPayload(userId, selectedMonth) {
         cards: cardSummaries,
         emis,
         fixed_expenses: fixedExpenses,
-        card_spends: spendsRaw.map(s => ({ ...s, id: String(s.id), card_id: String(s.card_id) })),
+        card_spends: enrichedSpends,
+        incomes: (incomesRaw || []).map(inc => ({ ...inc, id: String(inc.id) })),
         checklist,
         projection
     };
@@ -764,15 +790,19 @@ router.delete('/fixed/:id', async (req, res) => {
     }
 });
 
-// 6. CARD SPENDS CRUD
+// 6. ONE-TIME SPENDS CRUD (Supports UPI/Cash/Bank OR Credit Card)
 router.post('/spends', async (req, res) => {
     try {
         const userId = req.khataUserId;
         const b = req.body || {};
+        const cardId = (b.card_id && String(b.card_id).trim() && String(b.card_id) !== 'none')
+            ? String(b.card_id).trim()
+            : null;
         const spendData = {
             user_id: userId,
-            card_id: String(b.card_id),
-            title: b.title || 'Card Spend',
+            card_id: cardId,
+            payment_method: b.payment_method || (cardId ? 'Credit Card' : 'UPI / Cash / Bank'),
+            title: b.title || 'One-Time Spend',
             category: b.category || 'Shopping',
             amount: Number(b.amount) || 0,
             month: b.month || '2026-11',
@@ -804,6 +834,54 @@ router.delete('/spends/:id', async (req, res) => {
         } else {
             const userStore = getUserFallback(userId);
             userStore.card_spends = userStore.card_spends.filter(s => String(s.id) !== String(id));
+            saveLocalStore();
+        }
+        return res.json({ ok: true });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+});
+
+// 6B. ONE-TIME INCOMES CRUD
+router.post('/incomes', async (req, res) => {
+    try {
+        const userId = req.khataUserId;
+        const b = req.body || {};
+        const incomeData = {
+            user_id: userId,
+            title: b.title || 'Income',
+            category: b.category || 'Salary / Business',
+            amount: Number(b.amount) || 0,
+            month: b.month || '2026-11',
+            income_date: b.income_date || new Date().toISOString().slice(0, 10),
+            payment_mode: b.payment_mode || 'Bank / UPI',
+            notes: b.notes || ''
+        };
+
+        if (isMongoConnected()) {
+            const created = await KhataKitIncome.create(incomeData);
+            return res.status(201).json({ id: created._id.toString() });
+        } else {
+            const userStore = getUserFallback(userId);
+            const newId = 'inc_' + Date.now();
+            userStore.incomes.push({ id: newId, ...incomeData });
+            saveLocalStore();
+            return res.status(201).json({ id: newId });
+        }
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+});
+
+router.delete('/incomes/:id', async (req, res) => {
+    try {
+        const userId = req.khataUserId;
+        const { id } = req.params;
+        if (isMongoConnected()) {
+            await KhataKitIncome.findOneAndDelete({ _id: id, user_id: userId });
+        } else {
+            const userStore = getUserFallback(userId);
+            userStore.incomes = (userStore.incomes || []).filter(inc => String(inc.id) !== String(id));
             saveLocalStore();
         }
         return res.json({ ok: true });
