@@ -5,7 +5,7 @@ import {
     CreditCard, Calendar, CheckCircle2, PieChart, TrendingDown,
     Plus, Settings, Download, Upload, Trash2, Edit3,
     ChevronLeft, ChevronRight, Home, Shield, Zap, DollarSign,
-    Sparkles, Layers, Check, AlertCircle, Wallet, ArrowUpRight, Database, User
+    Sparkles, Layers, Check, AlertCircle, Wallet, ArrowUpRight, User
 } from 'lucide-react';
 import API_BASE_URL from '../config';
 import { useAuth } from '../context/AuthContext';
@@ -781,20 +781,14 @@ const KhataKit = () => {
                     </div>
                     <div>
                         <div className="kk-status-pill">
-                            <span className="kk-live-dot"></span>
-                            <span>CS CORP • KHATAKIT</span>
-                            <span className="kk-sep">•</span>
                             <User size={11} />
-                            <span>{userDisplayName}</span>
-                            <span className="kk-sep">•</span>
-                            <Database size={11} />
-                            <span>{data?.database || 'MongoDB'}</span>
+                            <span>{userDisplayName}&apos;s KhataKit</span>
                         </div>
                         <h1 className="kk-brand-title">
                             Chaudhary <span className="kk-brand-accent">KhataKit</span>
                         </h1>
                         <p className="kk-brand-subtitle">
-                            Card-Wise EMIs • Credit Statements • Room Rent &amp; Insurance Tracker
+                            Personal Expense, Card EMI &amp; Monthly Bill Tracker
                         </p>
                     </div>
                     <button
@@ -871,52 +865,59 @@ const KhataKit = () => {
                 </div>
             </header>
 
-            {/* Navigation Tabs */}
-            <nav className="kk-nav-tabs" role="tablist">
-                <button
-                    type="button"
-                    className={`kk-nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('dashboard')}
-                >
-                    <PieChart size={16} />
-                    <span>Overview &amp; Analytics</span>
-                </button>
-                <button
-                    type="button"
-                    className={`kk-nav-tab ${activeTab === 'checklist' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('checklist')}
-                >
-                    <CheckCircle2 size={16} />
-                    <span>Monthly Checklist</span>
-                    <span className="kk-tab-badge">{unpaidCount}</span>
-                </button>
-                <button
-                    type="button"
-                    className={`kk-nav-tab ${activeTab === 'cards' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('cards')}
-                >
-                    <CreditCard size={16} />
-                    <span>Cards &amp; Statements</span>
-                    <span className="kk-tab-badge secondary">{cards.length}</span>
-                </button>
-                <button
-                    type="button"
-                    className={`kk-nav-tab ${activeTab === 'emis' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('emis')}
-                >
-                    <Calendar size={16} />
-                    <span>EMI Tenure Tracker</span>
-                    <span className="kk-tab-badge secondary">{summary.active_emis_count}</span>
-                </button>
-                <button
-                    type="button"
-                    className={`kk-nav-tab ${activeTab === 'fixed' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('fixed')}
-                >
-                    <Home size={16} />
-                    <span>Fixed Expenses (Rent, Insurance, Bills)</span>
-                </button>
-            </nav>
+            {/* Navigation Tabs (Segmented Mobile-First Wrap) */}
+            <div className="kk-segmented-tabs-wrap">
+                <nav className="kk-nav-tabs" role="tablist">
+                    <button
+                        type="button"
+                        className={`kk-nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('dashboard')}
+                    >
+                        <PieChart size={15} />
+                        <span className="kk-tab-full">Overview &amp; Analytics</span>
+                        <span className="kk-tab-short">Overview</span>
+                    </button>
+                    <button
+                        type="button"
+                        className={`kk-nav-tab ${activeTab === 'checklist' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('checklist')}
+                    >
+                        <CheckCircle2 size={15} />
+                        <span className="kk-tab-full">Monthly Checklist</span>
+                        <span className="kk-tab-short">Checklist</span>
+                        <span className="kk-tab-badge">{unpaidCount}</span>
+                    </button>
+                    <button
+                        type="button"
+                        className={`kk-nav-tab ${activeTab === 'cards' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('cards')}
+                    >
+                        <CreditCard size={15} />
+                        <span className="kk-tab-full">Cards &amp; Statements</span>
+                        <span className="kk-tab-short">Cards</span>
+                        <span className="kk-tab-badge secondary">{cards.length}</span>
+                    </button>
+                    <button
+                        type="button"
+                        className={`kk-nav-tab ${activeTab === 'emis' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('emis')}
+                    >
+                        <Calendar size={15} />
+                        <span className="kk-tab-full">EMI Tenure Tracker</span>
+                        <span className="kk-tab-short">EMIs</span>
+                        <span className="kk-tab-badge secondary">{summary.active_emis_count}</span>
+                    </button>
+                    <button
+                        type="button"
+                        className={`kk-nav-tab ${activeTab === 'fixed' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('fixed')}
+                    >
+                        <Home size={15} />
+                        <span className="kk-tab-full">Fixed Expenses (Rent, Insurance, Bills)</span>
+                        <span className="kk-tab-short">Fixed</span>
+                    </button>
+                </nav>
+            </div>
 
             {/* KPI Summary Strip */}
             <section className="kk-kpi-grid">
@@ -1225,87 +1226,70 @@ const KhataKit = () => {
                             </div>
                         </div>
 
-                        <div className="kk-table-responsive">
+                        <div className="kk-item-cards-list">
                             {!filteredChecklist.length ? (
                                 <p className="kk-text-muted" style={{ padding: '16px 0' }}>
                                     No matching checklist items for this filter in {formatMonthDisplay(selectedMonth)}.
                                 </p>
                             ) : (
-                                <table className="kk-data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Due Day</th>
-                                            <th>Expense / EMI Item</th>
-                                            <th>Card / Payment Mode</th>
-                                            <th>Category</th>
-                                            <th>Amount ({settings.currency_symbol || '₹'})</th>
-                                            <th>Status</th>
-                                            <th style={{ textAlign: 'right' }}>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {filteredChecklist.map(item => {
-                                            const key = `${item.item_type}:${item.item_id}`;
-                                            const currentAmt = inlineAmounts[key] !== undefined ? inlineAmounts[key] : item.amount;
-                                            return (
-                                                <tr key={item.uid} className="kk-mobile-table-card">
-                                                    <td data-label="Due Date">
-                                                        <span className="kk-badge kk-badge-orange">Due {getOrdinal(item.due_day)}</span>
-                                                    </td>
-                                                    <td data-label="Expense / EMI">
-                                                        <div style={{ fontWeight: 700 }}>{item.title}</div>
-                                                        <div className="kk-subtext">{item.subtitle}</div>
-                                                    </td>
-                                                    <td data-label="Payment Mode">
-                                                        <span className="kk-inline-card">
-                                                            <span className="kk-color-dot" style={{ background: item.card_color }}></span>
-                                                            {item.card_name}
+                                filteredChecklist.map(item => {
+                                    const key = `${item.item_type}:${item.item_id}`;
+                                    const currentAmt = inlineAmounts[key] !== undefined ? inlineAmounts[key] : item.amount;
+                                    return (
+                                        <div key={item.uid} className={`kk-item-card ${item.is_paid ? 'is-paid' : ''}`}>
+                                            <div className="kk-item-main">
+                                                <div className="kk-item-badges-row">
+                                                    <span className="kk-badge kk-badge-orange">Due {getOrdinal(item.due_day)}</span>
+                                                    <span className="kk-badge kk-badge-nocost">{item.category}</span>
+                                                    {item.auto_pay && (
+                                                        <span className="kk-badge kk-badge-orange">Auto-Pay</span>
+                                                    )}
+                                                    {item.is_paid ? (
+                                                        <span className="kk-badge kk-badge-paid">
+                                                            ✓ Paid {item.paid_date ? `(${item.paid_date})` : ''}
                                                         </span>
-                                                    </td>
-                                                    <td data-label="Category">
-                                                        <span className="kk-badge kk-badge-nocost">{item.category}</span>
-                                                        {item.auto_pay && (
-                                                            <span className="kk-badge kk-badge-orange" style={{ marginLeft: 6 }}>Auto-Pay</span>
-                                                        )}
-                                                    </td>
-                                                    <td data-label={`Amount (${settings.currency_symbol || '₹'})`}>
-                                                        <input
-                                                            type="number"
-                                                            step="any"
-                                                            className="kk-inline-amount-input"
-                                                            value={currentAmt}
-                                                            onChange={(e) => setInlineAmounts({ ...inlineAmounts, [key]: e.target.value })}
-                                                            onBlur={(e) => {
-                                                                const val = Number(e.target.value) || 0;
-                                                                if (val !== Number(item.amount)) {
-                                                                    toggleChecklistPayment(item.item_type, item.item_id, item.is_paid, val);
-                                                                }
-                                                            }}
-                                                        />
-                                                    </td>
-                                                    <td data-label="Status">
-                                                        {item.is_paid ? (
-                                                            <span className="kk-badge kk-badge-paid">
-                                                                ✓ Paid {item.paid_date ? `(${item.paid_date})` : ''}
-                                                            </span>
-                                                        ) : (
-                                                            <span className="kk-badge kk-badge-unpaid">⏳ Pending</span>
-                                                        )}
-                                                    </td>
-                                                    <td data-label="Action" className="kk-td-actions">
-                                                        <button
-                                                            type="button"
-                                                            className={`kk-btn kk-btn-sm ${item.is_paid ? 'kk-btn-secondary' : 'kk-btn-emerald'}`}
-                                                            onClick={() => toggleChecklistPayment(item.item_type, item.item_id, !item.is_paid, currentAmt)}
-                                                        >
-                                                            {item.is_paid ? 'Undo Paid' : '✓ Mark Paid'}
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
+                                                    ) : (
+                                                        <span className="kk-badge kk-badge-unpaid">⏳ Pending</span>
+                                                    )}
+                                                </div>
+                                                <h3 className="kk-item-title">{item.title}</h3>
+                                                <div className="kk-item-meta-line">
+                                                    <span className="kk-inline-card">
+                                                        <span className="kk-color-dot" style={{ background: item.card_color }}></span>
+                                                        <strong>{item.card_name}</strong>
+                                                    </span>
+                                                    <span>•</span>
+                                                    <span>{item.subtitle}</span>
+                                                </div>
+                                            </div>
+                                            <div className="kk-item-actions">
+                                                <div className="kk-amount-edit-wrap">
+                                                    <span className="kk-curr-prefix">{settings.currency_symbol || '₹'}</span>
+                                                    <input
+                                                        type="number"
+                                                        step="any"
+                                                        className="kk-inline-amount-input"
+                                                        value={currentAmt}
+                                                        onChange={(e) => setInlineAmounts({ ...inlineAmounts, [key]: e.target.value })}
+                                                        onBlur={(e) => {
+                                                            const val = Number(e.target.value) || 0;
+                                                            if (val !== Number(item.amount)) {
+                                                                toggleChecklistPayment(item.item_type, item.item_id, item.is_paid, val);
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    className={`kk-btn ${item.is_paid ? 'kk-btn-secondary' : 'kk-btn-emerald'}`}
+                                                    onClick={() => toggleChecklistPayment(item.item_type, item.item_id, !item.is_paid, currentAmt)}
+                                                >
+                                                    {item.is_paid ? 'Undo Paid' : '✓ Mark Paid'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })
                             )}
                         </div>
                     </div>
@@ -1547,93 +1531,74 @@ const KhataKit = () => {
                             </div>
                         </div>
 
-                        <div className="kk-table-responsive">
+                        <div className="kk-item-cards-list">
                             {!filteredEmis.length ? (
                                 <p className="kk-text-muted" style={{ padding: '16px 0' }}>No EMIs match the selected filters.</p>
                             ) : (
-                                <table className="kk-data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>EMI Item &amp; Rate</th>
-                                            <th>Card / Account</th>
-                                            <th>Monthly EMI</th>
-                                            <th>Tenure Progress</th>
-                                            <th>Remaining Balance</th>
-                                            <th>{formatMonthDisplay(selectedMonth, true)} Status</th>
-                                            <th style={{ textAlign: 'right' }}>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {filteredEmis.map(e => {
-                                            const completedCount = e.completed_installments ?? e.installments_completed ?? 0;
-                                            const remainingCount = e.remaining_installments ?? e.installments_remaining ?? 0;
-                                            return (
-                                                <tr key={e.id} className="kk-mobile-table-card">
-                                                    <td data-label="EMI Item">
-                                                        <div style={{ fontWeight: 700 }}>{e.title}</div>
-                                                        <div className="kk-subtext">
-                                                            {e.category} •{' '}
-                                                            {Number(e.interest_rate) === 0 ? (
-                                                                <span className="kk-badge kk-badge-nocost">No-Cost 0%</span>
-                                                            ) : (
-                                                                `${e.interest_rate}% p.a.`
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                    <td data-label="Card / Account">
-                                                        <span className="kk-inline-card">
-                                                            <span className="kk-color-dot" style={{ background: e.card_color }}></span>
-                                                            <strong>{e.card_name}</strong>
+                                filteredEmis.map(e => {
+                                    const completedCount = e.completed_installments ?? e.installments_completed ?? 0;
+                                    const remainingCount = e.remaining_installments ?? e.installments_remaining ?? 0;
+                                    return (
+                                        <div key={e.id} className="kk-item-card">
+                                            <div className="kk-item-main">
+                                                <div className="kk-item-badges-row">
+                                                    <span className="kk-badge kk-badge-orange">{e.category}</span>
+                                                    {Number(e.interest_rate) === 0 ? (
+                                                        <span className="kk-badge kk-badge-nocost">No-Cost 0%</span>
+                                                    ) : (
+                                                        <span className="kk-badge kk-badge-nocost">{e.interest_rate}% p.a.</span>
+                                                    )}
+                                                    {e.is_due_this_month ? (
+                                                        <span className={`kk-badge ${e.is_paid_this_month ? 'kk-badge-paid' : 'kk-badge-unpaid'}`}>
+                                                            {e.is_paid_this_month ? '✓ Paid This Month' : `Inst #${e.installment_number} Due`}
                                                         </span>
-                                                        <div className="kk-subtext">Due {getOrdinal(e.effective_due_day)} of month</div>
-                                                    </td>
-                                                    <td data-label="Monthly EMI">
-                                                        <strong style={{ fontSize: '0.98rem' }}>{formatMoney(e.monthly_emi)}</strong>
-                                                        <small className="kk-muted-inline">/mo</small>
-                                                        <div className="kk-subtext">Principal: {formatMoney(e.total_principal)}</div>
-                                                    </td>
-                                                    <td data-label="Tenure Progress" className="kk-td-progress">
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700 }}>
-                                                            <span>{completedCount} / {e.total_months} Paid</span>
-                                                            <span>{e.progress_percent}%</span>
-                                                        </div>
-                                                        <div className="kk-progress-track">
-                                                            <div className="kk-progress-fill" style={{ width: `${e.progress_percent}%`, background: '#f97316' }}></div>
-                                                        </div>
-                                                        <div className="kk-subtext">
-                                                            {formatMonthDisplay(e.start_month, true)} &#8594; {formatMonthDisplay(e.end_month, true)}
-                                                        </div>
-                                                    </td>
-                                                    <td data-label="Remaining">
-                                                        <div style={{ fontWeight: 800, color: '#ea580c' }}>{formatMoney(e.amount_remaining)}</div>
-                                                        <div className="kk-subtext">{remainingCount} months left</div>
-                                                    </td>
-                                                    <td data-label={`${formatMonthDisplay(selectedMonth, true)} Status`}>
-                                                        {e.is_due_this_month ? (
-                                                            <span className={`kk-badge ${e.is_paid_this_month ? 'kk-badge-paid' : 'kk-badge-unpaid'}`}>
-                                                                {e.is_paid_this_month ? '✓ Paid This Month' : `Inst #${e.installment_number} Due`}
-                                                            </span>
-                                                        ) : (
-                                                            <span className="kk-badge kk-badge-orange">
-                                                                {remainingCount === 0 ? 'Completed' : `Not Due in ${formatMonthDisplay(selectedMonth, true)}`}
-                                                            </span>
-                                                        )}
-                                                    </td>
-                                                    <td data-label="Actions" className="kk-td-actions">
-                                                        <div style={{ display: 'inline-flex', gap: 6 }}>
-                                                            <button type="button" className="kk-btn kk-btn-secondary kk-btn-sm" onClick={() => openEditEmiModal(e)}>
-                                                                Edit
-                                                            </button>
-                                                            <button type="button" className="kk-btn kk-btn-danger-ghost kk-btn-sm" onClick={() => handleDeleteEmi(e.id)}>
-                                                                Delete
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
+                                                    ) : (
+                                                        <span className="kk-badge kk-badge-orange">
+                                                            {remainingCount === 0 ? 'Completed' : `Not Due in ${formatMonthDisplay(selectedMonth, true)}`}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <h3 className="kk-item-title">{e.title}</h3>
+                                                <div className="kk-item-meta-line">
+                                                    <span className="kk-inline-card">
+                                                        <span className="kk-color-dot" style={{ background: e.card_color }}></span>
+                                                        <strong>{e.card_name}</strong>
+                                                    </span>
+                                                    <span>•</span>
+                                                    <span>Due {getOrdinal(e.effective_due_day)}</span>
+                                                    <span>•</span>
+                                                    <span>Principal: {formatMoney(e.total_principal)}</span>
+                                                </div>
+                                                <div className="kk-emi-progress-block">
+                                                    <div className="kk-emi-progress-labels">
+                                                        <span>{completedCount} of {e.total_months} Installments Paid ({e.progress_percent}%)</span>
+                                                        <span>Left: <strong>{formatMoney(e.amount_remaining)}</strong> ({remainingCount} mo)</span>
+                                                    </div>
+                                                    <div className="kk-progress-track">
+                                                        <div className="kk-progress-fill" style={{ width: `${e.progress_percent}%`, background: '#f97316' }}></div>
+                                                    </div>
+                                                    <div className="kk-subtext">
+                                                        Tenure: {formatMonthDisplay(e.start_month, true)} &#8594; {formatMonthDisplay(e.end_month, true)}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="kk-item-actions">
+                                                <div className="kk-item-price-tag">
+                                                    <strong>{formatMoney(e.monthly_emi)}</strong>
+                                                    <small>/month</small>
+                                                </div>
+                                                <div className="kk-action-btn-pair">
+                                                    <button type="button" className="kk-btn kk-btn-secondary kk-btn-sm" onClick={() => openEditEmiModal(e)}>
+                                                        Edit
+                                                    </button>
+                                                    <button type="button" className="kk-btn kk-btn-danger-ghost kk-btn-sm" onClick={() => handleDeleteEmi(e.id)}>
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })
                             )}
                         </div>
                     </div>
@@ -1678,85 +1643,66 @@ const KhataKit = () => {
                             <strong>{formatMoney(totalMonthlyEquivalent)} / month</strong>
                         </div>
 
-                        <div className="kk-table-responsive">
+                        <div className="kk-item-cards-list">
                             {!filteredFixed.length ? (
                                 <p className="kk-text-muted" style={{ padding: '16px 0' }}>No fixed expenses found for this category.</p>
                             ) : (
-                                <table className="kk-data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Expense Title</th>
-                                            <th>Category</th>
-                                            <th>Billing Amount &amp; Cycle</th>
-                                            <th>Monthly Equivalent</th>
-                                            <th>Payment Mode / Card</th>
-                                            <th>Due Day</th>
-                                            <th>{formatMonthDisplay(selectedMonth, true)} Status</th>
-                                            <th style={{ textAlign: 'right' }}>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {filteredFixed.map(f => (
-                                            <tr key={f.id} className="kk-mobile-table-card">
-                                                <td data-label="Expense">
-                                                    <div style={{ fontWeight: 700 }}>{f.title}</div>
-                                                    {f.notes && <div className="kk-subtext">{f.notes}</div>}
-                                                </td>
-                                                <td data-label="Category">
-                                                    <span className="kk-badge kk-badge-orange">{f.category}</span>
-                                                </td>
-                                                <td data-label="Billing Cycle">
-                                                    <strong style={{ fontSize: '0.96rem' }}>{formatMoney(f.amount)}</strong>
-                                                    <span className="kk-badge kk-badge-nocost" style={{ marginLeft: 6 }}>{f.frequency}</span>
-                                                </td>
-                                                <td data-label="Monthly Burn">
-                                                    <span style={{ fontWeight: 700, color: 'var(--kk-text-secondary)' }}>
-                                                        {formatMoney(f.monthly_equivalent)}/mo
+                                filteredFixed.map(f => (
+                                    <div key={f.id} className="kk-item-card">
+                                        <div className="kk-item-main">
+                                            <div className="kk-item-badges-row">
+                                                <span className="kk-badge kk-badge-orange">{f.category}</span>
+                                                <span className="kk-badge kk-badge-nocost">{f.frequency}</span>
+                                                <span className="kk-badge kk-badge-orange">Due {getOrdinal(f.effective_due_day)}</span>
+                                                {f.auto_pay && (
+                                                    <span className="kk-badge kk-badge-paid">Auto-Pay</span>
+                                                )}
+                                            </div>
+                                            <h3 className="kk-item-title">{f.title}</h3>
+                                            <div className="kk-item-meta-line">
+                                                {f.card_name ? (
+                                                    <span className="kk-inline-card">
+                                                        <span className="kk-color-dot" style={{ background: f.card_color }}></span>
+                                                        Credit Card: <strong>{f.card_name}</strong>
                                                     </span>
-                                                </td>
-                                                <td data-label="Payment Mode">
-                                                    {f.card_name ? (
-                                                        <span className="kk-inline-card">
-                                                            <span className="kk-color-dot" style={{ background: f.card_color }}></span>
-                                                            Credit Card: <strong>{f.card_name}</strong>
-                                                        </span>
-                                                    ) : (
-                                                        <span>{f.payment_method}</span>
-                                                    )}
-                                                    {f.auto_pay && (
-                                                        <span className="kk-badge kk-badge-orange" style={{ marginLeft: 6 }}>Auto-Pay</span>
-                                                    )}
-                                                </td>
-                                                <td data-label="Due Date">Due {getOrdinal(f.effective_due_day)}</td>
-                                                <td data-label={`${formatMonthDisplay(selectedMonth, true)} Status`}>
-                                                    {f.is_due_this_month ? (
-                                                        <button
-                                                            type="button"
-                                                            className={`kk-btn kk-btn-sm ${f.is_paid_this_month ? 'kk-btn-secondary' : 'kk-btn-emerald'}`}
-                                                            onClick={() => toggleChecklistPayment('fixed', f.id, !f.is_paid_this_month, f.paid_amount_this_month)}
-                                                        >
-                                                            {f.is_paid_this_month ? `✓ Paid in ${formatMonthDisplay(selectedMonth, true)}` : 'Mark Paid'}
-                                                        </button>
-                                                    ) : (
-                                                        <span className="kk-badge kk-badge-orange">
-                                                            Not Due in {formatMonthDisplay(selectedMonth, true)}
-                                                        </span>
-                                                    )}
-                                                </td>
-                                                <td data-label="Actions" className="kk-td-actions">
-                                                    <div style={{ display: 'inline-flex', gap: 6 }}>
-                                                        <button type="button" className="kk-btn kk-btn-secondary kk-btn-sm" onClick={() => openEditFixedModal(f)}>
-                                                            Edit
-                                                        </button>
-                                                        <button type="button" className="kk-btn kk-btn-danger-ghost kk-btn-sm" onClick={() => handleDeleteFixed(f.id)}>
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                                ) : (
+                                                    <span>{f.payment_method}</span>
+                                                )}
+                                                <span>•</span>
+                                                <span>Monthly Burn: <strong>{formatMoney(f.monthly_equivalent)}/mo</strong></span>
+                                                {f.notes && (
+                                                    <>
+                                                        <span>•</span>
+                                                        <span>{f.notes}</span>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="kk-item-actions">
+                                            <div className="kk-item-price-tag">
+                                                <strong>{formatMoney(f.amount)}</strong>
+                                                <small>/{f.frequency}</small>
+                                            </div>
+                                            <div className="kk-action-btn-pair">
+                                                {f.is_due_this_month && (
+                                                    <button
+                                                        type="button"
+                                                        className={`kk-btn kk-btn-sm ${f.is_paid_this_month ? 'kk-btn-secondary' : 'kk-btn-emerald'}`}
+                                                        onClick={() => toggleChecklistPayment('fixed', f.id, !f.is_paid_this_month, f.paid_amount_this_month)}
+                                                    >
+                                                        {f.is_paid_this_month ? '✓ Paid' : 'Mark Paid'}
+                                                    </button>
+                                                )}
+                                                <button type="button" className="kk-btn kk-btn-secondary kk-btn-sm" onClick={() => openEditFixedModal(f)}>
+                                                    Edit
+                                                </button>
+                                                <button type="button" className="kk-btn kk-btn-danger-ghost kk-btn-sm" onClick={() => handleDeleteFixed(f.id)}>
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
                             )}
                         </div>
                     </div>
@@ -2339,9 +2285,9 @@ const KhataKit = () => {
                             <hr className="kk-divider" />
 
                             <div className="kk-backup-section">
-                                <h4>📦 Database &amp; Reports ({data?.database || 'MongoDB Atlas'})</h4>
+                                <h4>📦 Reports &amp; Backup</h4>
                                 <p className="kk-text-muted">
-                                    Your data is persisted in MongoDB via the <code>/khatakit</code> API. You can also export CSV reports or JSON backups anytime.
+                                    Export your monthly expense report as CSV or download a backup file anytime.
                                 </p>
                                 <div className="kk-backup-btns">
                                     <button type="button" className="kk-btn kk-btn-secondary kk-btn-sm" onClick={exportMonthlyCsv}>

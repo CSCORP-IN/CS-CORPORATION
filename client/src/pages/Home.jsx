@@ -417,14 +417,11 @@ const Home = () => {
 
                     {/* 4 Flagship Platforms Grid */}
                     <div className="platforms-cards-grid">
-                        {platformsData.map((plat) => {
-                            const cardRef = useRef(null);
-                            return (
+                        {platformsData.map((plat) => (
                                 <div 
                                     className="platform-card" 
                                     key={plat.id}
-                                    ref={cardRef}
-                                    onMouseMove={(e) => handleMouseMove(e, cardRef.current)}
+                                    onMouseMove={(e) => handleMouseMove(e, e.currentTarget)}
                                 >
                                     <div className="spotlight-glow-border"></div>
                                     <div className="platform-card-content">
@@ -469,8 +466,7 @@ const Home = () => {
 
                                     </div>
                                 </div>
-                            );
-                        })}
+                        ))}
                     </div>
 
                 </div>
@@ -495,14 +491,11 @@ const Home = () => {
 
                     {/* Developer Tools Spotlight Grid */}
                     <div className="spotlight-cards-grid">
-                        {developerToolsData.map((proj) => {
-                            const cardRef = useRef(null);
-                            return (
+                        {developerToolsData.map((proj) => (
                                 <div 
                                     className="spotlight-card"
                                     key={proj.id}
-                                    ref={cardRef}
-                                    onMouseMove={(e) => handleMouseMove(e, cardRef.current)}
+                                    onMouseMove={(e) => handleMouseMove(e, e.currentTarget)}
                                 >
                                     <div className="spotlight-glow-border"></div>
                                     <div className="spotlight-card-content">
@@ -537,8 +530,7 @@ const Home = () => {
 
                                     </div>
                                 </div>
-                            );
-                        })}
+                        ))}
                     </div>
 
                 </div>

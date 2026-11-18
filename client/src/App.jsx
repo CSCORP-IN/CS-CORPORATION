@@ -18,6 +18,7 @@ import Login from './pages/Login';
 import Profile from './pages/Profile';
 import ThankYou from './pages/ThankYou';
 import KhataKit from './pages/KhataKit';
+import CSLocker from './pages/CSLocker';
 import { ArticleProvider } from './context/ArticleContext';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -32,6 +33,7 @@ function AppRoutes() {
   const isConnectSubdomain = hostname === 'connect.cscorp.in' || hostname === 'courses.cscorp.in' || hostname.startsWith('connect.') || hostname.startsWith('courses.');
   const isArticlesSubdomain = hostname === 'articles.cscorp.in' || hostname === 'blog.cscorp.in' || hostname.startsWith('articles.') || hostname.startsWith('blog.');
   const isKhataKitSubdomain = hostname === 'khatakit.cscorp.in' || hostname.startsWith('khatakit.');
+  const isCSLockerSubdomain = hostname === 'cslocker.cscorp.in' || hostname === 'locker.cscorp.in' || hostname.startsWith('cslocker.') || hostname.startsWith('locker.');
 
   const isThankYouPage = location.pathname === '/thankyou' || location.pathname === '/thank-you';
 
@@ -42,6 +44,7 @@ function AppRoutes() {
     if (isConnectSubdomain) return <Courses />;
     if (isArticlesSubdomain) return <Articles />;
     if (isKhataKitSubdomain) return <KhataKit />;
+    if (isCSLockerSubdomain) return <CSLocker />;
     return <ChaudharySons />;
   };
 
@@ -71,6 +74,7 @@ function AppRoutes() {
           <Route path="/thankyou" element={<ThankYou />} />
           <Route path="/thank-you" element={<Navigate to="/thankyou" replace />} />
           <Route path="/khatakit" element={<KhataKit />} />
+          <Route path="/cslocker" element={<CSLocker />} />
         </Routes>
       </main>
       {!isThankYouPage && <Footer />}

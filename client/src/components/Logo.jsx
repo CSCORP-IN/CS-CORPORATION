@@ -38,6 +38,10 @@ const BRAND_CONFIGS = {
         words: ['Chaudhary', 'cscorp.in', 'चौधरी'],
         bottom: 'KHATAKIT'
     },
+    'cslocker': {
+        words: ['Chaudhary', 'cscorp.in', 'चौधरी'],
+        bottom: 'CS LOCKER'
+    },
     'default': {
         words: ['Chaudhary', 'cscorp.in', 'चौधरी'],
         bottom: '& SONS'
@@ -45,16 +49,12 @@ const BRAND_CONFIGS = {
 };
 
 const Logo = ({ className = "", variant }) => {
-    let location;
-    try {
-        location = useLocation();
-    } catch (e) {
-        location = { pathname: '/' };
-    }
+    const location = useLocation();
 
     const currentVariant = variant || (
         (location?.pathname === '/thankyou' || location?.pathname === '/thank-you') ? 'thanks' :
         location?.pathname?.startsWith('/khatakit') ? 'khatakit' :
+        location?.pathname?.startsWith('/cslocker') ? 'cslocker' :
         (location?.pathname === '/anant-chaudhary' || location?.pathname === '/anant') ? 'anant' :
         (location?.pathname === '/ankit-chaudhary' || location?.pathname === '/ankit' || location?.pathname === '/resume') ? 'ankit' :
         (location?.pathname === '/chaudhary-and-sons' || location?.pathname === '/' || location?.pathname === '/profile' || location?.pathname.startsWith('/admin')) ? 'sons' :

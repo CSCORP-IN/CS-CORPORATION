@@ -1,0 +1,713 @@
+/* ==========================================================================
+   CS LOCKER - VERTICAL MOBILE-FIRST SINGLE-COLUMN APP LAYOUT
+   Max-width 680px centered column: identical clean vertical flow on mobile & desktop
+   ========================================================================== */
+
+.csl-vertical-shell {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 82px 14px 4rem 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-sizing: border-box;
+    color: #09090b;
+    min-height: 100vh;
+}
+
+.csl-vertical-shell *,
+.csl-vertical-shell *::before,
+.csl-vertical-shell *::after {
+    box-sizing: border-box;
+}
+
+/* 1. Header Card */
+.csl-header-card {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 20px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    width: 100%;
+}
+
+.csl-header-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.csl-brand-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.28);
+}
+
+.csl-header-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.csl-user-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #ea580c;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    padding: 2px 9px;
+    border-radius: 9999px;
+    margin-bottom: 3px;
+}
+
+.csl-title {
+    font-size: 1.25rem;
+    font-weight: 900;
+    margin: 0;
+    line-height: 1.2;
+    color: #09090b;
+}
+
+.csl-accent {
+    color: #f97316;
+}
+
+.csl-subtitle {
+    font-size: 0.78rem;
+    color: #52525b;
+    margin: 2px 0 0 0;
+}
+
+.csl-upload-cta {
+    width: 100%;
+    min-height: 46px;
+    font-size: 0.9rem !important;
+    border-radius: 14px !important;
+}
+
+/* 2-Column Summary Strip inside Header */
+.csl-summary-strip {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+}
+
+.csl-summary-box {
+    background: #f8fafc;
+    border: 1px solid #e4e4e7;
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.csl-summary-box.active {
+    background: #fff7ed;
+    border-color: #f97316;
+}
+
+.csl-sum-num {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #09090b;
+    line-height: 1.1;
+}
+
+.csl-sum-lbl {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #52525b;
+    margin-top: 3px;
+}
+
+/* 2. Vertical Search & Filter Card */
+.csl-filter-card {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 20px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    width: 100%;
+}
+
+.csl-search-box {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.csl-search-icon {
+    position: absolute;
+    left: 12px;
+    color: #71717a;
+    pointer-events: none;
+}
+
+.csl-search-box input {
+    width: 100%;
+    padding: 11px 36px 11px 38px;
+    border-radius: 12px;
+    border: 1px solid #e4e4e7;
+    background: #f8fafc;
+    font-size: 16px;
+    color: #09090b;
+    outline: none;
+}
+
+.csl-search-box input:focus {
+    border-color: #f97316;
+    background: #ffffff;
+}
+
+.csl-clear-btn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #71717a;
+    cursor: pointer;
+    display: inline-flex;
+}
+
+.csl-filter-selects {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+@media (min-width: 500px) {
+    .csl-filter-selects {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.csl-filter-selects select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid #e4e4e7;
+    background: #f8fafc;
+    color: #09090b;
+    font-size: 0.82rem;
+    font-weight: 700;
+    outline: none;
+}
+
+/* 3. Vertical Document List */
+.csl-vertical-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.csl-doc-item {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 18px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    width: 100%;
+}
+
+.csl-doc-item:hover {
+    border-color: #f97316;
+}
+
+.csl-doc-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+}
+
+.csl-doc-icon {
+    width: 48px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 0.6rem;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+
+.csl-doc-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.csl-doc-badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.csl-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    background: #fff7ed;
+    color: #ea580c;
+    border: 1px solid #fed7aa;
+}
+
+.csl-doc-meta {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #71717a;
+}
+
+.csl-doc-name {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: #09090b;
+    margin: 0;
+    word-break: break-word;
+}
+
+.csl-doc-file {
+    font-size: 0.74rem;
+    color: #71717a;
+    word-break: break-all;
+}
+
+.csl-doc-notes {
+    font-size: 0.78rem;
+    color: #52525b;
+    margin: 4px 0 0 0;
+    word-break: break-word;
+}
+
+.csl-star-btn {
+    background: none;
+    border: none;
+    color: #a1a1aa;
+    cursor: pointer;
+    padding: 4px;
+    flex-shrink: 0;
+}
+
+.csl-star-btn.starred {
+    color: #f59e0b;
+}
+
+.csl-doc-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px dashed #e4e4e7;
+    width: 100%;
+}
+
+.csl-doc-actions > .csl-btn {
+    flex: 1;
+}
+
+/* Buttons */
+.csl-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.csl-btn-sm {
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    border-radius: 10px;
+}
+
+.csl-btn-primary {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+}
+
+.csl-btn-secondary {
+    background: #f8fafc;
+    color: #09090b;
+    border-color: #e4e4e7;
+}
+
+.csl-icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid #e4e4e7;
+    background: #f8fafc;
+    color: #52525b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.csl-icon-btn.danger:hover {
+    color: #f43f5e;
+    border-color: #f43f5e;
+    background: rgba(244, 63, 94, 0.08);
+}
+
+/* Empty State */
+.csl-empty-card {
+    background: #ffffff;
+    border: 1px dashed #fed7aa;
+    border-radius: 20px;
+    padding: 2.5rem 1.25rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.csl-empty-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    background: #fff7ed;
+    color: #f97316;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.csl-empty-card h3 {
+    font-size: 1.08rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.csl-empty-card p {
+    font-size: 0.82rem;
+    color: #52525b;
+    margin: 0;
+    max-width: 360px;
+}
+
+.csl-empty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.csl-spinner {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 3px solid #fed7aa;
+    border-top-color: #f97316;
+    animation: cslSpin 0.8s linear infinite;
+}
+
+@keyframes cslSpin {
+    to { transform: rotate(360deg); }
+}
+
+.csl-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 14px;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+}
+
+/* Modals */
+.csl-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: rgba(9, 9, 11, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 14px;
+    box-sizing: border-box;
+}
+
+.csl-modal-card {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 86dvh;
+    overflow-y: auto;
+    padding: 18px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.22);
+    box-sizing: border-box;
+}
+
+.csl-modal-card.csl-modal-preview {
+    max-width: 680px;
+}
+
+.csl-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.csl-modal-header h3 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.csl-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #71717a;
+    cursor: pointer;
+}
+
+.csl-form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.csl-dropzone {
+    border: 2px dashed #fdba74;
+    background: #fff7ed;
+    border-radius: 14px;
+    padding: 20px 14px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.csl-dropzone h4 {
+    margin: 0 0 3px 0;
+    font-size: 0.92rem;
+    font-weight: 800;
+}
+
+.csl-dropzone p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #52525b;
+}
+
+.csl-selected-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.csl-selected-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: #f8fafc;
+    border: 1px solid #e4e4e7;
+    border-radius: 10px;
+}
+
+.csl-selected-row input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #e4e4e7;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.csl-selected-row small {
+    display: block;
+    font-size: 0.7rem;
+    color: #71717a;
+    margin-top: 2px;
+}
+
+.csl-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.csl-field label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #52525b;
+}
+
+.csl-field input,
+.csl-field select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #e4e4e7;
+    background: #f8fafc;
+    font-size: 16px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.csl-check-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.csl-modal-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 6px;
+    padding-top: 12px;
+    border-top: 1px solid #e4e4e7;
+}
+
+.csl-preview-box {
+    width: 100%;
+    background: #f8fafc;
+    border: 1px solid #e4e4e7;
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.csl-pdf-frame {
+    width: 100%;
+    height: 58vh;
+    border: none;
+}
+
+.csl-preview-img {
+    max-width: 100%;
+    max-height: 55vh;
+    object-fit: contain;
+}
+
+.csl-text-box {
+    width: 100%;
+    max-height: 50vh;
+    overflow: auto;
+    padding: 12px;
+}
+
+.csl-text-box pre {
+    margin: 0;
+    font-size: 0.78rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.csl-no-preview {
+    padding: 2rem 1rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.csl-no-preview h4 {
+    margin: 4px 0 0 0;
+    font-size: 0.92rem;
+    word-break: break-all;
+}
+
+.csl-no-preview p {
+    margin: 0;
+    font-size: 0.76rem;
+    color: #71717a;
+}
+
+.csl-toast-wrap {
+    position: fixed;
+    bottom: 20px;
+    left: 14px;
+    right: 14px;
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+}
+
+.csl-toast {
+    background: #18181b;
+    color: #ffffff;
+    border-left: 4px solid #f97316;
+    padding: 11px 18px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+}

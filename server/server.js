@@ -13,6 +13,7 @@ import User from './models/User.js';
 import Enquiry from './models/Enquiry.js';
 import ThankYouWish from './models/ThankYouWish.js';
 import khatakitRoutes from './routes/khatakitRoutes.js';
+import cslockerRoutes from './routes/cslockerRoutes.js';
 import { sendOTPEmail, sendContactEmail, sendEnquiryEmail } from './utils/emailService.js';
 
 dotenv.config();
@@ -922,6 +923,11 @@ app.get(['/api/thankyou/wishes', '/thankyou/wishes'], async (req, res) => {
 // KHATAKIT EXPENSE & EMI MANAGER API (/khatakit & /api/khatakit)
 // ==========================================================
 app.use(['/api/khatakit', '/khatakit'], khatakitRoutes);
+
+// ==========================================================
+// CS LOCKER CENTRALIZED DOCUMENT MANAGEMENT API (/cslocker & /api/cslocker)
+// ==========================================================
+app.use(['/api/cslocker', '/cslocker'], cslockerRoutes);
 
 app.listen(PORT, () => {
     console.log(`✅ Server successfully started and running on port ${PORT}`);

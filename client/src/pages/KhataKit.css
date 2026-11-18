@@ -1,6 +1,7 @@
 /* ==========================================================================
-   CS CORP • CHAUDHARY KHATAKIT - EXPENSE & EMI MANAGER STYLES
+   CS CORP • CHAUDHARY KHATAKIT - MOBILE-FIRST EXPENSE & EMI MANAGER STYLES
    Matches CS Corporation (cscorp.in) Ultra-Clean Orange & Minimalist Theme
+   Strict viewport containment: zero horizontal overflow on 320px–1920px+
    ========================================================================== */
 
 .kk-master-container,
@@ -26,7 +27,7 @@
     --kk-shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.12);
     --kk-radius-sm: 10px;
     --kk-radius-md: 16px;
-    --kk-radius-lg: 24px;
+    --kk-radius-lg: 22px;
 }
 
 .kk-theme-dark {
@@ -44,17 +45,31 @@
     --kk-shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.6);
 }
 
+/* Strict Mobile-First Vertical App Container (Max-width 680px centered column) */
 .kk-master-container {
-    padding-top: 96px;
-    padding-bottom: 5rem;
-    padding-left: 24px;
-    padding-right: 24px;
-    max-width: 1400px;
+    width: 100%;
+    max-width: 680px;
+    min-width: 0;
     margin: 0 auto;
+    padding: 82px 14px 96px 14px;
     color: var(--kk-text-primary);
     position: relative;
     min-height: 100vh;
-    animation: kkFadeIn 0.35s ease;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    animation: kkFadeIn 0.3s ease;
+}
+
+.kk-master-container *,
+.kk-master-container *::before,
+.kk-master-container *::after {
+    box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+    .kk-master-container {
+        padding: 92px 16px 5rem 16px;
+    }
 }
 
 @keyframes kkFadeIn {
@@ -68,6 +83,7 @@
     inset: 0;
     pointer-events: none;
     z-index: -1;
+    overflow: hidden;
 }
 
 .kk-orb {
@@ -80,17 +96,22 @@
 .kk-orb-orange {
     top: 4%;
     left: 12%;
-    width: 600px;
-    height: 600px;
+    width: 320px;
+    height: 320px;
     background: radial-gradient(circle, rgba(249, 115, 22, 0.13) 0%, transparent 70%);
 }
 
 .kk-orb-amber {
     top: 42%;
     right: 8%;
-    width: 520px;
-    height: 520px;
+    width: 280px;
+    height: 280px;
     background: radial-gradient(circle, rgba(245, 158, 11, 0.09) 0%, transparent 70%);
+}
+
+@media (min-width: 769px) {
+    .kk-orb-orange { width: 600px; height: 600px; }
+    .kk-orb-amber { width: 520px; height: 520px; }
 }
 
 .kk-grid-overlay {
@@ -112,6 +133,7 @@
     padding: 5rem 1rem;
     color: var(--kk-text-secondary);
     font-weight: 600;
+    text-align: center;
 }
 
 .kk-spinner {
@@ -127,36 +149,43 @@
     to { transform: rotate(360deg); }
 }
 
-/* Topbar */
+/* ==========================================================================
+   1. TOPBAR (VERTICAL STACKED COMMAND CARD ON MOBILE & DESKTOP)
+   ========================================================================== */
 .kk-topbar {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 18px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
     background: var(--kk-bg-surface);
     border: 1px solid var(--kk-border);
-    border-radius: var(--kk-radius-lg);
-    padding: 18px 24px;
+    border-radius: 20px;
+    padding: 16px;
     box-shadow: var(--kk-shadow-sm);
-    margin-bottom: 18px;
-    transition: all 0.25s ease;
-}
-
-.kk-topbar:hover {
-    border-color: var(--kk-border-accent);
+    margin-bottom: 14px;
+    transition: border-color 0.25s ease;
 }
 
 .kk-brand-block {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+}
+
+.kk-brand-block > div:not(.kk-brand-icon) {
+    flex: 1 1 0%;
+    min-width: 0;
 }
 
 .kk-brand-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 14px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
     background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
     color: #ffffff;
     display: flex;
@@ -166,20 +195,38 @@
     flex-shrink: 0;
 }
 
+@media (min-width: 769px) {
+    .kk-brand-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+    }
+}
+
 .kk-status-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.68rem;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 100%;
+    font-size: 0.62rem;
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     color: #ea580c;
     background: #fff7ed;
     border: 1px solid #fed7aa;
-    padding: 2px 10px;
+    padding: 2px 8px;
     border-radius: 9999px;
     margin-bottom: 4px;
+}
+
+@media (min-width: 769px) {
+    .kk-status-pill {
+        font-size: 0.68rem;
+        gap: 6px;
+        padding: 2px 10px;
+    }
 }
 
 .kk-live-dot {
@@ -188,6 +235,7 @@
     border-radius: 50%;
     background: #f97316;
     box-shadow: 0 0 8px #f97316;
+    flex-shrink: 0;
 }
 
 .kk-sep {
@@ -195,12 +243,19 @@
 }
 
 .kk-brand-title {
-    font-size: 1.38rem;
+    font-size: 1.15rem;
     font-weight: 900;
     letter-spacing: -0.025em;
     color: var(--kk-text-primary);
     margin: 0;
-    line-height: 1.15;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+@media (min-width: 769px) {
+    .kk-brand-title {
+        font-size: 1.38rem;
+    }
 }
 
 .kk-brand-accent {
@@ -208,40 +263,75 @@
 }
 
 .kk-brand-subtitle {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     color: var(--kk-text-secondary);
     margin: 2px 0 0 0;
+    line-height: 1.35;
 }
 
-/* Month Navigator */
+@media (min-width: 769px) {
+    .kk-brand-subtitle {
+        font-size: 0.8rem;
+    }
+}
+
+.kk-mobile-settings-btn {
+    display: inline-flex;
+    margin-left: auto;
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+}
+
+.kk-desktop-settings-btn {
+    display: none;
+}
+
+/* Month Navigator (Always Full Width inside Vertical Card) */
 .kk-month-navigator {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
     background: var(--kk-bg-elevated);
     border: 1px solid var(--kk-border);
     padding: 6px 10px;
-    border-radius: 9999px;
+    border-radius: 14px;
 }
 
 .kk-month-picker-wrap {
     position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    padding: 4px 12px;
+    justify-content: center;
+    gap: 6px;
+    padding: 4px 8px;
     cursor: pointer;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .kk-cal-icon {
     color: #f97316;
+    flex-shrink: 0;
 }
 
 .kk-month-label {
     font-weight: 800;
-    font-size: 0.94rem;
+    font-size: 0.86rem;
     color: var(--kk-text-primary);
     pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (min-width: 769px) {
+    .kk-month-label {
+        font-size: 0.94rem;
+    }
 }
 
 .kk-month-picker-wrap input[type="month"] {
@@ -252,54 +342,70 @@
     width: 100%;
 }
 
+/* Quick Action Buttons: Clean 2x2 Grid */
 .kk-topbar-actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
+    width: 100%;
+    min-width: 0;
 }
 
-/* Buttons */
+/* ==========================================================================
+   2. BUTTONS & CONTROLS
+   ========================================================================== */
 .kk-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    font-size: 0.84rem;
+    gap: 5px;
+    font-size: 0.78rem;
     font-weight: 700;
-    padding: 9px 16px;
-    border-radius: 9999px;
+    padding: 9px 10px;
+    border-radius: 12px;
     border: 1px solid transparent;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (min-width: 769px) {
+    .kk-btn {
+        font-size: 0.84rem;
+        padding: 9px 16px;
+        border-radius: 9999px;
+        gap: 6px;
+    }
 }
 
 .kk-btn-sm {
-    padding: 5px 12px;
-    font-size: 0.77rem;
+    padding: 5px 10px;
+    font-size: 0.74rem;
+    border-radius: 8px;
+}
+
+@media (min-width: 769px) {
+    .kk-btn-sm {
+        padding: 5px 12px;
+        font-size: 0.77rem;
+        border-radius: 9999px;
+    }
 }
 
 .kk-btn-primary {
     background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
     color: #ffffff;
-    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.28);
-}
-
-.kk-btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.42);
+    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
 }
 
 .kk-btn-emerald {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-}
-
-.kk-btn-emerald:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.38);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.22);
 }
 
 .kk-btn-secondary {
@@ -308,31 +414,15 @@
     border-color: var(--kk-border);
 }
 
-.kk-btn-secondary:hover {
-    border-color: #f97316;
-    color: #ea580c;
-    transform: translateY(-1px);
-}
-
 .kk-btn-ghost {
     background: transparent;
     color: var(--kk-text-secondary);
-}
-
-.kk-btn-ghost:hover {
-    background: var(--kk-bg-elevated);
-    color: var(--kk-text-primary);
 }
 
 .kk-btn-danger-ghost {
     background: rgba(244, 63, 94, 0.08);
     color: #f43f5e;
     border-color: rgba(244, 63, 94, 0.22);
-}
-
-.kk-btn-danger-ghost:hover {
-    background: #f43f5e;
-    color: #ffffff;
 }
 
 .kk-icon-btn {
@@ -346,13 +436,8 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    flex-shrink: 0;
     transition: all 0.2s ease;
-}
-
-.kk-icon-btn:hover {
-    border-color: #f97316;
-    color: #ea580c;
-    background: #fff7ed;
 }
 
 .kk-icon-btn-sm {
@@ -361,48 +446,85 @@
     font-size: 0.85rem;
 }
 
-/* Navigation Tabs */
+/* ==========================================================================
+   3. NAVIGATION TABS (WRAPPED COMPACT TABS ON TOP + STICKY BOTTOM BAR ON MOBILE)
+   ========================================================================== */
+.kk-segmented-tabs-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-bottom: 14px;
+}
+
 .kk-nav-tabs {
     display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    margin-bottom: 18px;
-    padding-bottom: 4px;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .kk-nav-tab {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 11px;
     border-radius: 9999px;
     border: 1px solid var(--kk-border);
     background: var(--kk-bg-surface);
     color: var(--kk-text-secondary);
-    font-size: 0.86rem;
+    font-size: 0.74rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
     white-space: nowrap;
+    flex: 1 1 auto;
+    min-width: 0;
+    transition: all 0.2s ease;
 }
 
-.kk-nav-tab:hover {
-    border-color: #f97316;
-    color: var(--kk-text-primary);
+.kk-tab-full {
+    display: none;
+}
+
+.kk-tab-short {
+    display: inline;
+}
+
+@media (min-width: 769px) {
+    .kk-segmented-tabs-wrap {
+        margin-bottom: 18px;
+    }
+    .kk-nav-tabs {
+        gap: 10px;
+    }
+    .kk-nav-tab {
+        flex: 0 0 auto;
+        padding: 10px 18px;
+        font-size: 0.86rem;
+        gap: 8px;
+    }
+    .kk-tab-full {
+        display: inline;
+    }
+    .kk-tab-short {
+        display: none;
+    }
 }
 
 .kk-nav-tab.active {
     background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
     border-color: #ea580c;
     color: #ffffff;
-    box-shadow: 0 4px 16px rgba(249, 115, 22, 0.32);
+    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.28);
 }
 
 .kk-tab-badge {
     background: #f43f5e;
     color: #ffffff;
-    font-size: 0.7rem;
-    padding: 1px 7px;
+    font-size: 0.68rem;
+    padding: 1px 6px;
     border-radius: 9999px;
     font-weight: 800;
 }
@@ -417,32 +539,127 @@
     color: #ffffff;
 }
 
-/* KPI Grid */
+/* Mobile Sticky Bottom App Bar */
+.kk-mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100vw;
+    z-index: 1500;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    background: var(--kk-bg-surface);
+    border-top: 1px solid var(--kk-border);
+    box-shadow: 0 -8px 26px rgba(0, 0, 0, 0.08);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+    backdrop-filter: blur(14px);
+    box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+    .kk-mobile-bottom-nav {
+        display: none;
+    }
+}
+
+.kk-mob-nav-item {
+    background: transparent;
+    border: none;
+    color: var(--kk-text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 2px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.kk-mob-nav-item span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.kk-mob-nav-item.active {
+    color: #f97316;
+    background: rgba(249, 115, 22, 0.1);
+    font-weight: 800;
+}
+
+.kk-mob-icon-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kk-mob-badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background: #f43f5e;
+    color: #ffffff;
+    font-size: 0.56rem;
+    font-weight: 800;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 4px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kk-mob-badge.secondary {
+    background: #f97316;
+}
+
+/* ==========================================================================
+   4. KPI SUMMARY STRIP (CLEAN 2x2 VERTICAL GRID)
+   ========================================================================== */
 .kk-kpi-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
-    gap: 14px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-bottom: 14px;
+}
+
+.kk-kpi-card:first-child {
+    grid-column: span 2;
 }
 
 .kk-kpi-card {
     background: var(--kk-bg-surface);
     border: 1px solid var(--kk-border);
-    border-radius: var(--kk-radius-md);
-    padding: 16px 18px;
+    border-radius: 14px;
+    padding: 12px 12px 12px 14px;
     box-shadow: var(--kk-shadow-sm);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
     overflow: hidden;
-    transition: all 0.25s ease;
+    min-width: 0;
+    max-width: 100%;
 }
 
-.kk-kpi-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--kk-border-accent);
-    box-shadow: var(--kk-shadow-md);
+@media (min-width: 769px) {
+    .kk-kpi-card {
+        padding: 16px 18px;
+        border-radius: var(--kk-radius-md);
+    }
 }
 
 .kk-kpi-card::before {
@@ -457,41 +674,70 @@
 
 .kk-kpi-top {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 6px;
+    flex-wrap: wrap;
+    gap: 4px;
     margin-bottom: 6px;
+    min-width: 0;
 }
 
 .kk-kpi-label {
-    font-size: 0.74rem;
+    font-size: 0.64rem;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
     color: var(--kk-text-secondary);
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+@media (min-width: 769px) {
+    .kk-kpi-label {
+        font-size: 0.74rem;
+        letter-spacing: 0.05em;
+    }
 }
 
 .kk-kpi-value {
-    font-size: 1.55rem;
+    font-size: 1.15rem;
     font-weight: 900;
     letter-spacing: -0.02em;
     color: var(--kk-text-primary);
-    margin-bottom: 6px;
+    margin-bottom: 4px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+@media (min-width: 769px) {
+    .kk-kpi-value {
+        font-size: 1.55rem;
+        margin-bottom: 6px;
+    }
 }
 
 .kk-kpi-unit {
-    font-size: 0.82rem;
+    font-size: 0.7rem;
     font-weight: 600;
     color: var(--kk-text-secondary);
 }
 
 .kk-kpi-sub {
-    font-size: 0.77rem;
+    font-size: 0.68rem;
     color: var(--kk-text-secondary);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-width: 0;
+}
+
+@media (min-width: 769px) {
+    .kk-kpi-sub {
+        font-size: 0.77rem;
+        gap: 8px;
+    }
 }
 
 /* Progress Bar */
@@ -510,103 +756,139 @@
     transition: width 0.35s ease;
 }
 
-/* Panels & Grids */
-.kk-dashboard-charts-grid {
-    display: grid;
-    grid-template-columns: 1.25fr 1fr;
-    gap: 18px;
-    margin-bottom: 18px;
+/* ==========================================================================
+   5. PANELS & DASHBOARD GRIDS (STRICTLY 1 VERTICAL COLUMN)
+   ========================================================================== */
+.kk-tab-pane {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
 }
 
+.kk-dashboard-charts-grid,
 .kk-dashboard-bottom-grid {
-    display: grid;
-    grid-template-columns: 1.1fr 1.15fr;
-    gap: 18px;
-}
-
-@media (max-width: 1024px) {
-    .kk-dashboard-charts-grid,
-    .kk-dashboard-bottom-grid {
-        grid-template-columns: 1fr;
-    }
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-bottom: 14px;
 }
 
 .kk-panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     background: var(--kk-bg-surface);
     border: 1px solid var(--kk-border);
-    border-radius: var(--kk-radius-lg);
-    padding: 22px;
+    border-radius: 18px;
+    padding: 14px;
     box-shadow: var(--kk-shadow-sm);
-    transition: border-color 0.25s ease;
+    overflow: hidden;
 }
 
-.kk-panel:hover {
-    border-color: var(--kk-border-accent);
+@media (min-width: 769px) {
+    .kk-panel {
+        border-radius: var(--kk-radius-lg);
+        padding: 22px;
+    }
 }
 
 .kk-panel-header {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 14px;
+    min-width: 0;
 }
 
-.kk-panel-header.wrap-gap {
-    flex-wrap: wrap;
+@media (min-width: 769px) {
+    .kk-panel-header {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .kk-panel-header.wrap-gap {
+        flex-wrap: wrap;
+    }
 }
 
 .kk-panel-title {
-    font-size: 1.06rem;
+    font-size: 0.96rem;
     font-weight: 800;
     color: var(--kk-text-primary);
     margin: 0;
+    word-break: break-word;
+}
+
+@media (min-width: 769px) {
+    .kk-panel-title {
+        font-size: 1.06rem;
+    }
 }
 
 .kk-panel-subtitle {
-    font-size: 0.8rem;
+    font-size: 0.74rem;
     color: var(--kk-text-secondary);
     margin: 2px 0 0 0;
+    line-height: 1.35;
+}
+
+@media (min-width: 769px) {
+    .kk-panel-subtitle {
+        font-size: 0.8rem;
+    }
 }
 
 /* Card Breakdown Mini List */
 .kk-cards-mini-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
 }
 
 .kk-card-mini-item {
     background: var(--kk-bg-elevated);
     border: 1px solid var(--kk-border);
-    border-radius: var(--kk-radius-md);
-    padding: 13px 16px;
+    border-radius: 14px;
+    padding: 12px;
+    width: 100%;
+    min-width: 0;
 }
 
 .kk-card-mini-top {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-bottom: 8px;
 }
 
 .kk-card-mini-name {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-weight: 800;
-    font-size: 0.92rem;
+    font-size: 0.86rem;
     flex-wrap: wrap;
+    min-width: 0;
 }
 
 .kk-mini-stmt-amt {
-    font-size: 1.05rem;
+    font-size: 0.98rem;
     font-weight: 800;
 }
 
 .kk-color-dot {
-    width: 11px;
-    height: 11px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     display: inline-block;
     flex-shrink: 0;
@@ -615,8 +897,8 @@
 .kk-card-mini-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    font-size: 0.77rem;
+    gap: 8px 12px;
+    font-size: 0.73rem;
     color: var(--kk-text-secondary);
     margin-top: 6px;
 }
@@ -629,47 +911,74 @@
 /* Donut Chart */
 .kk-donut-container {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 8px 0;
+    justify-content: center;
+    gap: 16px;
+    padding: 6px 0;
+    width: 100%;
+    min-width: 0;
+}
+
+@media (min-width: 640px) {
+    .kk-donut-container {
+        flex-direction: row;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
 }
 
 .kk-donut-legend {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-width: 210px;
-    flex: 1;
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 200px;
 }
 
 .kk-legend-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 0.82rem;
+    gap: 8px;
+    font-size: 0.78rem;
     padding: 6px 10px;
     border-radius: 8px;
     background: var(--kk-bg-elevated);
     border: 1px solid var(--kk-border);
+    min-width: 0;
 }
 
 .kk-legend-label {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-weight: 600;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* 6-Month Projection Chart */
+/* 6-Month Projection Chart (Strict minmax(0, 1fr) so 6 bars never overflow) */
 .kk-projection-chart {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
     align-items: end;
-    height: 225px;
-    padding-top: 20px;
+    height: 185px;
+    padding-top: 14px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+@media (min-width: 769px) {
+    .kk-projection-chart {
+        gap: 12px;
+        height: 225px;
+        padding-top: 20px;
+    }
 }
 
 .kk-proj-col {
@@ -678,59 +987,73 @@
     align-items: center;
     height: 100%;
     justify-content: flex-end;
+    min-width: 0;
+    width: 100%;
 }
 
 .kk-proj-val {
-    font-size: 0.72rem;
+    font-size: 0.6rem;
     font-weight: 700;
     color: var(--kk-text-secondary);
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     text-align: center;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (min-width: 769px) {
+    .kk-proj-val {
+        font-size: 0.72rem;
+    }
 }
 
 .kk-proj-bar-wrap {
     width: 100%;
-    max-width: 48px;
-    height: 170px;
+    max-width: 34px;
+    height: 130px;
     background: var(--kk-bg-elevated);
     border: 1px solid var(--kk-border);
-    border-radius: 10px 10px 4px 4px;
+    border-radius: 8px 8px 4px 4px;
     overflow: hidden;
     display: flex;
     flex-direction: column-reverse;
 }
 
-.kk-proj-seg-emi {
-    background: #f97316;
-    width: 100%;
-    transition: height 0.3s ease;
+@media (min-width: 769px) {
+    .kk-proj-bar-wrap {
+        max-width: 48px;
+        height: 170px;
+    }
 }
 
-.kk-proj-seg-fixed {
-    background: #10b981;
-    width: 100%;
-    transition: height 0.3s ease;
-}
-
-.kk-proj-seg-spend {
-    background: #0284c7;
-    width: 100%;
-    transition: height 0.3s ease;
-}
+.kk-proj-seg-emi { background: #f97316; width: 100%; transition: height 0.3s ease; }
+.kk-proj-seg-fixed { background: #10b981; width: 100%; transition: height 0.3s ease; }
+.kk-proj-seg-spend { background: #0284c7; width: 100%; transition: height 0.3s ease; }
 
 .kk-proj-month {
-    font-size: 0.76rem;
+    font-size: 0.65rem;
     font-weight: 700;
     color: var(--kk-text-secondary);
-    margin-top: 8px;
+    margin-top: 6px;
+    white-space: nowrap;
+}
+
+@media (min-width: 769px) {
+    .kk-proj-month {
+        font-size: 0.76rem;
+        margin-top: 8px;
+    }
 }
 
 .kk-proj-legend {
     display: flex;
-    gap: 16px;
+    flex-wrap: wrap;
+    gap: 10px 16px;
     justify-content: center;
     margin-top: 12px;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 600;
     color: var(--kk-text-secondary);
 }
@@ -753,19 +1076,31 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-height: 270px;
+    max-height: 290px;
     overflow-y: auto;
+    width: 100%;
+    min-width: 0;
 }
 
 .kk-quick-item {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 10px 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 11px 12px;
     background: var(--kk-bg-elevated);
     border: 1px solid var(--kk-border);
     border-radius: var(--kk-radius-sm);
+    width: 100%;
+    min-width: 0;
+}
+
+@media (min-width: 640px) {
+    .kk-quick-item {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
 }
 
 .kk-quick-item.paid {
@@ -774,48 +1109,66 @@
 
 .kk-quick-item-left {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
+    min-width: 0;
 }
 
 .kk-quick-item-title {
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     font-weight: 700;
+    word-break: break-word;
 }
 
 .kk-quick-item-sub {
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     color: var(--kk-text-secondary);
+    word-break: break-word;
 }
 
 .kk-quick-item-right {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
+    border-top: 1px dashed var(--kk-border);
+    padding-top: 8px;
 }
 
-/* Filter Pills */
+@media (min-width: 640px) {
+    .kk-quick-item-right {
+        border-top: none;
+        padding-top: 0;
+        justify-content: flex-end;
+    }
+}
+
+/* Filter Pills (Wraps cleanly inside card on mobile & desktop) */
 .kk-filter-pills {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+@media (min-width: 769px) {
+    .kk-filter-pills {
+        width: auto;
+    }
 }
 
 .kk-pill {
-    padding: 6px 14px;
+    padding: 6px 11px;
     border-radius: 9999px;
     border: 1px solid var(--kk-border);
     background: var(--kk-bg-elevated);
     color: var(--kk-text-secondary);
-    font-size: 0.78rem;
+    font-size: 0.73rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.kk-pill:hover {
-    border-color: #f97316;
-    color: var(--kk-text-primary);
+    white-space: nowrap;
 }
 
 .kk-pill.active {
@@ -824,48 +1177,168 @@
     color: #ffffff;
 }
 
-/* Tables */
-.kk-table-responsive {
+/* ==========================================================================
+   6. MOBILE-FIRST ITEM CARDS (CHECKLIST, EMIS, FIXED EXPENSES)
+   ========================================================================== */
+.kk-item-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     width: 100%;
-    overflow-x: auto;
+    max-width: 100%;
+    min-width: 0;
 }
 
-.kk-data-table {
+.kk-item-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
     width: 100%;
-    border-collapse: collapse;
-    font-size: 0.86rem;
-}
-
-.kk-data-table th {
-    text-align: left;
-    padding: 12px 14px;
-    font-size: 0.73rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--kk-text-secondary);
-    border-bottom: 1px solid var(--kk-border);
+    max-width: 100%;
+    min-width: 0;
     background: var(--kk-bg-elevated);
+    border: 1px solid var(--kk-border);
+    border-radius: 16px;
+    padding: 14px;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
 }
 
-.kk-data-table td {
-    padding: 13px 14px;
-    border-bottom: 1px solid var(--kk-border);
-    vertical-align: middle;
+.kk-item-card.is-paid {
+    opacity: 0.75;
 }
 
-.kk-data-table tr:hover td {
-    background: rgba(249, 115, 22, 0.03);
+.kk-item-main {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    width: 100%;
+    flex: 1;
+}
+
+.kk-item-badges-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.kk-item-title {
+    font-size: 0.96rem;
+    font-weight: 800;
+    color: var(--kk-text-primary);
+    margin: 0;
+    word-break: break-word;
+    line-height: 1.3;
+}
+
+.kk-item-meta-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.76rem;
+    color: var(--kk-text-secondary);
+    word-break: break-word;
+}
+
+.kk-emi-progress-block {
+    margin-top: 4px;
+    padding: 8px 10px;
+    background: var(--kk-bg-surface);
+    border: 1px solid var(--kk-border);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.kk-emi-progress-labels {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.kk-item-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--kk-border);
+    width: 100%;
+}
+
+.kk-amount-edit-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.kk-curr-prefix {
+    font-weight: 800;
+    font-size: 0.88rem;
+    color: var(--kk-text-secondary);
+}
+
+.kk-item-price-tag {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+}
+
+.kk-item-price-tag strong {
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: var(--kk-text-primary);
+}
+
+.kk-item-price-tag small {
+    font-size: 0.74rem;
+    color: var(--kk-text-secondary);
+}
+
+.kk-action-btn-pair {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+@media (min-width: 769px) {
+    .kk-item-card {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+    }
+    .kk-item-actions {
+        width: auto;
+        border-top: none;
+        padding-top: 0;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+        flex-shrink: 0;
+    }
 }
 
 .kk-subtext {
-    font-size: 0.75rem;
+    font-size: 0.73rem;
     color: var(--kk-text-secondary);
+    word-break: break-word;
 }
 
 .kk-inline-card {
     display: inline-flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
 }
 
@@ -874,11 +1347,12 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 2px 9px;
+    padding: 2px 8px;
     border-radius: 9999px;
-    font-size: 0.71rem;
+    font-size: 0.68rem;
     font-weight: 800;
     white-space: nowrap;
+    max-width: 100%;
 }
 
 .kk-badge-paid {
@@ -905,24 +1379,45 @@
     border: 1px solid rgba(2, 132, 199, 0.25);
 }
 
-/* Cards & Statements Grid */
+/* ==========================================================================
+   7. CARDS & STATEMENTS GRID (1 COLUMN ON MOBILE, MULTI ON DESKTOP)
+   ========================================================================== */
 .kk-section-toolbar {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 14px;
+    width: 100%;
+    min-width: 0;
+}
+
+@media (min-width: 769px) {
+    .kk-section-toolbar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
 }
 
 .kk-section-heading {
-    font-size: 1.18rem;
+    font-size: 1.05rem;
     font-weight: 900;
     margin: 0;
+    word-break: break-word;
+}
+
+@media (min-width: 769px) {
+    .kk-section-heading {
+        font-size: 1.18rem;
+    }
 }
 
 .kk-section-subheading {
-    font-size: 0.82rem;
+    font-size: 0.76rem;
     color: var(--kk-text-secondary);
     margin: 2px 0 0 0;
 }
@@ -930,55 +1425,68 @@
 .kk-toolbar-btns,
 .kk-toolbar-filters {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 8px;
+    width: 100%;
+    min-width: 0;
 }
 
-.kk-cards-statement-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 22px;
-}
-
-@media (max-width: 520px) {
-    .kk-cards-statement-grid {
-        grid-template-columns: 1fr;
+@media (min-width: 640px) {
+    .kk-toolbar-btns,
+    .kk-toolbar-filters {
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+        width: auto;
     }
 }
 
+.kk-cards-statement-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
 .kk-statement-card-box {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     background: var(--kk-bg-surface);
     border: 1px solid var(--kk-border);
-    border-radius: var(--kk-radius-lg);
+    border-radius: 18px;
     overflow: hidden;
     box-shadow: var(--kk-shadow-sm);
     display: flex;
     flex-direction: column;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.kk-statement-card-box:hover {
-    transform: translateY(-4px);
-    border-color: #f97316;
-    box-shadow: var(--kk-shadow-md);
 }
 
 .kk-credit-card-visual {
-    padding: 20px;
+    padding: 16px;
     color: #ffffff;
     background: linear-gradient(135deg, var(--card-accent, #f97316) 0%, #18181b 100%);
+    width: 100%;
+    min-width: 0;
+}
+
+@media (min-width: 769px) {
+    .kk-credit-card-visual {
+        padding: 20px;
+    }
 }
 
 .kk-cc-top {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 14px;
 }
 
 .kk-cc-bank {
-    font-size: 0.73rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     opacity: 0.88;
@@ -986,90 +1494,114 @@
 }
 
 .kk-cc-name {
-    font-size: 1.18rem;
+    font-size: 1.05rem;
     font-weight: 900;
+    word-break: break-word;
 }
 
 .kk-cc-number {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.88rem;
+    font-size: 0.8rem;
     background: rgba(0, 0, 0, 0.28);
-    padding: 3px 9px;
+    padding: 3px 8px;
     border-radius: 6px;
+    flex-shrink: 0;
 }
 
 .kk-cc-middle {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-bottom: 12px;
 }
 
 .kk-cc-bill-label {
-    font-size: 0.74rem;
+    font-size: 0.7rem;
     opacity: 0.88;
 }
 
 .kk-cc-bill-amount {
-    font-size: 1.62rem;
+    font-size: 1.38rem;
     font-weight: 900;
 }
 
 .kk-cc-dates {
     text-align: right;
-    font-size: 0.76rem;
+    font-size: 0.72rem;
     opacity: 0.92;
 }
 
 .kk-cc-utilization {
     background: rgba(0, 0, 0, 0.25);
-    padding: 8px 12px;
+    padding: 8px 10px;
     border-radius: 8px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
 }
 
 .kk-cc-util-row {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 2px;
     margin-bottom: 4px;
 }
 
+@media (min-width: 640px) {
+    .kk-cc-util-row {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
 .kk-statement-body {
-    padding: 16px 20px;
+    padding: 14px;
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
 }
 
 .kk-stmt-pills-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
 }
 
 .kk-stmt-mini-box {
     background: var(--kk-bg-elevated);
     border: 1px solid var(--kk-border);
-    padding: 8px 10px;
+    padding: 7px 6px;
     border-radius: 10px;
     text-align: center;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .kk-stmt-mini-box span {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.64rem;
     color: var(--kk-text-secondary);
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .kk-stmt-mini-box strong {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     font-weight: 800;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .kk-stmt-section-title {
-    font-size: 0.73rem;
+    font-size: 0.7rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -1087,35 +1619,66 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 0.83rem;
-    padding: 8px 11px;
+    gap: 8px;
+    font-size: 0.8rem;
+    padding: 8px 10px;
     background: var(--kk-bg-elevated);
     border: 1px solid var(--kk-border);
     border-radius: 8px;
+    min-width: 0;
 }
 
 .kk-statement-footer {
-    padding: 12px 20px;
+    padding: 12px 14px;
     border-top: 1px solid var(--kk-border);
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: stretch;
     background: var(--kk-bg-elevated);
-    flex-wrap: wrap;
     gap: 8px;
 }
 
+.kk-statement-footer > div {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+}
+
+.kk-statement-footer > button {
+    width: 100%;
+    padding: 9px;
+}
+
+@media (min-width: 640px) {
+    .kk-statement-footer {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .kk-statement-footer > div {
+        display: flex !important;
+        width: auto;
+    }
+    .kk-statement-footer > button {
+        width: auto;
+    }
+}
+
 .kk-burn-rate-banner {
-    margin-bottom: 14px;
-    padding: 10px 14px;
+    margin-bottom: 12px;
+    padding: 10px 12px;
     border-radius: 10px;
     background: #fff7ed;
     border: 1px solid #fed7aa;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #9a3412;
+    word-break: break-word;
 }
 
-/* Forms & Modals */
+/* ==========================================================================
+   8. FORMS & MODALS (VIEWPORT CENTERED ON ALL SCREENS)
+   ========================================================================== */
 .kk-input-select,
 .kk-form-group input[type="text"],
 .kk-form-group input[type="number"],
@@ -1127,14 +1690,30 @@
     border: 1px solid var(--kk-border);
     border-radius: var(--kk-radius-sm);
     padding: 9px 12px;
-    font-size: 0.86rem;
+    font-size: 16px; /* Prevents iOS auto-zoom */
+    min-height: 42px;
     outline: none;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     transition: border-color 0.2s ease;
+    box-sizing: border-box;
 }
 
-.kk-input-select {
-    width: auto;
+@media (min-width: 769px) {
+    .kk-input-select {
+        width: auto;
+        font-size: 0.85rem;
+        min-height: 36px;
+    }
+    .kk-form-group input[type="text"],
+    .kk-form-group input[type="number"],
+    .kk-form-group input[type="month"],
+    .kk-form-group input[type="date"],
+    .kk-form-group select {
+        font-size: 0.86rem;
+        min-height: 38px;
+    }
 }
 
 .kk-form-group input:focus,
@@ -1144,7 +1723,7 @@
 }
 
 .kk-inline-amount-input {
-    width: 112px;
+    width: 105px;
     padding: 5px 8px;
     font-weight: 800;
     text-align: right;
@@ -1169,7 +1748,7 @@
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    padding: 16px;
+    padding: 12px;
     box-sizing: border-box;
 }
 
@@ -1177,17 +1756,29 @@
     background: var(--kk-bg-surface);
     color: var(--kk-text-primary);
     border: 1px solid var(--kk-border);
-    border-radius: var(--kk-radius-lg);
+    border-radius: 20px;
     width: 100%;
     max-width: 540px;
-    max-height: 86vh;
-    max-height: 86dvh;
+    max-height: 85vh;
+    max-height: 85dvh;
     overflow-y: auto;
-    padding: 22px 24px;
+    padding: 18px 16px;
     box-shadow: var(--kk-shadow-lg);
     margin: auto;
     position: relative;
+    box-sizing: border-box;
     animation: kkModalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 640px) {
+    .kk-modal-card {
+        padding: 24px;
+        border-radius: var(--kk-radius-lg);
+    }
+}
+
+.kk-modal-card.kk-modal-lg {
+    max-width: 680px;
 }
 
 @keyframes kkModalPop {
@@ -1195,19 +1786,15 @@
     100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-.kk-modal-card.kk-modal-lg {
-    max-width: 680px;
-}
-
 .kk-modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .kk-modal-header h3 {
-    font-size: 1.15rem;
+    font-size: 1.08rem;
     font-weight: 900;
     margin: 0;
 }
@@ -1223,8 +1810,8 @@
 
 .kk-form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
     margin-bottom: 12px;
 }
 
@@ -1232,24 +1819,26 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    min-width: 0;
 }
 
 .kk-form-group.span-2 {
-    grid-column: span 2;
+    grid-column: span 1;
 }
 
-@media (max-width: 560px) {
+@media (min-width: 560px) {
     .kk-form-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
     }
     .kk-form-group.span-2 {
-        grid-column: span 1;
+        grid-column: span 2;
     }
 }
 
 .kk-form-group label {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 700;
     color: var(--kk-text-secondary);
 }
@@ -1261,6 +1850,7 @@
     border-radius: 8px;
     border: 1px solid var(--kk-border);
     background: var(--kk-bg-elevated);
+    width: 100%;
 }
 
 .kk-checkbox-group {
@@ -1280,37 +1870,52 @@
     background: #fff7ed;
     border: 1px solid #fed7aa;
     border-radius: var(--kk-radius-sm);
-    padding: 10px 14px;
-    font-size: 0.82rem;
+    padding: 10px 12px;
+    font-size: 0.78rem;
     margin-bottom: 12px;
     color: #9a3412;
 }
 
 .kk-modal-footer {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 16px;
+    flex-direction: column-reverse;
+    gap: 8px;
+    margin-top: 14px;
     padding-top: 12px;
     border-top: 1px solid var(--kk-border);
+}
+
+.kk-modal-footer .kk-btn {
+    width: 100%;
+    min-height: 42px;
+}
+
+@media (min-width: 560px) {
+    .kk-modal-footer {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+    .kk-modal-footer .kk-btn {
+        width: auto;
+    }
 }
 
 .kk-divider {
     border: none;
     border-top: 1px solid var(--kk-border);
-    margin: 16px 0;
+    margin: 14px 0;
 }
 
 .kk-backup-section h4 {
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     font-weight: 800;
     margin-bottom: 4px;
 }
 
 .kk-text-muted {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--kk-text-secondary);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .kk-backup-btns {
@@ -1322,524 +1927,28 @@
 /* Toast */
 .kk-toast-container {
     position: fixed;
-    bottom: 22px;
-    right: 22px;
-    z-index: 3000;
+    bottom: 78px;
+    left: 12px;
+    right: 12px;
+    z-index: 9999;
+}
+
+@media (min-width: 769px) {
+    .kk-toast-container {
+        bottom: 22px;
+        left: auto;
+        right: 22px;
+    }
 }
 
 .kk-toast {
     background: #18181b;
     color: #ffffff;
     border-left: 4px solid #f97316;
-    padding: 12px 18px;
+    padding: 12px 16px;
     border-radius: 10px;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 700;
-}
-
-/* ==========================================================================
-   MOBILE-FIRST & RESPONSIVE OPTIMIZATIONS (Phones, Phablets & Tablets)
-   ========================================================================== */
-
-/* Desktop defaults for mobile-only elements */
-.kk-mobile-settings-btn {
-    display: none;
-    margin-left: auto;
-    flex-shrink: 0;
-}
-
-.kk-mobile-bottom-nav {
-    display: none;
-}
-
-.kk-td-progress {
-    min-width: 190px;
-}
-
-.kk-td-actions {
-    text-align: right;
-}
-
-/* Hide ugly scrollbars on horizontal pill strips */
-.kk-nav-tabs::-webkit-scrollbar,
-.kk-filter-pills::-webkit-scrollbar {
-    display: none;
-}
-.kk-nav-tabs,
-.kk-filter-pills {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-@media (max-width: 768px) {
-    .kk-master-container {
-        padding-top: 76px;
-        padding-bottom: 96px; /* Space for sticky bottom nav */
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    /* 1. Compact Mobile Topbar & 2x2 Quick Action Grid */
-    .kk-topbar {
-        padding: 14px;
-        gap: 12px;
-        border-radius: 18px;
-        margin-bottom: 14px;
-    }
-
-    .kk-brand-block {
-        width: 100%;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .kk-brand-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-    }
-
-    .kk-status-pill {
-        font-size: 0.6rem;
-        padding: 2px 8px;
-        gap: 4px;
-        flex-wrap: wrap;
-    }
-
-    .kk-brand-title {
-        font-size: 1.15rem;
-    }
-
-    .kk-brand-subtitle {
-        font-size: 0.72rem;
-        line-height: 1.3;
-    }
-
-    .kk-mobile-settings-btn {
-        display: inline-flex;
-        width: 38px;
-        height: 38px;
-    }
-
-    .kk-desktop-settings-btn {
-        display: none;
-    }
-
-    /* Full-width Month Navigator for easy thumb reach */
-    .kk-month-navigator {
-        width: 100%;
-        justify-content: space-between;
-        padding: 5px 8px;
-        border-radius: 14px;
-    }
-
-    .kk-month-picker-wrap {
-        flex: 1;
-        justify-content: center;
-        padding: 4px 6px;
-    }
-
-    .kk-month-label {
-        font-size: 0.88rem;
-    }
-
-    /* 2x2 Equal Grid for Quick Add Buttons */
-    .kk-topbar-actions {
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-    }
-
-    .kk-topbar-actions .kk-btn {
-        width: 100%;
-        padding: 10px 10px;
-        font-size: 0.78rem;
-        border-radius: 12px;
-        min-height: 42px;
-    }
-
-    /* 2. Top Nav Tabs compact + Sticky Bottom App Bar */
-    .kk-nav-tabs {
-        gap: 6px;
-        margin-bottom: 14px;
-        padding-bottom: 2px;
-    }
-
-    .kk-nav-tab {
-        padding: 8px 13px;
-        font-size: 0.78rem;
-        gap: 6px;
-    }
-
-    .kk-mobile-bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 1500;
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        background: var(--kk-bg-surface);
-        border-top: 1px solid var(--kk-border);
-        box-shadow: 0 -8px 26px rgba(0, 0, 0, 0.08);
-        padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
-        backdrop-filter: blur(14px);
-    }
-
-    .kk-mob-nav-item {
-        background: transparent;
-        border: none;
-        color: var(--kk-text-secondary);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 3px;
-        padding: 6px 2px;
-        font-size: 0.66rem;
-        font-weight: 700;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .kk-mob-nav-item.active {
-        color: #f97316;
-        background: rgba(249, 115, 22, 0.1);
-        font-weight: 800;
-    }
-
-    .kk-mob-icon-wrap {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .kk-mob-badge {
-        position: absolute;
-        top: -5px;
-        right: -10px;
-        background: #f43f5e;
-        color: #ffffff;
-        font-size: 0.58rem;
-        font-weight: 800;
-        min-width: 15px;
-        height: 15px;
-        padding: 0 4px;
-        border-radius: 9999px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .kk-mob-badge.secondary {
-        background: #f97316;
-    }
-
-    /* 3. 2x2 Compact KPI Grid on Mobile (Fits Above the Fold) */
-    .kk-kpi-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-        margin-bottom: 14px;
-    }
-
-    .kk-kpi-card {
-        padding: 12px 12px 12px 14px;
-        border-radius: 14px;
-    }
-
-    .kk-kpi-label {
-        font-size: 0.64rem;
-        letter-spacing: 0.03em;
-    }
-
-    .kk-kpi-value {
-        font-size: 1.18rem;
-        margin-bottom: 4px;
-        word-break: break-word;
-    }
-
-    .kk-kpi-unit {
-        font-size: 0.7rem;
-    }
-
-    .kk-kpi-sub {
-        font-size: 0.68rem;
-        flex-wrap: wrap;
-        gap: 4px;
-    }
-
-    /* 4. Panels, Charts & Actionable Dues */
-    .kk-panel {
-        padding: 14px;
-        border-radius: 18px;
-    }
-
-    .kk-panel-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        margin-bottom: 12px;
-    }
-
-    .kk-panel-title {
-        font-size: 0.96rem;
-    }
-
-    .kk-panel-subtitle {
-        font-size: 0.74rem;
-    }
-
-    .kk-filter-pills {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: 2px;
-    }
-
-    .kk-pill {
-        white-space: nowrap;
-        padding: 6px 12px;
-        font-size: 0.74rem;
-    }
-
-    .kk-projection-chart {
-        gap: 6px;
-        height: 185px;
-        padding-top: 12px;
-    }
-
-    .kk-proj-val {
-        font-size: 0.62rem;
-    }
-
-    .kk-proj-bar-wrap {
-        height: 130px;
-        max-width: 34px;
-    }
-
-    .kk-proj-month {
-        font-size: 0.66rem;
-    }
-
-    .kk-quick-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-        padding: 12px;
-    }
-
-    .kk-quick-item-right {
-        justify-content: space-between;
-        border-top: 1px dashed var(--kk-border);
-        padding-top: 8px;
-    }
-
-    /* 5. Convert Wide HTML Tables into Native Mobile Cards */
-    .kk-table-responsive {
-        overflow-x: visible;
-    }
-
-    .kk-data-table,
-    .kk-data-table tbody {
-        display: block;
-        width: 100%;
-    }
-
-    .kk-data-table thead {
-        display: none;
-    }
-
-    .kk-data-table tr.kk-mobile-table-card {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        background: var(--kk-bg-elevated);
-        border: 1px solid var(--kk-border);
-        border-radius: 16px;
-        padding: 14px;
-        margin-bottom: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-    }
-
-    .kk-data-table tr.kk-mobile-table-card td {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 4px 0;
-        border-bottom: 1px dashed rgba(148, 163, 184, 0.22);
-        text-align: right;
-        font-size: 0.82rem;
-    }
-
-    .kk-data-table tr.kk-mobile-table-card td:last-child {
-        border-bottom: none;
-        padding-top: 8px;
-    }
-
-    .kk-data-table tr.kk-mobile-table-card td::before {
-        content: attr(data-label);
-        font-size: 0.72rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        color: var(--kk-text-secondary);
-        text-align: left;
-        flex-shrink: 0;
-    }
-
-    .kk-td-progress {
-        min-width: 0;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        text-align: left !important;
-    }
-
-    .kk-td-actions {
-        justify-content: flex-end;
-    }
-
-    .kk-inline-amount-input {
-        width: 110px;
-        font-size: 0.9rem;
-        padding: 6px 10px;
-    }
-
-    /* 6. Cards & Statements Mobile Layout */
-    .kk-section-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-
-    .kk-toolbar-btns,
-    .kk-toolbar-filters {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-
-    .kk-toolbar-filters .kk-btn {
-        grid-column: span 2;
-    }
-
-    .kk-input-select {
-        width: 100%;
-        font-size: 0.8rem;
-        padding: 9px 10px;
-    }
-
-    .kk-cards-statement-grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
-    }
-
-    .kk-credit-card-visual {
-        padding: 16px;
-    }
-
-    .kk-cc-bill-amount {
-        font-size: 1.35rem;
-    }
-
-    .kk-cc-util-row {
-        flex-direction: column;
-        gap: 2px;
-        font-size: 0.7rem;
-    }
-
-    .kk-statement-body {
-        padding: 14px;
-    }
-
-    .kk-stmt-mini-box {
-        padding: 7px 6px;
-    }
-
-    .kk-stmt-mini-box span {
-        font-size: 0.65rem;
-    }
-
-    .kk-stmt-mini-box strong {
-        font-size: 0.82rem;
-    }
-
-    .kk-statement-footer {
-        padding: 12px 14px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-
-    .kk-statement-footer > div {
-        display: grid !important;
-        grid-template-columns: repeat(3, 1fr);
-        width: 100%;
-    }
-
-    .kk-statement-footer > button {
-        width: 100%;
-        padding: 10px;
-    }
-
-    /* 7. Screen-Centered Viewport Modals on Mobile */
-    .kk-modal-backdrop {
-        align-items: center;
-        justify-content: center;
-        padding: 12px;
-    }
-
-    .kk-modal-card,
-    .kk-modal-card.kk-modal-lg {
-        max-width: 100%;
-        max-height: 84vh;
-        max-height: 84dvh;
-        border-radius: 20px;
-        padding: 18px 16px;
-        margin: auto;
-    }
-
-    .kk-form-group input[type="text"],
-    .kk-form-group input[type="number"],
-    .kk-form-group input[type="month"],
-    .kk-form-group input[type="date"],
-    .kk-form-group select {
-        font-size: 16px; /* Prevents iOS auto-zoom on input focus */
-        min-height: 44px;
-    }
-
-    .kk-modal-footer {
-        flex-direction: column-reverse;
-        gap: 8px;
-    }
-
-    .kk-modal-footer .kk-btn {
-        width: 100%;
-        min-height: 44px;
-    }
-
-    /* Toast above mobile bottom nav */
-    .kk-toast-container {
-        bottom: 78px;
-        left: 12px;
-        right: 12px;
-    }
-
-    .kk-toast {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-@media (max-width: 380px) {
-    .kk-kpi-value {
-        font-size: 1.05rem;
-    }
-    .kk-topbar-actions {
-        grid-template-columns: 1fr 1fr;
-    }
+    text-align: center;
 }

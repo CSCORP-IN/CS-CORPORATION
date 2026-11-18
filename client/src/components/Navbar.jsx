@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { 
     X, BookOpen, PenTool, LayoutDashboard, Home, GraduationCap, 
-    FileText, ArrowUpRight, Truck, Layers, LogIn, LogOut, User, ShieldCheck, Wallet
+    FileText, ArrowUpRight, Truck, Layers, LogIn, LogOut, User, Wallet, FolderLock
 } from 'lucide-react';
 import Logo from './Logo';
 import { useAuth } from '../context/AuthContext';
@@ -185,18 +185,32 @@ const Navbar = () => {
                                 </NavLink>
                             </li>
                             {isAuthenticated && (
-                                <li>
-                                    <NavLink to="/khatakit" onClick={() => setIsOpen(false)} className="dropdown-item-link">
-                                        <div className="dropdown-item-icon"><Wallet size={18} /></div>
-                                        <div className="dropdown-item-info">
-                                            <div className="dropdown-title-row">
-                                                <span className="dropdown-item-title">ChaudharyKhataKit</span>
-                                                <span className="live-pill-tag">Personal</span>
+                                <>
+                                    <li>
+                                        <NavLink to="/khatakit" onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                            <div className="dropdown-item-icon"><Wallet size={18} /></div>
+                                            <div className="dropdown-item-info">
+                                                <div className="dropdown-title-row">
+                                                    <span className="dropdown-item-title">ChaudharyKhataKit</span>
+                                                    <span className="live-pill-tag">Personal</span>
+                                                </div>
+                                                <span className="dropdown-item-desc">My Card EMIs, Statements &amp; Expense Manager</span>
                                             </div>
-                                            <span className="dropdown-item-desc">My Card EMIs, Statements &amp; Expense Manager</span>
-                                        </div>
-                                    </NavLink>
-                                </li>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink to="/cslocker" onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                            <div className="dropdown-item-icon"><FolderLock size={18} /></div>
+                                            <div className="dropdown-item-info">
+                                                <div className="dropdown-title-row">
+                                                    <span className="dropdown-item-title">Chaudhary CS Locker</span>
+                                                    <span className="live-pill-tag">Vault</span>
+                                                </div>
+                                                <span className="dropdown-item-desc">Centralized Document Management &amp; GridFS Vault</span>
+                                            </div>
+                                        </NavLink>
+                                    </li>
+                                </>
                             )}
                         </ul>
 
@@ -229,6 +243,10 @@ const Navbar = () => {
                                         <NavLink to="/khatakit" onClick={() => setIsOpen(false)} className="auth-profile-nav-btn">
                                             <Wallet size={14} />
                                             <span>My KhataKit Expenses</span>
+                                        </NavLink>
+                                        <NavLink to="/cslocker" onClick={() => setIsOpen(false)} className="auth-profile-nav-btn">
+                                            <FolderLock size={14} />
+                                            <span>My CS Locker Vault</span>
                                         </NavLink>
                                         {user?.role === 'admin' && (
                                             <NavLink to="/admin" onClick={() => setIsOpen(false)} className="auth-admin-btn">
