@@ -20,6 +20,7 @@ import ThankYou from './pages/ThankYou';
 import KhataKit from './pages/KhataKit';
 import CSLocker from './pages/CSLocker';
 import AppDashboard from './pages/AppDashboard';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import WorkspacePreferencesModal from './components/WorkspacePreferencesModal';
 import { ArticleProvider } from './context/ArticleContext';
 import { AuthProvider, useAuth, isNativeAppEnvironment } from './context/AuthContext';
@@ -110,6 +111,8 @@ function AppRoutes() {
           <Route path="/thank-you" element={<Navigate to="/thankyou" replace />} />
           <Route path="/khatakit" element={<KhataKit />} />
           <Route path="/cslocker" element={<CSLocker />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/privacy" element={<Navigate to="/privacy-policy" replace />} />
         </Routes>
       </main>
       {!isThankYouPage && <Footer />}

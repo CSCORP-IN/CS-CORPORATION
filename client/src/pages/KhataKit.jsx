@@ -616,7 +616,7 @@ const KhataKit = () => {
                     card_id: spendForm.card_id || null
                 })
             });
-            showToastMsg('One-time spend added!');
+            showToastMsg('Expense added!');
             setSpendModalOpen(false);
             await loadDashboard();
         } catch (err) {
@@ -1010,10 +1010,10 @@ const KhataKit = () => {
                 {/* Quick Actions */}
                 <div className="kk-topbar-actions">
                     <button type="button" className="kk-btn kk-btn-primary" onClick={() => openAddSpendModal()}>
-                        <Plus size={15} /> One-Time Spend
+                        <Plus size={15} /> Add Expense
                     </button>
                     <button type="button" className="kk-btn kk-btn-emerald" onClick={openAddIncomeModal}>
-                        <Plus size={15} /> One-Time Income
+                        <Plus size={15} /> Add Income
                     </button>
                     <button type="button" className="kk-btn kk-btn-secondary" onClick={openAddInvestmentModal}>
                         <TrendingUp size={15} /> + Investment
@@ -1337,20 +1337,20 @@ const KhataKit = () => {
                             </div>
                         </div>
 
-                        {/* One-Time Spends & One-Time Incomes This Month */}
+                        {/* Expenses & Incomes This Month */}
                         <div className="kk-panel">
                             <div className="kk-panel-header">
                                 <div>
-                                    <h2 className="kk-panel-title">💸 One-Time Spends ({formatMonthDisplay(selectedMonth, true)})</h2>
+                                    <h2 className="kk-panel-title">💸 Expenses ({formatMonthDisplay(selectedMonth, true)})</h2>
                                     <p className="kk-panel-subtitle">All non-EMI spends via UPI, Cash, Bank, or Credit Card</p>
                                 </div>
                                 <button type="button" className="kk-btn kk-btn-primary kk-btn-sm" onClick={() => openAddSpendModal()}>
-                                    + Add Spend
+                                    + Add Expense
                                 </button>
                             </div>
                             <div className="kk-quick-checklist">
                                 {!cardSpends.length ? (
-                                    <p className="kk-text-muted">No one-time spends logged for {formatMonthDisplay(selectedMonth)}.</p>
+                                    <p className="kk-text-muted">No expenses logged for {formatMonthDisplay(selectedMonth)}.</p>
                                 ) : (
                                     cardSpends.map(sp => (
                                         <div key={sp.id} className="kk-quick-item">
@@ -1382,7 +1382,7 @@ const KhataKit = () => {
                         <div className="kk-panel">
                             <div className="kk-panel-header">
                                 <div>
-                                    <h2 className="kk-panel-title">💰 One-Time Incomes ({formatMonthDisplay(selectedMonth, true)})</h2>
+                                    <h2 className="kk-panel-title">💰 Incomes ({formatMonthDisplay(selectedMonth, true)})</h2>
                                     <p className="kk-panel-subtitle">Salary, freelance, bonus, refund, or other income received</p>
                                 </div>
                                 <button type="button" className="kk-btn kk-btn-emerald kk-btn-sm" onClick={openAddIncomeModal}>
@@ -1391,7 +1391,7 @@ const KhataKit = () => {
                             </div>
                             <div className="kk-quick-checklist">
                                 {!incomes.length ? (
-                                    <p className="kk-text-muted">No one-time income entries logged for {formatMonthDisplay(selectedMonth)}.</p>
+                                    <p className="kk-text-muted">No income entries logged for {formatMonthDisplay(selectedMonth)}.</p>
                                 ) : (
                                     incomes.map(inc => (
                                         <div key={inc.id} className="kk-quick-item">
@@ -2619,12 +2619,12 @@ const KhataKit = () => {
                 </div>
             )}
 
-            {/* MODAL 4: ADD ONE-TIME SPEND (UPI / CASH / BANK OR CREDIT CARD) */}
+            {/* MODAL 4: ADD EXPENSE (UPI / CASH / BANK OR CREDIT CARD) */}
             {spendModalOpen && (
                 <div className="kk-modal-backdrop" onClick={() => setSpendModalOpen(false)}>
                     <div className="kk-modal-card" onClick={(e) => e.stopPropagation()}>
                         <div className="kk-modal-header">
-                            <h3>Add One-Time Spend</h3>
+                            <h3>Add Expense</h3>
                             <button type="button" className="kk-modal-close" onClick={() => setSpendModalOpen(false)}>&times;</button>
                         </div>
                         <form onSubmit={handleSaveSpend}>
@@ -2706,19 +2706,19 @@ const KhataKit = () => {
                             </div>
                             <div className="kk-modal-footer">
                                 <button type="button" className="kk-btn kk-btn-ghost" onClick={() => setSpendModalOpen(false)}>Cancel</button>
-                                <button type="submit" className="kk-btn kk-btn-primary">Save One-Time Spend</button>
+                                <button type="submit" className="kk-btn kk-btn-primary">Save Expense</button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
 
-            {/* MODAL 4B: ADD ONE-TIME INCOME */}
+            {/* MODAL 4B: ADD INCOME */}
             {incomeModalOpen && (
                 <div className="kk-modal-backdrop" onClick={() => setIncomeModalOpen(false)}>
                     <div className="kk-modal-card" onClick={(e) => e.stopPropagation()}>
                         <div className="kk-modal-header">
-                            <h3>Add One-Time Income</h3>
+                            <h3>Add Income</h3>
                             <button type="button" className="kk-modal-close" onClick={() => setIncomeModalOpen(false)}>&times;</button>
                         </div>
                         <form onSubmit={handleSaveIncome}>

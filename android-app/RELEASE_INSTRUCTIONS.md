@@ -1,31 +1,43 @@
 ## CS Corp Android App Release Guide
 
+### Package Name / Application ID
+- **Package Name:** `app.cscorp.in` (Registered on Google Play Console)
+
+---
+
+### Production Build Files (Root Workspace me available)
+- **Android App Bundle (.aab):** [CS-Corp.aab](file:///d:/Production/CS%20Corp/CS-Corp.aab) *(Google Play Console publishing ke liye)*
+- **Android APK (.apk):** [CS-Corp.apk](file:///d:/Production/CS%20Corp/CS-Corp.apk) *(Direct phone me install karne ke liye)*
+
+---
+
+### Release Signing Keystore Details
+Ye bundle aur APK production key se signed hain:
+- **Keystore File:** `d:\Production\CS Corp\android-app\app\cscorp-release.jks`
+- **Key Alias:** `cscorp`
+- **Store Password:** `cscorp@2026`
+- **Key Password:** `cscorp@2026`
+- **Validity:** 10,000 days (Play Store standard)
+
+---
+
 ### Project Location
 Aapka complete Android Studio project yahan saved hai:
 `d:\Production\CS Corp\android-app\`
 
 ---
 
-### Release APK Generate Karne Ke 2 Aasaan Tareeqe:
-
-#### Tareeqa 1: Android Studio Se (Recommended - 1 Click)
-Aapke laptop me Android Studio already installed hai (`C:\Program Files\Android\Android Studio`):
-
-1. **Android Studio Open Karein:**
-   - **File -> Open** par click karein.
-   - Folder select karein: `d:\Production\CS Corp\android-app`
-2. **Build Release APK:**
-   - Top menu me **Build -> Build Bundle(s) / APK(s) -> Build APK(s)** par click karein.
-3. **APK Ready:**
-   - Build hone ke baad neeche right corner par notification aayega: `locate`.
-   - Release / Debug APK file yahan save hogi:
-     `d:\Production\CS Corp\android-app\app\build\outputs\apk\debug\app-debug.apk`
-   - Is `.apk` file ko apne phone me send karke direct install karein.
+### Command Line Se Build Karne Ka Command:
+Agar future me dubara build karna ho:
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+cd "d:\Production\CS Corp\android-app"
+C:\Users\offic\.gradle\wrapper\dists\gradle-9.3.1-bin\23ovyewtku6u96viwx3xl3oks\gradle-9.3.1\bin\gradle.bat bundleRelease --no-daemon
+```
 
 ---
 
-#### Tareeqa 2: Instant PWA Release (Bina Kisi Build Ke Phone Me Direct Install)
-Agar aapko APK file build karne ka wait nahi karna hai:
+### Tareeqa: Instant PWA Install (Bina Kisi File Ke Phone Me Direct Install)
 1. Mobile ke Chrome me apni site open karein: `https://cscorp.in`
 2. Chrome ke top-right 3-dots menu par tap karein.
 3. **"Install App"** ya **"Add to Home screen"** dabayein.

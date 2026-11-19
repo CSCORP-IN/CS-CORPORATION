@@ -83,7 +83,11 @@ const Footer = () => {
 
                 {/* Bottom Copyright & Security Strip */}
                 <div className="footer-copyright-strip">
-                    <p>{`© ${new Date().getFullYear()} CS Corporation (Chaudhary & Sons Corporation) • cscorp.in. All rights reserved.`}</p>
+                    <p>
+                        {`© ${new Date().getFullYear()} CS Corporation (Chaudhary & Sons Corporation) • cscorp.in. All rights reserved.`}
+                        {' • '}
+                        <Link to="/privacy-policy" style={{ color: '#ea580c', fontWeight: 600, textDecoration: 'none' }}>Privacy Policy</Link>
+                    </p>
                     <div className="footer-status-pill">
                         <span className="live-status-dot"></span>
                         <span>Enterprise Systems Operational</span>

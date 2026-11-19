@@ -1,0 +1,4 @@
+#Thu Nov 19 18:53:24 IST 2026
+base.0=D\:\\Production\\CS Corp\\android-app\\app\\build\\intermediates\\dex\\release\\mergeDexRelease\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
