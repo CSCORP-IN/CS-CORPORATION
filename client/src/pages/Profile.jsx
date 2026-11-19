@@ -6,20 +6,28 @@ import {
     User, Mail, Phone, Lock, FileText, ShoppingBag, 
     ShieldCheck, CheckCircle2, Clock, AlertCircle, Save, 
     ExternalLink, Plus, BookOpen, Layers, Sparkles, KeyRound,
-    Globe, Linkedin, Github, Twitter, ArrowRight, Check, Shield
+    Globe, Linkedin, Github, Twitter, ArrowRight, Check, Shield, Sliders, Wallet, FolderLock, GraduationCap
 } from 'lucide-react';
+import { AVAILABLE_MODULES } from '../components/WorkspacePreferencesModal';
 import './Profile.css';
 
 const Profile = () => {
-    const { user, isAuthenticated, logout } = useAuth();
+    const { user, isAuthenticated, logout, updatePreferences } = useAuth();
     const navigate = useNavigate();
 
-    const [activeTab, setActiveTab] = useState('articles'); // 'articles' | 'purchases' | 'info' | 'security'
+    const [activeTab, setActiveTab] = useState('articles'); // 'articles' | 'purchases' | 'workspace' | 'info' | 'security'
     const [loading, setLoading] = useState(true);
     const [profileData, setProfileData] = useState(null);
     const [articles, setArticles] = useState([]);
     const [purchases, setPurchases] = useState([]);
     const [stats, setStats] = useState({ totalArticles: 0, publishedArticles: 0, pendingArticles: 0, totalPurchases: 0 });
+
+    // Workspace Preferences Module state
+    const [prefModules, setPrefModules] = useState(() => {
+        const existing = user?.enabledModules;
+        return Array.isArray(existing) ? existing : [];
+    });
+    const [prefSaving, setPrefSaving] = useState(false);
 
     // Profile Edit Form State
     const [formData, setFormData] = useState({
@@ -160,6 +168,33 @@ const Profile = () => {
         }
     };
 
+    const togglePrefModule = (id) => {
+        setPrefModules(prev => {
+            if (prev.includes(id)) {
+                return prev.filter(m => m !== id);
+            } else {
+                return [...prev, id];
+            }
+        });
+    };
+
+    const handleSaveWorkspacePreferences = async () => {
+        setPrefSaving(true);
+        setFeedback({ type: '', message: '' });
+        try {
+            const res = await updatePreferences(prefModules);
+            if (res.success) {
+                setFeedback({ type: 'success', message: 'Workspace preferences updated! Navigation menu has been customized.' });
+            } else {
+                setFeedback({ type: 'error', message: res.message || 'Failed to update preferences' });
+            }
+        } catch (e) {
+            setFeedback({ type: 'error', message: 'Error updating workspace preferences' });
+        } finally {
+            setPrefSaving(false);
+        }
+    };
+
     if (!isAuthenticated) return null;
 
     const userInitial = (profileData?.firstName?.[0] || user?.email?.[0] || 'U').toUpperCase();
@@ -248,6 +283,14 @@ const Profile = () => {
                             <ShoppingBag size={16} />
                             <span className="tab-text-full">My Purchases ({purchases.length})</span>
                             <span className="tab-text-short">Purchases ({purchases.length})</span>
+                        </button>
+                        <button
+                            className={`profile-tab-btn ${activeTab === 'workspace' ? 'active' : ''}`}
+                            onClick={() => { setActiveTab('workspace'); setFeedback({ type: '', message: '' }); }}
+                        >
+                            <Sliders size={16} />
+                            <span className="tab-text-full">Workspace &amp; Menu</span>
+                            <span className="tab-text-short">Workspace</span>
                         </button>
                         <button
                             className={`profile-tab-btn ${activeTab === 'info' ? 'active' : ''}`}
@@ -406,7 +449,69 @@ const Profile = () => {
                     </div>
                 )}
 
-                {/* TAB 3: EDIT PROFILE INFORMATION */}
+                {/* TAB 3: WORKSPACE & MENU PREFERENCES */}
+                {activeTab === 'workspace' && (
+                    <div className="profile-tab-content animate-fade-in">
+                        <div className="tab-section-header">
+                            <div>
+                                <h2>Workspace &amp; Menu Visibility</h2>
+                                <p>Select which modules and tools you want visible in your account menu. If none are selected, the entire portal remains visible.</p>
+                            </div>
+                            <button
+                                type="button"
+                                className={`wsp-preset-btn ${prefModules.length === 0 ? 'active' : ''}`}
+                                onClick={() => setPrefModules([])}
+                            >
+                                <Eye size={14} />
+                                <span>Show Everything</span>
+                            </button>
+                        </div>
+
+                        <div className="wsp-modules-grid glass-card" style={{ padding: '20px' }}>
+                            {AVAILABLE_MODULES.map(mod => {
+                                const Icon = mod.icon;
+                                const isChecked = prefModules.length === 0 || prefModules.includes(mod.id);
+                                return (
+                                    <div
+                                        key={mod.id}
+                                        className={`wsp-module-card ${isChecked ? 'is-selected' : ''}`}
+                                        onClick={() => togglePrefModule(mod.id)}
+                                    >
+                                        <div className="wsp-module-checkbox">
+                                            {isChecked && <Check size={14} />}
+                                        </div>
+                                        <div className="wsp-module-main">
+                                            <div className="wsp-module-top">
+                                                <div className="wsp-module-icon" style={{ color: mod.color, background: `${mod.color}15` }}>
+                                                    <Icon size={18} />
+                                                </div>
+                                                <div className="wsp-module-titles">
+                                                    <h4>{mod.title}</h4>
+                                                    <span className="wsp-module-tag">{mod.tag}</span>
+                                                </div>
+                                            </div>
+                                            <p className="wsp-module-desc">{mod.desc}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <div className="form-actions-foot" style={{ marginTop: '16px' }}>
+                            <button 
+                                type="button" 
+                                className="btn-primary" 
+                                onClick={handleSaveWorkspacePreferences} 
+                                disabled={prefSaving}
+                            >
+                                <Save size={16} />
+                                <span>{prefSaving ? 'Saving Preferences...' : 'Save Workspace Preferences'}</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* TAB 4: EDIT PROFILE INFORMATION */}
                 {activeTab === 'info' && (
                     <div className="profile-tab-content animate-fade-in">
                         <div className="tab-section-header">

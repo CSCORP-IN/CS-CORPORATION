@@ -2,19 +2,26 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { 
     X, BookOpen, PenTool, LayoutDashboard, Home, GraduationCap, 
-    FileText, ArrowUpRight, Truck, Layers, LogIn, LogOut, User, Wallet, FolderLock
+    FileText, ArrowUpRight, Truck, Layers, LogIn, LogOut, User, Wallet, FolderLock, Sliders
 } from 'lucide-react';
 import Logo from './Logo';
 import { useAuth } from '../context/AuthContext';
+import WorkspacePreferencesModal from './WorkspacePreferencesModal';
 import './Navbar.css';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [showPrefModal, setShowPrefModal] = useState(false);
     const { isAuthenticated, user, logout } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const menuRef = useRef(null);
+
+    // Filter which modules the user has enabled (empty/all = everything visible)
+    const userModules = Array.isArray(user?.enabledModules) ? user.enabledModules : [];
+    const showAll = userModules.length === 0;
+    const canShow = (modId) => showAll || userModules.includes(modId);
 
     // Close dropdown on route change
     useEffect(() => {
@@ -118,98 +125,116 @@ const Navbar = () => {
 
                     <div className="dropdown-menu-content">
                         <ul className="dropdown-links-list">
-                            <li>
-                                <NavLink to="/" end onClick={() => setIsOpen(false)} className="dropdown-item-link">
-                                    <div className="dropdown-item-icon"><Layers size={18} /></div>
-                                    <div className="dropdown-item-info">
-                                        <span className="dropdown-item-title">Chaudhary & Sons</span>
-                                        <span className="dropdown-item-desc">Enterprise & Holdings Hub</span>
-                                    </div>
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/ankit-chaudhary" onClick={() => setIsOpen(false)} className="dropdown-item-link">
-                                    <div className="dropdown-item-icon"><Home size={18} /></div>
-                                    <div className="dropdown-item-info">
-                                        <span className="dropdown-item-title">Ankit Chaudhary</span>
-                                        <span className="dropdown-item-desc">Maximo EAM & Architecture</span>
-                                    </div>
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/anant-chaudhary" onClick={() => setIsOpen(false)} className="dropdown-item-link">
-                                    <div className="dropdown-item-icon"><Truck size={18} /></div>
-                                    <div className="dropdown-item-info">
-                                        <span className="dropdown-item-title">Anant Chaudhary</span>
-                                        <span className="dropdown-item-desc">Supply Chain & Logistics Leader</span>
-                                    </div>
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/courses" onClick={() => setIsOpen(false)} className="dropdown-item-link">
-                                    <div className="dropdown-item-icon"><GraduationCap size={18} /></div>
-                                    <div className="dropdown-item-info">
-                                        <div className="dropdown-title-row">
-                                            <span className="dropdown-item-title">ChaudharyConnect</span>
-                                            <span className="live-pill-tag">Live</span>
+                            {canShow('hub') && (
+                                <li>
+                                    <NavLink to="/" end onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                        <div className="dropdown-item-icon"><Layers size={18} /></div>
+                                        <div className="dropdown-item-info">
+                                            <span className="dropdown-item-title">Chaudhary & Sons</span>
+                                            <span className="dropdown-item-desc">Enterprise & Holdings Hub</span>
                                         </div>
-                                        <span className="dropdown-item-desc">Live IBM Maximo Bootcamp</span>
-                                    </div>
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/docs" onClick={() => setIsOpen(false)} className="dropdown-item-link">
-                                    <div className="dropdown-item-icon"><BookOpen size={18} /></div>
-                                    <div className="dropdown-item-info">
-                                        <span className="dropdown-item-title">ChaudharyDocs</span>
-                                        <span className="dropdown-item-desc">Architecture & Script Guides</span>
-                                    </div>
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/articles" onClick={() => setIsOpen(false)} className="dropdown-item-link">
-                                    <div className="dropdown-item-icon"><FileText size={18} /></div>
-                                    <div className="dropdown-item-info">
-                                        <span className="dropdown-item-title">ChaudharyArticles</span>
-                                        <span className="dropdown-item-desc">Technical Publications</span>
-                                    </div>
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/post" onClick={() => setIsOpen(false)} className="dropdown-item-link">
-                                    <div className="dropdown-item-icon"><PenTool size={18} /></div>
-                                    <div className="dropdown-item-info">
-                                        <span className="dropdown-item-title">Write Article</span>
-                                        <span className="dropdown-item-desc">Submit to Knowledge Base</span>
-                                    </div>
-                                </NavLink>
-                            </li>
+                                    </NavLink>
+                                </li>
+                            )}
+                            {canShow('hub') && (
+                                <li>
+                                    <NavLink to="/ankit-chaudhary" onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                        <div className="dropdown-item-icon"><Home size={18} /></div>
+                                        <div className="dropdown-item-info">
+                                            <span className="dropdown-item-title">Ankit Chaudhary</span>
+                                            <span className="dropdown-item-desc">Maximo EAM & Architecture</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                            )}
+                            {canShow('hub') && (
+                                <li>
+                                    <NavLink to="/anant-chaudhary" onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                        <div className="dropdown-item-icon"><Truck size={18} /></div>
+                                        <div className="dropdown-item-info">
+                                            <span className="dropdown-item-title">Anant Chaudhary</span>
+                                            <span className="dropdown-item-desc">Supply Chain & Logistics Leader</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                            )}
+                            {canShow('csconnect') && (
+                                <li>
+                                    <NavLink to="/courses" onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                        <div className="dropdown-item-icon"><GraduationCap size={18} /></div>
+                                        <div className="dropdown-item-info">
+                                            <div className="dropdown-title-row">
+                                                <span className="dropdown-item-title">ChaudharyConnect</span>
+                                                <span className="live-pill-tag">Live</span>
+                                            </div>
+                                            <span className="dropdown-item-desc">Live IBM Maximo Bootcamp</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                            )}
+                            {canShow('csdocs') && (
+                                <li>
+                                    <NavLink to="/docs" onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                        <div className="dropdown-item-icon"><BookOpen size={18} /></div>
+                                        <div className="dropdown-item-info">
+                                            <span className="dropdown-item-title">ChaudharyDocs</span>
+                                            <span className="dropdown-item-desc">Architecture & Script Guides</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                            )}
+                            {canShow('articles') && (
+                                <li>
+                                    <NavLink to="/articles" onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                        <div className="dropdown-item-icon"><FileText size={18} /></div>
+                                        <div className="dropdown-item-info">
+                                            <span className="dropdown-item-title">ChaudharyArticles</span>
+                                            <span className="dropdown-item-desc">Technical Publications</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                            )}
+                            {canShow('articles') && (
+                                <li>
+                                    <NavLink to="/post" onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                        <div className="dropdown-item-icon"><PenTool size={18} /></div>
+                                        <div className="dropdown-item-info">
+                                            <span className="dropdown-item-title">Write Article</span>
+                                            <span className="dropdown-item-desc">Submit to Knowledge Base</span>
+                                        </div>
+                                    </NavLink>
+                                </li>
+                            )}
                             {isAuthenticated && (
                                 <>
-                                    <li>
-                                        <NavLink to="/khatakit" onClick={() => setIsOpen(false)} className="dropdown-item-link">
-                                            <div className="dropdown-item-icon"><Wallet size={18} /></div>
-                                            <div className="dropdown-item-info">
-                                                <div className="dropdown-title-row">
-                                                    <span className="dropdown-item-title">ChaudharyKhataKit</span>
-                                                    <span className="live-pill-tag">Personal</span>
+                                    {canShow('khatakit') && (
+                                        <li>
+                                            <NavLink to="/khatakit" onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                                <div className="dropdown-item-icon"><Wallet size={18} /></div>
+                                                <div className="dropdown-item-info">
+                                                    <div className="dropdown-title-row">
+                                                        <span className="dropdown-item-title">ChaudharyKhataKit</span>
+                                                        <span className="live-pill-tag">Personal</span>
+                                                    </div>
+                                                    <span className="dropdown-item-desc">My Card EMIs, Statements &amp; Expense Manager</span>
                                                 </div>
-                                                <span className="dropdown-item-desc">My Card EMIs, Statements &amp; Expense Manager</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink to="/cslocker" onClick={() => setIsOpen(false)} className="dropdown-item-link">
-                                            <div className="dropdown-item-icon"><FolderLock size={18} /></div>
-                                            <div className="dropdown-item-info">
-                                                <div className="dropdown-title-row">
-                                                    <span className="dropdown-item-title">Chaudhary CS Locker</span>
-                                                    <span className="live-pill-tag">Vault</span>
+                                            </NavLink>
+                                        </li>
+                                    )}
+                                    {canShow('cslocker') && (
+                                        <li>
+                                            <NavLink to="/cslocker" onClick={() => setIsOpen(false)} className="dropdown-item-link">
+                                                <div className="dropdown-item-icon"><FolderLock size={18} /></div>
+                                                <div className="dropdown-item-info">
+                                                    <div className="dropdown-title-row">
+                                                        <span className="dropdown-item-title">Chaudhary CS Locker</span>
+                                                        <span className="live-pill-tag">Vault</span>
+                                                    </div>
+                                                    <span className="dropdown-item-desc">Centralized Document Management &amp; GridFS Vault</span>
                                                 </div>
-                                                <span className="dropdown-item-desc">Centralized Document Management &amp; GridFS Vault</span>
-                                            </div>
-                                        </NavLink>
-                                    </li>
+                                            </NavLink>
+                                        </li>
+                                    )}
                                 </>
                             )}
                         </ul>
@@ -236,18 +261,31 @@ const Navbar = () => {
                                     </NavLink>
 
                                     <div className="auth-actions-row">
+                                        <button 
+                                            type="button" 
+                                            onClick={() => { setIsOpen(false); setShowPrefModal(true); }} 
+                                            className="auth-profile-nav-btn"
+                                            style={{ background: 'rgba(234, 88, 12, 0.08)', color: '#ea580c', border: '1px solid rgba(234, 88, 12, 0.25)' }}
+                                        >
+                                            <Sliders size={14} />
+                                            <span>Customize Workspace &amp; Menu</span>
+                                        </button>
                                         <NavLink to="/profile" onClick={() => setIsOpen(false)} className="auth-profile-nav-btn">
                                             <User size={14} />
-                                            <span>My Profile & Purchases</span>
+                                            <span>My Profile &amp; Purchases</span>
                                         </NavLink>
-                                        <NavLink to="/khatakit" onClick={() => setIsOpen(false)} className="auth-profile-nav-btn">
-                                            <Wallet size={14} />
-                                            <span>My KhataKit Expenses</span>
-                                        </NavLink>
-                                        <NavLink to="/cslocker" onClick={() => setIsOpen(false)} className="auth-profile-nav-btn">
-                                            <FolderLock size={14} />
-                                            <span>My CS Locker Vault</span>
-                                        </NavLink>
+                                        {canShow('khatakit') && (
+                                            <NavLink to="/khatakit" onClick={() => setIsOpen(false)} className="auth-profile-nav-btn">
+                                                <Wallet size={14} />
+                                                <span>My KhataKit Expenses</span>
+                                            </NavLink>
+                                        )}
+                                        {canShow('cslocker') && (
+                                            <NavLink to="/cslocker" onClick={() => setIsOpen(false)} className="auth-profile-nav-btn">
+                                                <FolderLock size={14} />
+                                                <span>My CS Locker Vault</span>
+                                            </NavLink>
+                                        )}
                                         {user?.role === 'admin' && (
                                             <NavLink to="/admin" onClick={() => setIsOpen(false)} className="auth-admin-btn">
                                                 <LayoutDashboard size={14} />
@@ -278,6 +316,11 @@ const Navbar = () => {
                     </div>
                 </div>
             )}
+            {/* Workspace Customization Modal */}
+            <WorkspacePreferencesModal
+                isOpen={showPrefModal}
+                onClose={() => setShowPrefModal(false)}
+            />
         </header>
     );
 };

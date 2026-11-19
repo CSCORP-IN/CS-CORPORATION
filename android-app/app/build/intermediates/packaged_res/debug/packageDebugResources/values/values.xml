@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CS Corp</string>
+    <style name="Theme.CSCorpApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#ea580c</item>
+        <item name="colorPrimaryVariant">#c2410c</item>
+        <item name="colorOnPrimary">#ffffff</item>
+        <item name="android:statusBarColor">#ea580c</item>
+        
+        <item name="android:fitsSystemWindows">true</item>
+    </style>
+</resources>

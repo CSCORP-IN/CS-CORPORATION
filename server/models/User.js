@@ -60,6 +60,19 @@ const userSchema = new mongoose.Schema({
         enum: ['active', 'pending', 'suspended', 'inactive'],
         index: true 
     },
+    // Personalized Workspace Preferences:
+    // [] or ['all'] = Full Ecosystem (Everything)
+    // ['khatakit'] = Only KhataKit
+    // ['cslocker'] = Only CS Locker
+    // ['khatakit', 'cslocker'] = Both tools
+    enabledModules: {
+        type: [String],
+        default: []
+    },
+    hasChosenPreferences: {
+        type: Boolean,
+        default: false
+    },
     isVerified: { 
         type: Boolean, 
         default: false,

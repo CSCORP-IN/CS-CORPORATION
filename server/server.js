@@ -272,7 +272,9 @@ app.post('/api/verify-otp', async (req, res) => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                enabledModules: user.enabledModules || [],
+                hasChosenPreferences: Boolean(user.hasChosenPreferences)
             }
         });
     } catch (error) {
@@ -488,7 +490,9 @@ app.post('/api/login', async (req, res) => {
                     firstName: user.firstName || 'Admin',
                     lastName: user.lastName || 'User',
                     email: user.email,
-                    role: user.role
+                    role: user.role,
+                    enabledModules: user.enabledModules || [],
+                    hasChosenPreferences: Boolean(user.hasChosenPreferences)
                 }
             });
         }
@@ -698,6 +702,49 @@ app.get('/api/user/profile', async (req, res) => {
     } catch (error) {
         console.error('Error fetching user profile:', error);
         res.status(500).json({ success: false, message: 'Error loading user profile', error: error.message });
+    }
+});
+
+// Update User Workspace Module Preferences
+app.put('/api/user/preferences', async (req, res) => {
+    const { email, enabledModules } = req.body;
+    if (!email) {
+        return res.status(400).json({ success: false, message: 'User email is required' });
+    }
+
+    try {
+        const cleanModules = Array.isArray(enabledModules)
+            ? enabledModules.filter(m => ['khatakit', 'cslocker', 'hub'].includes(m))
+            : [];
+
+        const updatedUser = await User.findOneAndUpdate(
+            { email },
+            {
+                enabledModules: cleanModules,
+                hasChosenPreferences: true
+            },
+            { new: true }
+        ).select('-password -otp -otpExpiry');
+
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        res.json({
+            success: true,
+            message: 'Workspace preferences updated successfully!',
+            user: {
+                firstName: updatedUser.firstName,
+                lastName: updatedUser.lastName,
+                email: updatedUser.email,
+                role: updatedUser.role,
+                enabledModules: updatedUser.enabledModules || [],
+                hasChosenPreferences: true
+            }
+        });
+    } catch (error) {
+        console.error('Error updating user preferences:', error);
+        res.status(500).json({ success: false, message: 'Error updating preferences', error: error.message });
     }
 });
 

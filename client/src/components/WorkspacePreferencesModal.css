@@ -1,0 +1,245 @@
+.wsp-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(9, 9, 11, 0.65);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.wsp-card {
+    width: 100%;
+    max-width: 620px;
+    max-height: 90vh;
+    max-height: 90dvh;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 24px;
+    padding: 28px 24px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.16);
+    position: relative;
+    box-sizing: border-box;
+}
+
+.wsp-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.wsp-icon-badge {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(249, 115, 22, 0.12);
+    color: #f97316;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.wsp-header h2 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #09090b;
+    margin: 0 0 6px 0;
+}
+
+.wsp-header p {
+    font-size: 0.85rem;
+    color: #71717a;
+    margin: 0;
+    line-height: 1.45;
+}
+
+.wsp-presets-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #f4f4f8;
+    padding: 8px 12px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.wsp-preset-btn {
+    background: transparent;
+    border: 1px solid #d4d4d8;
+    color: #18181b;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.wsp-preset-btn.active {
+    background: #ea580c;
+    border-color: #ea580c;
+    color: #ffffff;
+}
+
+.wsp-presets-hint {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #ea580c;
+}
+
+.wsp-modules-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.wsp-module-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: #ffffff;
+    border: 1.5px solid #e4e4e7;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.wsp-module-card:hover {
+    border-color: #cbd5e1;
+    background: #fafafa;
+}
+
+.wsp-module-card.is-selected {
+    border-color: #ea580c;
+    background: #fffaf5;
+}
+
+.wsp-module-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 1.5px solid #d4d4d8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 3px;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.wsp-module-card.is-selected .wsp-module-checkbox {
+    background: #ea580c;
+    border-color: #ea580c;
+    color: #ffffff;
+}
+
+.wsp-module-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.wsp-module-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.wsp-module-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wsp-module-titles {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.wsp-module-titles h4 {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #09090b;
+}
+
+.wsp-module-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 1px 7px;
+    border-radius: 9999px;
+    background: #f4f4f5;
+    color: #71717a;
+}
+
+.wsp-module-desc {
+    margin: 0;
+    font-size: 0.77rem;
+    color: #52525b;
+    line-height: 1.38;
+}
+
+.wsp-status-msg {
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #10b981;
+    margin-bottom: 12px;
+}
+
+.wsp-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid #f4f4f5;
+}
+
+.wsp-cancel-btn {
+    padding: 10px 18px;
+    font-size: 0.88rem;
+}
+
+.wsp-save-btn {
+    padding: 10px 22px;
+    font-size: 0.88rem;
+}
+
+@media (max-width: 560px) {
+    .wsp-card {
+        padding: 20px 16px;
+    }
+    .wsp-footer {
+        flex-direction: column-reverse;
+    }
+    .wsp-save-btn, .wsp-cancel-btn {
+        width: 100%;
+    }
+}

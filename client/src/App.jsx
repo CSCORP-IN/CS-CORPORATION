@@ -19,13 +19,26 @@ import Profile from './pages/Profile';
 import ThankYou from './pages/ThankYou';
 import KhataKit from './pages/KhataKit';
 import CSLocker from './pages/CSLocker';
+import WorkspacePreferencesModal from './components/WorkspacePreferencesModal';
 import { ArticleProvider } from './context/ArticleContext';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
 
 function AppRoutes() {
   const location = useLocation();
+  const { isAuthenticated, user } = useAuth();
+  const [showFirstTimeModal, setShowFirstTimeModal] = React.useState(false);
+
+  // Check if newly logged-in user hasn't chosen preferences yet
+  React.useEffect(() => {
+    if (isAuthenticated && user && user.hasChosenPreferences === false) {
+      setShowFirstTimeModal(true);
+    } else {
+      setShowFirstTimeModal(false);
+    }
+  }, [isAuthenticated, user]);
+
   const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
   const isAnantSubdomain = hostname === 'anant.cscorp.in' || hostname.startsWith('anant.');
   const isAnkitSubdomain = hostname === 'ankit.cscorp.in' || hostname.startsWith('ankit.');
@@ -37,6 +50,12 @@ function AppRoutes() {
 
   const isThankYouPage = location.pathname === '/thankyou' || location.pathname === '/thank-you';
 
+  // Smart landing based on user preferences:
+  // If user only enabled ['khatakit'] and visits '/', take them straight to /khatakit
+  const userModules = Array.isArray(user?.enabledModules) ? user.enabledModules : [];
+  const onlyKhataKit = userModules.length === 1 && userModules[0] === 'khatakit';
+  const onlyCSLocker = userModules.length === 1 && userModules[0] === 'cslocker';
+
   const getSubdomainHome = () => {
     if (isAnantSubdomain) return <AnantPortfolio />;
     if (isAnkitSubdomain) return <Home />;
@@ -45,6 +64,9 @@ function AppRoutes() {
     if (isArticlesSubdomain) return <Articles />;
     if (isKhataKitSubdomain) return <KhataKit />;
     if (isCSLockerSubdomain) return <CSLocker />;
+
+    if (onlyKhataKit) return <KhataKit />;
+    if (onlyCSLocker) return <CSLocker />;
     return <ChaudharySons />;
   };
 
@@ -53,7 +75,7 @@ function AppRoutes() {
       {!isThankYouPage && <Navbar />}
       <main className={`content ${isThankYouPage ? 'thankyou-clean-layout' : ''}`}>
         <Routes>
-          {/* Dynamic Root based on Subdomain (ankit., anant., docs., connect., articles.cscorp.in) */}
+          {/* Dynamic Root based on Subdomain or User Preference */}
           <Route path="/" element={getSubdomainHome()} />
           <Route path="/chaudhary-and-sons" element={<ChaudharySons />} />
           <Route path="/ankit-chaudhary" element={<Home />} />
@@ -78,6 +100,13 @@ function AppRoutes() {
         </Routes>
       </main>
       {!isThankYouPage && <Footer />}
+
+      {/* First-time Onboarding Modal for New Accounts */}
+      <WorkspacePreferencesModal
+        isOpen={showFirstTimeModal}
+        onClose={() => setShowFirstTimeModal(false)}
+        isFirstTime={true}
+      />
     </div>
   );
 }

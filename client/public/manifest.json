@@ -1,0 +1,41 @@
+{
+  "name": "CS Corp • KhataKit & CS Locker",
+  "short_name": "CS Corp",
+  "description": "Chaudhary & Sons Personal KhataKit Expense/EMI/SIP Manager, CS Locker Document Vault & Knowledge Hub",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fffaf5",
+  "theme_color": "#ea580c",
+  "icons": [
+    {
+      "src": "/appicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/appicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "KhataKit Manager",
+      "short_name": "KhataKit",
+      "description": "Open Personal Expense, EMI & SIP Manager",
+      "url": "/khatakit",
+      "icons": [{ "src": "/appicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "CS Locker Vault",
+      "short_name": "CS Locker",
+      "description": "Open Personal Document Locker",
+      "url": "/cslocker",
+      "icons": [{ "src": "/appicon.png", "sizes": "192x192" }]
+    }
+  ]
+}

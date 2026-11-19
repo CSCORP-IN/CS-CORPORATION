@@ -57,15 +57,18 @@
   --border-radius-full: 9999px;
 }
 
+/* Prevent Browser Selection & Tap Highlight (Pure Native App Feel) */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
   scroll-behavior: smooth;
   color-scheme: light;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -76,6 +79,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
   overflow-x: hidden;
+  user-select: none; /* Disables accidental blue highlight/selection on mobile tap */
+  -webkit-user-select: none;
+  overscroll-behavior-y: contain; /* Prevents browser pull-to-refresh glitching */
+}
+
+/* Allow text selection only inside forms and editable inputs */
+input, textarea, [contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 /* Base Headings */
