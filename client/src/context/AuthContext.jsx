@@ -6,7 +6,7 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 // Check if running as Installed App (Native Android WebView or PWA Standalone)
-const isNativeAppEnvironment = () => {
+export const isNativeAppEnvironment = () => {
     if (typeof window === 'undefined') return false;
     const isStandalonePWA =
         window.matchMedia('(display-mode: standalone)').matches ||

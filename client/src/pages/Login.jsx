@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
     Lock, User, AlertCircle, Mail, Phone, UserPlus, 
-    ArrowRight, ShieldCheck, CheckCircle2, RotateCw, ArrowLeft, KeyRound
+    ArrowRight, ShieldCheck, CheckCircle2, RotateCw, ArrowLeft, KeyRound, Globe
 } from 'lucide-react';
 import Logo from '../components/Logo';
 import './Login.css';
@@ -77,7 +77,7 @@ const Login = () => {
                 if (res.success) {
                     const target = redirectUrl
                         ? (redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`)
-                        : (res.role === 'admin' ? '/admin' : '/');
+                        : (res.role === 'admin' ? '/admin' : '/dashboard');
                     navigate(target);
                 } else if (res.requireOtp) {
                     // Account exists but unverified
@@ -138,7 +138,7 @@ const Login = () => {
             if (res.success) {
                 const target = redirectUrl
                     ? (redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`)
-                    : (res.role === 'admin' ? '/admin' : '/');
+                    : (res.role === 'admin' ? '/admin' : '/dashboard');
                 navigate(target);
             } else {
                 setError(res.message || 'Invalid or expired OTP');
@@ -639,6 +639,16 @@ const Login = () => {
                                     </>
                                 )}
                             </button>
+
+                            {/* Continue as Guest Button */}
+                            <div className="auth-guest-divider">
+                                <span>or</span>
+                            </div>
+
+                            <Link to="/guest" className="btn-secondary auth-guest-btn">
+                                <Globe size={16} />
+                                <span>Continue as Guest</span>
+                            </Link>
                         </form>
 
                         <div className="auth-card-footer">

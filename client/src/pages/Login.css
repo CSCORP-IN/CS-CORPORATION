@@ -218,6 +218,58 @@
     font-size: 0.95rem;
 }
 
+/* Continue as Guest Separator & Button */
+.auth-guest-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin: 0.4rem 0;
+}
+
+.auth-guest-divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-subtle);
+    z-index: 0;
+}
+
+.auth-guest-divider span {
+    position: relative;
+    z-index: 1;
+    background: var(--bg-card, #ffffff);
+    padding: 0 0.8rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+}
+
+.auth-guest-btn {
+    width: 100%;
+    padding: 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border-radius: var(--border-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-surface, #ffffff);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.auth-guest-btn:hover {
+    background: var(--bg-input);
+    border-color: var(--text-main);
+}
+
 .auth-card-footer {
     text-align: center;
     margin-top: 2rem;

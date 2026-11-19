@@ -1,0 +1,307 @@
+.app-dash-container {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 18px 16px 80px 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* User Greeting Header */
+.app-dash-user-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 20px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.app-dash-greeting {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.app-dash-salute {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #71717a;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.app-dash-name {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #09090b;
+    margin: 0;
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+.app-dash-email {
+    font-size: 0.78rem;
+    color: #ea580c;
+    font-weight: 600;
+    word-break: break-all;
+}
+
+.app-dash-pref-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    border: 1px solid rgba(234, 88, 12, 0.3);
+    background: rgba(234, 88, 12, 0.08);
+    color: #ea580c;
+    font-size: 0.74rem;
+    font-weight: 800;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.app-dash-pref-pill:hover {
+    background: #ea580c;
+    color: #ffffff;
+}
+
+/* Quick Action Carousel Chips */
+.app-dash-quick-actions {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 2px 8px 2px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.app-dash-quick-actions::-webkit-scrollbar {
+    display: none;
+}
+
+.quick-action-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    text-decoration: none;
+    border: 1px solid #e4e4e7;
+    background: #ffffff;
+    color: #18181b;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.quick-action-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.quick-action-chip.orange { border-color: rgba(249, 115, 22, 0.35); color: #ea580c; }
+.quick-action-chip.amber { border-color: rgba(245, 158, 11, 0.35); color: #d97706; }
+.quick-action-chip.blue { border-color: rgba(2, 132, 199, 0.35); color: #0284c7; }
+.quick-action-chip.emerald { border-color: rgba(16, 185, 129, 0.35); color: #059669; }
+.quick-action-chip.purple { border-color: rgba(139, 92, 246, 0.35); color: #7c3aed; }
+
+/* Cards Stack */
+.app-dash-cards-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+}
+
+.app-dash-card {
+    background: #ffffff;
+    border: 1px solid #e4e4e7;
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.app-dash-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.app-dash-card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.app-dash-card-title-group h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #09090b;
+}
+
+.card-sub-tag {
+    font-size: 0.7rem;
+    color: #71717a;
+    font-weight: 600;
+}
+
+.app-dash-icon-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.app-dash-icon-circle.orange { background: rgba(249, 115, 22, 0.12); color: #f97316; }
+.app-dash-icon-circle.amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+.app-dash-icon-circle.blue { background: rgba(2, 132, 199, 0.12); color: #0284c7; }
+.app-dash-icon-circle.purple { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+
+.card-action-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #ea580c;
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: rgba(234, 88, 12, 0.08);
+}
+
+/* Metrics 2x2 Grid inside Cards */
+.app-dash-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+}
+
+.dash-metric-item {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.metric-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+}
+
+.metric-val {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.25;
+}
+
+.metric-val.text-orange { color: #ea580c; }
+.metric-val.text-rose { color: #e11d48; }
+.metric-val.text-emerald { color: #059669; }
+.metric-val.text-blue { color: #0284c7; }
+.metric-val.text-amber { color: #d97706; }
+
+.metric-sub {
+    font-size: 0.68rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.dash-card-empty {
+    text-align: center;
+    padding: 14px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.dash-card-empty p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #71717a;
+}
+
+.dash-empty-btn {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #ea580c;
+    text-decoration: none;
+}
+
+.card-mini-action-row {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 4px;
+}
+
+.card-inline-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0284c7;
+    text-decoration: none;
+}
+
+.learning-links-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.learning-chip-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    color: #1e293b;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.learning-chip-item:hover {
+    background: #f1f5f9;
+    color: #ea580c;
+}
+
+.chip-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

@@ -19,9 +19,10 @@ import Profile from './pages/Profile';
 import ThankYou from './pages/ThankYou';
 import KhataKit from './pages/KhataKit';
 import CSLocker from './pages/CSLocker';
+import AppDashboard from './pages/AppDashboard';
 import WorkspacePreferencesModal from './components/WorkspacePreferencesModal';
 import { ArticleProvider } from './context/ArticleContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider, useAuth, isNativeAppEnvironment } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
 
@@ -29,6 +30,7 @@ function AppRoutes() {
   const location = useLocation();
   const { isAuthenticated, user } = useAuth();
   const [showFirstTimeModal, setShowFirstTimeModal] = React.useState(false);
+  const isAppMode = isNativeAppEnvironment();
 
   // Check if newly logged-in user hasn't chosen preferences yet
   React.useEffect(() => {
@@ -50,8 +52,9 @@ function AppRoutes() {
 
   const isThankYouPage = location.pathname === '/thankyou' || location.pathname === '/thank-you';
 
-  // Smart landing based on user preferences:
-  // If user only enabled ['khatakit'] and visits '/', take them straight to /khatakit
+  // Landing Page Strategy for cscorp.in (Both Web & Mobile App):
+  // 1. If user is logged in -> Open Personal User Dashboard (/dashboard)
+  // 2. If user is NOT logged in -> Default page is Login with "Continue as Guest"
   const userModules = Array.isArray(user?.enabledModules) ? user.enabledModules : [];
   const onlyKhataKit = userModules.length === 1 && userModules[0] === 'khatakit';
   const onlyCSLocker = userModules.length === 1 && userModules[0] === 'cslocker';
@@ -65,9 +68,15 @@ function AppRoutes() {
     if (isKhataKitSubdomain) return <KhataKit />;
     if (isCSLockerSubdomain) return <CSLocker />;
 
-    if (onlyKhataKit) return <KhataKit />;
-    if (onlyCSLocker) return <CSLocker />;
-    return <ChaudharySons />;
+    // When Authenticated on Main Domain:
+    if (isAuthenticated) {
+        if (onlyKhataKit) return <KhataKit />;
+        if (onlyCSLocker) return <CSLocker />;
+        return <AppDashboard />;
+    }
+
+    // Default when NOT logged in: Direct Login Screen with "Continue as Guest"
+    return <Login />;
   };
 
   return (
@@ -75,8 +84,12 @@ function AppRoutes() {
       {!isThankYouPage && <Navbar />}
       <main className={`content ${isThankYouPage ? 'thankyou-clean-layout' : ''}`}>
         <Routes>
-          {/* Dynamic Root based on Subdomain or User Preference */}
+          {/* Default Root: Login (with Guest) when logged out, Dashboard when logged in */}
           <Route path="/" element={getSubdomainHome()} />
+          <Route path="/dashboard" element={isAuthenticated ? <AppDashboard /> : <Navigate to="/login" replace />} />
+          
+          {/* Guest Home / Chaudhary & Sons Portal */}
+          <Route path="/guest" element={<ChaudharySons />} />
           <Route path="/chaudhary-and-sons" element={<ChaudharySons />} />
           <Route path="/ankit-chaudhary" element={<Home />} />
           <Route path="/ankit" element={<Navigate to="/ankit-chaudhary" replace />} />
