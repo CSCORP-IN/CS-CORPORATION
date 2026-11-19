@@ -2,11 +2,18 @@
     width: 100%;
     max-width: 680px;
     margin: 0 auto;
-    padding: 18px 16px 80px 16px;
+    padding: 92px 16px 80px 16px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-height: 100vh;
+}
+
+@media (min-width: 769px) {
+    .app-dash-container {
+        padding: 104px 16px 80px 16px;
+    }
 }
 
 /* User Greeting Header */
