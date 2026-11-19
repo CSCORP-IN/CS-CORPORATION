@@ -214,6 +214,7 @@ async function buildMonthPayload(userId, selectedMonth) {
     const { settings, cards, emisRaw, fixedRaw, spendsRaw, incomesRaw, investmentsRaw, paymentsRaw } = await getRawStateForMonth(userId, selectedMonth);
 
     const cardMap = new Map(cards.map(c => [String(c.id), c]));
+    const investmentMap = new Map((investmentsRaw || []).map(inv => [String(inv.id), inv]));
     const paymentMap = new Map();
     for (const p of paymentsRaw) {
         paymentMap.set(`${p.item_type}:${String(p.item_id)}`, p);
@@ -272,6 +273,7 @@ async function buildMonthPayload(userId, selectedMonth) {
         const fxIdStr = String(fx.id);
         const dueThisMonth = isFixedDueInMonth(fx, selectedMonth);
         const card = fx.card_id ? cardMap.get(String(fx.card_id)) : null;
+        const linkedInv = fx.investment_id ? investmentMap.get(String(fx.investment_id)) : null;
         const payRecord = paymentMap.get(`fixed:${fxIdStr}`);
         const monthlyEquivalent = getMonthlyEquivalent(fx);
 
@@ -282,7 +284,10 @@ async function buildMonthPayload(userId, selectedMonth) {
             card_name: card ? card.name : null,
             card_color: card ? card.color : null,
             card_last4: card ? card.last4 : null,
-            effective_due_day: fx.due_day || (card ? card.due_day : 5),
+            investment_id: fx.investment_id ? String(fx.investment_id) : null,
+            investment_title: linkedInv ? linkedInv.title : null,
+            investment_asset_type: linkedInv ? linkedInv.asset_type : null,
+            effective_due_day: fx.due_day || (card ? card.due_day : (linkedInv ? linkedInv.sip_day : 5)),
             is_due_this_month: dueThisMonth,
             monthly_equivalent: monthlyEquivalent,
             is_paid_this_month: payRecord ? Boolean(payRecord.is_paid) : false,
@@ -370,8 +375,12 @@ async function buildMonthPayload(userId, selectedMonth) {
             item_type: 'fixed',
             item_id: f.id,
             title: f.title,
-            subtitle: f.card_name ? `Charged to ${f.card_name} (${f.frequency})` : `${f.payment_method} (${f.frequency})`,
+            subtitle: f.investment_title
+                ? `Linked SIP: ${f.investment_title} • ${f.payment_method}`
+                : (f.card_name ? `Charged to ${f.card_name} (${f.frequency})` : `${f.payment_method} (${f.frequency})`),
             category: f.category,
+            investment_id: f.investment_id,
+            investment_title: f.investment_title,
             card_id: f.card_id,
             card_name: f.card_name || f.payment_method,
             card_color: f.card_color || '#10b981',
@@ -381,7 +390,7 @@ async function buildMonthPayload(userId, selectedMonth) {
             is_paid: f.is_paid_this_month,
             paid_date: f.paid_date,
             auto_pay: Boolean(f.auto_pay),
-            badge: f.frequency
+            badge: f.investment_title ? `SIP • ${f.frequency}` : f.frequency
         });
     }
 
@@ -755,6 +764,7 @@ router.post('/fixed', async (req, res) => {
             due_day: Number(b.due_day) || 5,
             payment_method: b.payment_method || 'UPI / Bank Transfer',
             card_id: b.card_id ? String(b.card_id) : null,
+            investment_id: b.investment_id ? String(b.investment_id) : null,
             auto_pay: Boolean(b.auto_pay),
             active: b.active !== undefined ? Boolean(b.active) : true,
             notes: b.notes || ''
@@ -789,6 +799,7 @@ router.put('/fixed/:id', async (req, res) => {
             due_day: Number(b.due_day) || 5,
             payment_method: b.payment_method || 'UPI / Bank Transfer',
             card_id: b.card_id ? String(b.card_id) : null,
+            investment_id: b.investment_id ? String(b.investment_id) : null,
             auto_pay: Boolean(b.auto_pay),
             active: b.active !== undefined ? Boolean(b.active) : true,
             notes: b.notes || ''

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     FolderLock, Upload, Search, FileText, Image as ImageIcon, FileSpreadsheet,
     FileArchive, FileCode, File, Download, Eye, Trash2, Edit3, Star,
-    X, Calendar, ChevronLeft, ChevronRight, User
+    X, Calendar, ChevronLeft, ChevronRight, User, Settings, Plus, Tag
 } from 'lucide-react';
 import API_BASE_URL from '../config';
 import { useAuth } from '../context/AuthContext';
@@ -200,7 +200,19 @@ const CSLocker = () => {
     });
     const [savingEdit, setSavingEdit] = useState(false);
 
-    const anyModalOpen = uploadModalOpen || Boolean(previewDoc) || Boolean(editDoc);
+    // Custom Categories State
+    const [categories, setCategories] = useState([]);
+    const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState('');
+    const [editingCat, setEditingCat] = useState(null);
+    const [inlineNewCatOpen, setInlineNewCatOpen] = useState(false);
+    const [inlineNewCatName, setInlineNewCatName] = useState('');
+
+    const categoryList = categories.length > 0
+        ? categories.map(c => c.name)
+        : CATEGORIES;
+
+    const anyModalOpen = uploadModalOpen || Boolean(previewDoc) || Boolean(editDoc) || categoryModalOpen;
 
     useEffect(() => {
         if (typeof document === 'undefined') return;
@@ -272,6 +284,110 @@ const CSLocker = () => {
         loadDocuments();
     }, [loadDocuments]);
 
+    const loadCategories = useCallback(async () => {
+        if (!isAuthenticated || !userKey) return;
+        try {
+            const res = await lockerFetch('/categories');
+            if (res.success && Array.isArray(res.categories)) {
+                setCategories(res.categories);
+            }
+        } catch (err) {
+            console.error('Failed to load categories:', err);
+        }
+    }, [isAuthenticated, userKey, lockerFetch]);
+
+    useEffect(() => {
+        loadCategories();
+    }, [loadCategories]);
+
+    const handleAddCategory = async (nameToAdd) => {
+        const clean = (nameToAdd || newCategoryName || '').trim();
+        if (!clean) {
+            showToast('Please enter a category name');
+            return null;
+        }
+        try {
+            const res = await lockerFetch('/categories', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: clean })
+            });
+            if (res.success) {
+                showToast(`Category "${clean}" created!`);
+                setNewCategoryName('');
+                setInlineNewCatName('');
+                setInlineNewCatOpen(false);
+                await loadCategories();
+                return res.category?.name || clean;
+            }
+        } catch (err) {
+            showToast(err.message || 'Failed to add category');
+            return null;
+        }
+    };
+
+    const handleUpdateCategory = async (id, newName) => {
+        const clean = (newName || '').trim();
+        if (!clean) {
+            showToast('Category name cannot be empty');
+            return;
+        }
+        try {
+            const res = await lockerFetch(`/categories/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: clean })
+            });
+            if (res.success) {
+                showToast('Category updated!');
+                setEditingCat(null);
+                await loadCategories();
+                await loadDocuments();
+            }
+        } catch (err) {
+            showToast(err.message || 'Failed to rename category');
+        }
+    };
+
+    const handleDeleteCategory = async (cat) => {
+        const count = stats.category_counts?.[cat.name] || 0;
+        const confirmMsg = count > 0
+            ? `Category "${cat.name}" has ${count} document(s). Deleting it will reassign these documents to "General". Continue?`
+            : `Delete category "${cat.name}"?`;
+        if (!window.confirm(confirmMsg)) return;
+        try {
+            const res = await lockerFetch(`/categories/${cat.id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fallback: 'General' })
+            });
+            if (res.success) {
+                showToast(`Category "${cat.name}" deleted`);
+                if (selectedCategory === cat.name) {
+                    setSelectedCategory('all');
+                }
+                await loadCategories();
+                await loadDocuments();
+            }
+        } catch (err) {
+            showToast(err.message || 'Failed to delete category');
+        }
+    };
+
+    const handleResetCategories = async () => {
+        if (!window.confirm('Restore standard default categories? Any documents in custom categories will be preserved.')) return;
+        try {
+            const res = await lockerFetch('/categories/reset', { method: 'POST' });
+            if (res.success) {
+                showToast('Categories restored to defaults');
+                await loadCategories();
+                await loadDocuments();
+            }
+        } catch (err) {
+            showToast(err.message || 'Failed to reset categories');
+        }
+    };
+
     useEffect(() => {
         if (!previewDoc || previewDoc.preview_kind !== 'text') {
             setPreviewTextContent('');
@@ -327,12 +443,15 @@ const CSLocker = () => {
 
     const openUploadModal = () => {
         setSelectedFiles([]);
+        const defaultCat = categoryList[0] || 'Identity & KYC';
         setUploadMeta({
-            category: selectedCategory !== 'all' ? selectedCategory : 'Identity & KYC',
+            category: selectedCategory !== 'all' ? selectedCategory : defaultCat,
             description: '',
             tags: '',
             is_starred: false
         });
+        setInlineNewCatOpen(false);
+        setInlineNewCatName('');
         setUploadModalOpen(true);
     };
 
@@ -399,6 +518,8 @@ const CSLocker = () => {
             tags: Array.isArray(doc.tags) ? doc.tags.join(', ') : '',
             is_starred: Boolean(doc.is_starred)
         });
+        setInlineNewCatOpen(false);
+        setInlineNewCatName('');
         setEditDoc(doc);
     };
 
@@ -538,18 +659,36 @@ const CSLocker = () => {
                 </div>
 
                 <div className="csl-filter-selects">
-                    <select
-                        value={selectedCategory}
-                        onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }}
-                        aria-label="Category"
-                    >
-                        <option value="all">All Categories</option>
-                        {CATEGORIES.map(c => (
-                            <option key={c} value={c}>
-                                {c} {stats.category_counts?.[c] ? `(${stats.category_counts[c]})` : ''}
-                            </option>
-                        ))}
-                    </select>
+                    <div className="csl-cat-select-wrap">
+                        <select
+                            value={selectedCategory}
+                            onChange={(e) => {
+                                if (e.target.value === '__manage__') {
+                                    setCategoryModalOpen(true);
+                                } else {
+                                    setSelectedCategory(e.target.value);
+                                    setPage(1);
+                                }
+                            }}
+                            aria-label="Category"
+                        >
+                            <option value="all">All Categories</option>
+                            {categoryList.map(c => (
+                                <option key={c} value={c}>
+                                    {c} {stats.category_counts?.[c] ? `(${stats.category_counts[c]})` : ''}
+                                </option>
+                            ))}
+                            <option value="__manage__">⚙️ + Custom Categories...</option>
+                        </select>
+                        <button
+                            type="button"
+                            className="csl-cat-gear-btn"
+                            title="Manage & Create Custom Categories"
+                            onClick={() => setCategoryModalOpen(true)}
+                        >
+                            <Settings size={15} />
+                        </button>
+                    </div>
 
                     <select
                         value={selectedFileType}
@@ -766,14 +905,61 @@ const CSLocker = () => {
                                     )}
 
                                     <div className="csl-field">
-                                        <label>Category</label>
+                                        <div className="csl-field-header-row">
+                                            <label>Category</label>
+                                            <button
+                                                type="button"
+                                                className="csl-text-btn-accent"
+                                                onClick={() => setInlineNewCatOpen(!inlineNewCatOpen)}
+                                            >
+                                                {inlineNewCatOpen ? 'Cancel' : '+ New Category'}
+                                            </button>
+                                        </div>
+                                        {inlineNewCatOpen && (
+                                            <div className="csl-inline-cat-box">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Category name (e.g. Car Papers)"
+                                                    value={inlineNewCatName}
+                                                    onChange={(e) => setInlineNewCatName(e.target.value)}
+                                                    onKeyDown={async (e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            const added = await handleAddCategory(inlineNewCatName);
+                                                            if (added) {
+                                                                setUploadMeta(prev => ({ ...prev, category: added }));
+                                                            }
+                                                        }
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="csl-btn csl-btn-primary csl-btn-sm"
+                                                    onClick={async () => {
+                                                        const added = await handleAddCategory(inlineNewCatName);
+                                                        if (added) {
+                                                            setUploadMeta(prev => ({ ...prev, category: added }));
+                                                        }
+                                                    }}
+                                                >
+                                                    Add
+                                                </button>
+                                            </div>
+                                        )}
                                         <select
                                             value={uploadMeta.category}
-                                            onChange={(e) => setUploadMeta({ ...uploadMeta, category: e.target.value })}
+                                            onChange={(e) => {
+                                                if (e.target.value === '__add__') {
+                                                    setInlineNewCatOpen(true);
+                                                } else {
+                                                    setUploadMeta({ ...uploadMeta, category: e.target.value });
+                                                }
+                                            }}
                                         >
-                                            {CATEGORIES.map(c => (
+                                            {categoryList.map(c => (
                                                 <option key={c} value={c}>{c}</option>
                                             ))}
+                                            <option value="__add__">+ Add Custom Category...</option>
                                         </select>
                                     </div>
 
@@ -910,14 +1096,61 @@ const CSLocker = () => {
                                         />
                                     </div>
                                     <div className="csl-field">
-                                        <label>Category</label>
+                                        <div className="csl-field-header-row">
+                                            <label>Category</label>
+                                            <button
+                                                type="button"
+                                                className="csl-text-btn-accent"
+                                                onClick={() => setInlineNewCatOpen(!inlineNewCatOpen)}
+                                            >
+                                                {inlineNewCatOpen ? 'Cancel' : '+ New Category'}
+                                            </button>
+                                        </div>
+                                        {inlineNewCatOpen && (
+                                            <div className="csl-inline-cat-box">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Category name (e.g. Vehicle Docs)"
+                                                    value={inlineNewCatName}
+                                                    onChange={(e) => setInlineNewCatName(e.target.value)}
+                                                    onKeyDown={async (e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            const added = await handleAddCategory(inlineNewCatName);
+                                                            if (added) {
+                                                                setEditForm(prev => ({ ...prev, category: added }));
+                                                            }
+                                                        }
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="csl-btn csl-btn-primary csl-btn-sm"
+                                                    onClick={async () => {
+                                                        const added = await handleAddCategory(inlineNewCatName);
+                                                        if (added) {
+                                                            setEditForm(prev => ({ ...prev, category: added }));
+                                                        }
+                                                    }}
+                                                >
+                                                    Add
+                                                </button>
+                                            </div>
+                                        )}
                                         <select
                                             value={editForm.category}
-                                            onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                                            onChange={(e) => {
+                                                if (e.target.value === '__add__') {
+                                                    setInlineNewCatOpen(true);
+                                                } else {
+                                                    setEditForm({ ...editForm, category: e.target.value });
+                                                }
+                                            }}
                                         >
-                                            {CATEGORIES.map(c => (
+                                            {categoryList.map(c => (
                                                 <option key={c} value={c}>{c}</option>
                                             ))}
+                                            <option value="__add__">+ Add Custom Category...</option>
                                         </select>
                                     </div>
                                     <div className="csl-field">
@@ -945,6 +1178,145 @@ const CSLocker = () => {
                                         </button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* MANAGE CUSTOM CATEGORIES MODAL */}
+                    {categoryModalOpen && (
+                        <div className="csl-modal-backdrop" onClick={() => setCategoryModalOpen(false)}>
+                            <div className="csl-modal-card" onClick={(e) => e.stopPropagation()}>
+                                <div className="csl-modal-header">
+                                    <div>
+                                        <h3 style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                            <Tag size={18} color="#ea580c" />
+                                            Custom Document Categories
+                                        </h3>
+                                        <p className="csl-subtitle" style={{ marginTop: 2 }}>
+                                            Apne convenient ke hisab se categories create, rename ya delete karein.
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="csl-modal-close"
+                                        onClick={() => setCategoryModalOpen(false)}
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+
+                                <div className="csl-form-stack" style={{ marginTop: 12 }}>
+                                    {/* Add New Category Form */}
+                                    <form
+                                        onSubmit={async (e) => {
+                                            e.preventDefault();
+                                            await handleAddCategory();
+                                        }}
+                                        className="csl-cat-add-row"
+                                    >
+                                        <input
+                                            type="text"
+                                            placeholder="Enter new category name (e.g. Vehicle Docs)..."
+                                            value={newCategoryName}
+                                            onChange={(e) => setNewCategoryName(e.target.value)}
+                                            maxLength={50}
+                                            required
+                                        />
+                                        <button type="submit" className="csl-btn csl-btn-primary">
+                                            + Add
+                                        </button>
+                                    </form>
+
+                                    {/* Category List */}
+                                    <div className="csl-cat-list">
+                                        {categories.length === 0 ? (
+                                            <p style={{ textAlign: 'center', color: '#71717a', fontSize: '0.85rem', padding: '16px 0' }}>
+                                                Loading categories...
+                                            </p>
+                                        ) : (
+                                            categories.map(cat => (
+                                                <div key={cat.id} className="csl-cat-item">
+                                                    {editingCat?.id === cat.id ? (
+                                                        <div className="csl-cat-edit-row">
+                                                            <input
+                                                                type="text"
+                                                                value={editingCat.name}
+                                                                onChange={(e) => setEditingCat({ ...editingCat, name: e.target.value })}
+                                                                autoFocus
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') {
+                                                                        e.preventDefault();
+                                                                        handleUpdateCategory(cat.id, editingCat.name);
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                className="csl-btn csl-btn-primary csl-btn-sm"
+                                                                onClick={() => handleUpdateCategory(cat.id, editingCat.name)}
+                                                            >
+                                                                Save
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className="csl-btn csl-btn-secondary csl-btn-sm"
+                                                                onClick={() => setEditingCat(null)}
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <>
+                                                            <div className="csl-cat-info">
+                                                                <span className="csl-cat-dot"></span>
+                                                                <strong className="csl-cat-title">{cat.name}</strong>
+                                                                <span className="csl-cat-count">
+                                                                    {stats.category_counts?.[cat.name] || 0} docs
+                                                                </span>
+                                                            </div>
+                                                            <div className="csl-cat-actions">
+                                                                <button
+                                                                    type="button"
+                                                                    className="csl-icon-btn"
+                                                                    title="Rename Category"
+                                                                    onClick={() => setEditingCat({ id: cat.id, name: cat.name })}
+                                                                >
+                                                                    <Edit3 size={14} />
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    className="csl-icon-btn danger"
+                                                                    title="Delete Category"
+                                                                    onClick={() => handleDeleteCategory(cat)}
+                                                                >
+                                                                    <Trash2 size={14} />
+                                                                </button>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+
+                                    <div className="csl-modal-footer" style={{ justifyContent: 'space-between' }}>
+                                        <button
+                                            type="button"
+                                            className="csl-btn csl-btn-secondary csl-btn-sm"
+                                            onClick={handleResetCategories}
+                                            title="Restore default standard categories"
+                                        >
+                                            Restore Defaults
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="csl-btn csl-btn-primary csl-btn-sm"
+                                            onClick={() => setCategoryModalOpen(false)}
+                                        >
+                                            Done
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}

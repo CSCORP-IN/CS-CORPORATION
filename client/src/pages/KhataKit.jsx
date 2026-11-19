@@ -182,6 +182,7 @@ const KhataKit = () => {
         start_month: '2026-01',
         payment_method: 'UPI / Bank Transfer',
         card_id: '',
+        investment_id: '',
         due_day: 5,
         auto_pay: false,
         notes: ''
@@ -386,6 +387,7 @@ const KhataKit = () => {
             start_month: selectedMonth,
             payment_method: 'UPI / Bank Transfer',
             card_id: '',
+            investment_id: '',
             due_day: 5,
             auto_pay: false,
             notes: ''
@@ -403,6 +405,7 @@ const KhataKit = () => {
             start_month: f.start_month || '2026-01',
             payment_method: f.payment_method || 'UPI / Bank Transfer',
             card_id: f.card_id || '',
+            investment_id: f.investment_id || '',
             due_day: f.due_day || 5,
             auto_pay: Boolean(f.auto_pay),
             notes: f.notes || ''
@@ -569,6 +572,7 @@ const KhataKit = () => {
             const payload = {
                 ...fixedForm,
                 card_id: fixedForm.card_id || null,
+                investment_id: fixedForm.investment_id || null,
                 active: true
             };
             if (fixedForm.id) {
@@ -1510,6 +1514,11 @@ const KhataKit = () => {
                                                     {item.auto_pay && (
                                                         <span className="kk-badge kk-badge-orange">Auto-Pay</span>
                                                     )}
+                                                    {item.investment_title && (
+                                                        <span className="kk-badge kk-badge-paid" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#059669', borderColor: '#10b981' }}>
+                                                            📈 SIP
+                                                        </span>
+                                                    )}
                                                     {item.is_paid ? (
                                                         <span className="kk-badge kk-badge-paid">
                                                             ✓ Paid {item.paid_date ? `(${item.paid_date})` : ''}
@@ -1922,6 +1931,11 @@ const KhataKit = () => {
                                                 <span className="kk-badge kk-badge-orange">Due {getOrdinal(f.effective_due_day)}</span>
                                                 {f.auto_pay && (
                                                     <span className="kk-badge kk-badge-paid">Auto-Pay</span>
+                                                )}
+                                                {f.investment_title && (
+                                                    <span className="kk-badge kk-badge-paid" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#059669', borderColor: '#10b981' }}>
+                                                        📈 Linked SIP: {f.investment_title}
+                                                    </span>
                                                 )}
                                             </div>
                                             <h3 className="kk-item-title">{f.title}</h3>
@@ -2442,6 +2456,36 @@ const KhataKit = () => {
                         </div>
                         <form onSubmit={handleSaveFixed}>
                             <div className="kk-form-grid">
+                                <div className="kk-form-group span-2">
+                                    <label>Link to Investment / SIP (Optional)</label>
+                                    <select
+                                        value={fixedForm.investment_id || ''}
+                                        onChange={(e) => {
+                                            const selId = e.target.value;
+                                            const selInv = investments.find(inv => String(inv.id) === String(selId));
+                                            setFixedForm(prev => ({
+                                                ...prev,
+                                                investment_id: selId,
+                                                title: selInv && (!prev.title || prev.title.trim() === '') ? `${selInv.title} SIP` : prev.title,
+                                                category: selInv ? 'Investments / SIP' : prev.category,
+                                                amount: selInv && (!prev.amount || Number(prev.amount) === 0) ? (selInv.monthly_sip_amount || selInv.total_invested || '') : prev.amount,
+                                                due_day: selInv && selInv.sip_day ? selInv.sip_day : prev.due_day
+                                            }));
+                                        }}
+                                    >
+                                        <option value="">-- None (Standard Fixed Expense) --</option>
+                                        {investments.map(inv => (
+                                            <option key={inv.id} value={inv.id}>
+                                                📈 {inv.title} ({inv.asset_type || 'SIP'}) — ₹{inv.monthly_sip_amount || inv.total_invested}/mo (Due {getOrdinal(inv.sip_day || 5)})
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {fixedForm.investment_id && (
+                                        <small style={{ color: '#059669', display: 'block', marginTop: 4, fontWeight: 500 }}>
+                                            ✓ Linked to Investment / SIP. Marking this paid helps keep monthly budget &amp; portfolio tracking in sync.
+                                        </small>
+                                    )}
+                                </div>
                                 <div className="kk-form-group span-2">
                                     <label>Expense Title *</label>
                                     <input

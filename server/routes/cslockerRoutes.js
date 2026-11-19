@@ -7,6 +7,7 @@ import path from 'path';
 import { Readable } from 'stream';
 import { fileURLToPath } from 'url';
 import CSLockerDocument from '../models/CSLockerDocument.js';
+import CSLockerCategory, { DEFAULT_CSLOCKER_CATEGORIES } from '../models/CSLockerCategory.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -763,6 +764,212 @@ router.delete('/documents/:id', async (req, res) => {
 
         return res.json({ success: true, message: 'Document permanently deleted from CS Locker.' });
     } catch (err) {
+        return res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// ============================================================================
+// 7. USER-CUSTOMIZABLE CATEGORIES API
+// ============================================================================
+
+// GET /cslocker/categories — Fetch user categories (or initialize defaults + doc categories)
+router.get('/categories', async (req, res) => {
+    try {
+        const userId = req.lockerUserId;
+        if (isMongoConnected()) {
+            let userCategories = await CSLockerCategory.find({ user_id: userId }).sort({ created_at: 1 });
+            
+            // If user has no categories initialized yet, seed them
+            if (!userCategories || userCategories.length === 0) {
+                const existingDocs = await CSLockerDocument.find({ user_id: userId }).select('category');
+                const docCats = new Set(existingDocs.map(d => d.category).filter(Boolean));
+                const initSet = new Set([...DEFAULT_CSLOCKER_CATEGORIES, ...docCats]);
+                const toInsert = Array.from(initSet).map(name => ({
+                    user_id: userId,
+                    name: String(name).trim()
+                }));
+                try {
+                    userCategories = await CSLockerCategory.insertMany(toInsert, { ordered: false });
+                } catch (e) {
+                    userCategories = await CSLockerCategory.find({ user_id: userId }).sort({ created_at: 1 });
+                }
+            }
+
+            return res.json({
+                success: true,
+                categories: userCategories.map(c => c.toJSON())
+            });
+        }
+
+        return res.json({
+            success: true,
+            categories: DEFAULT_CSLOCKER_CATEGORIES.map((name, i) => ({
+                id: `fallback-cat-${i}`,
+                user_id: userId,
+                name,
+                color: '#f97316'
+            }))
+        });
+    } catch (err) {
+        console.error('CSLocker get categories error:', err);
+        return res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// POST /cslocker/categories — Add custom category
+router.post('/categories', async (req, res) => {
+    try {
+        const userId = req.lockerUserId;
+        const name = String(req.body.name || '').trim();
+        const color = String(req.body.color || '#f97316').trim();
+
+        if (!name) {
+            return res.status(400).json({ success: false, error: 'Category name is required.' });
+        }
+        if (name.length > 50) {
+            return res.status(400).json({ success: false, error: 'Category name must be 50 characters or less.' });
+        }
+
+        if (isMongoConnected()) {
+            const existing = await CSLockerCategory.findOne({
+                user_id: userId,
+                name: { $regex: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+            });
+            if (existing) {
+                return res.status(400).json({ success: false, error: 'A category with this name already exists.' });
+            }
+
+            const cat = await CSLockerCategory.create({
+                user_id: userId,
+                name,
+                color
+            });
+            return res.json({
+                success: true,
+                category: cat.toJSON()
+            });
+        }
+
+        return res.json({
+            success: true,
+            category: { id: `cat-${Date.now()}`, user_id: userId, name, color }
+        });
+    } catch (err) {
+        console.error('CSLocker create category error:', err);
+        return res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// PUT /cslocker/categories/:id — Rename category & update linked documents
+router.put('/categories/:id', async (req, res) => {
+    try {
+        const userId = req.lockerUserId;
+        const { id } = req.params;
+        const newName = String(req.body.name || '').trim();
+        const color = req.body.color ? String(req.body.color).trim() : undefined;
+
+        if (!newName) {
+            return res.status(400).json({ success: false, error: 'Category name cannot be empty.' });
+        }
+
+        if (isMongoConnected() && mongoose.Types.ObjectId.isValid(id)) {
+            const cat = await CSLockerCategory.findOne({ _id: id, user_id: userId });
+            if (!cat) {
+                return res.status(404).json({ success: false, error: 'Category not found.' });
+            }
+
+            const oldName = cat.name;
+            const duplicate = await CSLockerCategory.findOne({
+                _id: { $ne: id },
+                user_id: userId,
+                name: { $regex: new RegExp(`^${newName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+            });
+            if (duplicate) {
+                return res.status(400).json({ success: false, error: 'Another category with this name already exists.' });
+            }
+
+            cat.name = newName;
+            if (color) cat.color = color;
+            await cat.save();
+
+            // Sync all documents that were under the old category name
+            if (oldName !== newName) {
+                await CSLockerDocument.updateMany(
+                    { user_id: userId, category: oldName },
+                    { $set: { category: newName } }
+                );
+            }
+
+            return res.json({
+                success: true,
+                category: cat.toJSON()
+            });
+        }
+
+        return res.json({ success: true, message: 'Updated' });
+    } catch (err) {
+        console.error('CSLocker update category error:', err);
+        return res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// DELETE /cslocker/categories/:id — Delete category & reassign documents to fallback
+router.delete('/categories/:id', async (req, res) => {
+    try {
+        const userId = req.lockerUserId;
+        const { id } = req.params;
+        const fallbackCategory = String(req.query.fallback || req.body?.fallback || 'General').trim();
+
+        if (isMongoConnected() && mongoose.Types.ObjectId.isValid(id)) {
+            const cat = await CSLockerCategory.findOne({ _id: id, user_id: userId });
+            if (!cat) {
+                return res.status(404).json({ success: false, error: 'Category not found.' });
+            }
+
+            const removedName = cat.name;
+            await CSLockerCategory.deleteOne({ _id: id, user_id: userId });
+
+            // Reassign any documents with this category to fallbackCategory
+            if (removedName !== fallbackCategory) {
+                await CSLockerDocument.updateMany(
+                    { user_id: userId, category: removedName },
+                    { $set: { category: fallbackCategory } }
+                );
+            }
+
+            return res.json({
+                success: true,
+                message: `Category "${removedName}" deleted. Any associated documents reassigned to "${fallbackCategory}".`
+            });
+        }
+
+        return res.json({ success: true, message: 'Category deleted.' });
+    } catch (err) {
+        console.error('CSLocker delete category error:', err);
+        return res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// POST /cslocker/categories/reset — Restore default categories
+router.post('/categories/reset', async (req, res) => {
+    try {
+        const userId = req.lockerUserId;
+        if (isMongoConnected()) {
+            await CSLockerCategory.deleteMany({ user_id: userId });
+            const toInsert = DEFAULT_CSLOCKER_CATEGORIES.map(name => ({
+                user_id: userId,
+                name
+            }));
+            const created = await CSLockerCategory.insertMany(toInsert);
+            return res.json({
+                success: true,
+                categories: created.map(c => c.toJSON()),
+                message: 'Categories restored to defaults.'
+            });
+        }
+        return res.json({ success: true, message: 'Reset' });
+    } catch (err) {
+        console.error('CSLocker reset categories error:', err);
         return res.status(500).json({ success: false, error: err.message });
     }
 });

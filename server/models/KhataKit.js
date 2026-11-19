@@ -71,6 +71,7 @@ const khataKitFixedExpenseSchema = new mongoose.Schema({
     due_day: { type: Number, default: 5 },
     payment_method: { type: String, default: 'UPI / Bank Transfer' },
     card_id: { type: String, default: null },
+    investment_id: { type: String, default: null }, // Linked SIP / Investment ID
     auto_pay: { type: Boolean, default: false },
     active: { type: Boolean, default: true },
     notes: { type: String, default: '' }
