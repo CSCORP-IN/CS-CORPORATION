@@ -109,6 +109,48 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const forgotPassword = async (email) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            return { success: false, message: 'Server connection error while sending OTP' };
+        }
+    };
+
+    const verifyResetOtp = async (email, otp) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/verify-reset-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, otp })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            return { success: false, message: 'Server connection error while verifying OTP' };
+        }
+    };
+
+    const resetPassword = async (email, otp, newPassword) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/reset-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, otp, newPassword })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            return { success: false, message: 'Server connection error while resetting password' };
+        }
+    };
+
     const logout = () => {
         setIsAuthenticated(false);
         setUser(null);
@@ -121,7 +163,18 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, signup, verifyOtp, resendOtp, logout }}>
+        <AuthContext.Provider value={{
+            isAuthenticated,
+            user,
+            login,
+            signup,
+            verifyOtp,
+            resendOtp,
+            forgotPassword,
+            verifyResetOtp,
+            resetPassword,
+            logout
+        }}>
             {children}
         </AuthContext.Provider>
     );

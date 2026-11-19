@@ -113,7 +113,28 @@ const khataKitIncomeSchema = new mongoose.Schema({
     toJSON: toJsonConfig
 });
 
-// 7. Monthly Payments Status Schema (Per User)
+// 7. Investments & SIP Portfolio Schema (Per User)
+const khataKitInvestmentSchema = new mongoose.Schema({
+    user_id: { type: String, required: true, index: true, trim: true },
+    title: { type: String, required: true, trim: true },
+    asset_type: { type: String, default: 'Mutual Fund / SIP' },
+    investment_mode: { type: String, default: 'SIP (Monthly)' },
+    monthly_sip_amount: { type: Number, default: 0 },
+    total_invested: { type: Number, required: true, default: 0 },
+    current_value: { type: Number, default: 0 },
+    expected_return_rate: { type: Number, default: 12 },
+    platform: { type: String, default: '', trim: true },
+    sip_day: { type: Number, default: 5 },
+    start_date: { type: String, default: '' },
+    status: { type: String, default: 'active', enum: ['active', 'paused', 'redeemed'] },
+    notes: { type: String, default: '' }
+}, {
+    collection: 'khatakit_investments',
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+    toJSON: toJsonConfig
+});
+
+// 8. Monthly Payments Status Schema (Per User)
 const khataKitMonthlyPaymentSchema = new mongoose.Schema({
     user_id: { type: String, required: true, index: true, trim: true },
     month: { type: String, required: true },
@@ -137,4 +158,5 @@ export const KhataKitEmi = mongoose.model('KhataKitEmi', khataKitEmiSchema);
 export const KhataKitFixedExpense = mongoose.model('KhataKitFixedExpense', khataKitFixedExpenseSchema);
 export const KhataKitCardSpend = mongoose.model('KhataKitCardSpend', khataKitCardSpendSchema);
 export const KhataKitIncome = mongoose.model('KhataKitIncome', khataKitIncomeSchema);
+export const KhataKitInvestment = mongoose.model('KhataKitInvestment', khataKitInvestmentSchema);
 export const KhataKitMonthlyPayment = mongoose.model('KhataKitMonthlyPayment', khataKitMonthlyPaymentSchema);

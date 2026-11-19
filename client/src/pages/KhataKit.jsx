@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
-    CreditCard, Calendar, CheckCircle2, PieChart, TrendingDown,
+    CreditCard, Calendar, CheckCircle2, PieChart, TrendingDown, TrendingUp,
     Plus, Settings, Download, Upload, Trash2, Edit3,
     ChevronLeft, ChevronRight, Home, Shield, Zap, DollarSign,
     Sparkles, Layers, Check, AlertCircle, Wallet, ArrowUpRight, User
@@ -112,6 +112,7 @@ const KhataKit = () => {
     const [emiCardFilter, setEmiCardFilter] = useState('all');
     const [emiStatusFilter, setEmiStatusFilter] = useState('all');
     const [fixedCategoryFilter, setFixedCategoryFilter] = useState('all');
+    const [investmentAssetFilter, setInvestmentAssetFilter] = useState('all');
 
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -124,9 +125,10 @@ const KhataKit = () => {
     const [fixedModalOpen, setFixedModalOpen] = useState(false);
     const [spendModalOpen, setSpendModalOpen] = useState(false);
     const [incomeModalOpen, setIncomeModalOpen] = useState(false);
+    const [investmentModalOpen, setInvestmentModalOpen] = useState(false);
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
 
-    const anyModalOpen = cardModalOpen || emiModalOpen || fixedModalOpen || spendModalOpen || incomeModalOpen || settingsModalOpen;
+    const anyModalOpen = cardModalOpen || emiModalOpen || fixedModalOpen || spendModalOpen || incomeModalOpen || investmentModalOpen || settingsModalOpen;
 
     // Lock background body scroll when any dialog is open
     useEffect(() => {
@@ -202,6 +204,22 @@ const KhataKit = () => {
         payment_mode: 'Bank / UPI',
         month: '2026-11',
         income_date: '2026-11-10',
+        notes: ''
+    });
+
+    const [investmentForm, setInvestmentForm] = useState({
+        id: '',
+        title: '',
+        asset_type: 'Mutual Fund / SIP',
+        investment_mode: 'SIP (Monthly)',
+        monthly_sip_amount: '',
+        total_invested: '',
+        current_value: '',
+        expected_return_rate: 12,
+        platform: '',
+        sip_day: 5,
+        start_date: '2026-01-05',
+        status: 'active',
         notes: ''
     });
 
@@ -420,6 +438,45 @@ const KhataKit = () => {
         setIncomeModalOpen(true);
     };
 
+    const openAddInvestmentModal = () => {
+        const todayStr = new Date().toISOString().slice(0, 10);
+        setInvestmentForm({
+            id: '',
+            title: '',
+            asset_type: 'Mutual Fund / SIP',
+            investment_mode: 'SIP (Monthly)',
+            monthly_sip_amount: '',
+            total_invested: '',
+            current_value: '',
+            expected_return_rate: 12,
+            platform: '',
+            sip_day: 5,
+            start_date: todayStr,
+            status: 'active',
+            notes: ''
+        });
+        setInvestmentModalOpen(true);
+    };
+
+    const openEditInvestmentModal = (inv) => {
+        setInvestmentForm({
+            id: inv.id,
+            title: inv.title || '',
+            asset_type: inv.asset_type || 'Mutual Fund / SIP',
+            investment_mode: inv.investment_mode || 'SIP (Monthly)',
+            monthly_sip_amount: inv.monthly_sip_amount || 0,
+            total_invested: inv.total_invested || 0,
+            current_value: inv.current_value || inv.total_invested || 0,
+            expected_return_rate: inv.expected_return_rate ?? 12,
+            platform: inv.platform || '',
+            sip_day: inv.sip_day || 5,
+            start_date: inv.start_date || '',
+            status: inv.status || 'active',
+            notes: inv.notes || ''
+        });
+        setInvestmentModalOpen(true);
+    };
+
     const openSettings = () => {
         const s = data?.settings || {};
         const code = s.currency_code || 'INR';
@@ -598,6 +655,40 @@ const KhataKit = () => {
         }
     };
 
+    const handleSaveInvestment = async (ev) => {
+        ev.preventDefault();
+        try {
+            if (investmentForm.id) {
+                await khataFetch(`/investments/${investmentForm.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(investmentForm)
+                });
+                showToastMsg('Investment updated!');
+            } else {
+                await khataFetch('/investments', {
+                    method: 'POST',
+                    body: JSON.stringify(investmentForm)
+                });
+                showToastMsg('New investment added to portfolio!');
+            }
+            setInvestmentModalOpen(false);
+            await loadDashboard();
+        } catch (err) {
+            showToastMsg('Error saving investment: ' + err.message);
+        }
+    };
+
+    const handleDeleteInvestment = async (id) => {
+        if (!window.confirm('Delete this investment from your portfolio?')) return;
+        try {
+            await khataFetch(`/investments/${id}`, { method: 'DELETE' });
+            showToastMsg('Investment removed');
+            await loadDashboard();
+        } catch (err) {
+            showToastMsg('Error deleting investment: ' + err.message);
+        }
+    };
+
     const toggleChecklistPayment = async (itemType, itemId, isPaid, amount) => {
         try {
             await khataFetch('/payments/toggle', {
@@ -760,6 +851,7 @@ const KhataKit = () => {
     const fixedExpenses = data?.fixed_expenses || [];
     const cardSpends = data?.card_spends || [];
     const incomes = data?.incomes || [];
+    const investments = data?.investments || [];
     const checklist = data?.checklist || [];
     const projection = data?.projection || [];
 
@@ -813,6 +905,24 @@ const KhataKit = () => {
         return true;
     });
     const totalMonthlyEquivalent = filteredFixed.reduce((s, f) => s + Number(f.monthly_equivalent || 0), 0);
+
+    const filteredInvestments = investments.filter(inv => {
+        if (investmentAssetFilter !== 'all' && inv.asset_type !== investmentAssetFilter) return false;
+        return true;
+    });
+
+    // Asset allocation breakdown for Investments tab
+    const assetBreakdownMap = new Map();
+    investments.filter(i => i.status !== 'redeemed').forEach(inv => {
+        const type = inv.asset_type || 'Other';
+        assetBreakdownMap.set(type, (assetBreakdownMap.get(type) || 0) + (Number(inv.current_value) || Number(inv.total_invested) || 0));
+    });
+    const assetAllocationEntries = [...assetBreakdownMap.entries()].sort((a, b) => b[1] - a[1]);
+    const totalPortfolioVal = Number(summary.total_portfolio_current_value) || assetAllocationEntries.reduce((s, e) => s + e[1], 0);
+    const totalPortfolioInv = Number(summary.total_portfolio_invested) || investments.filter(i => i.status !== 'redeemed').reduce((s, i) => s + (Number(i.total_invested) || 0), 0);
+    const totalPortfolioGain = totalPortfolioVal - totalPortfolioInv;
+    const totalPortfolioGainPct = totalPortfolioInv > 0 ? Number(((totalPortfolioGain / totalPortfolioInv) * 100).toFixed(1)) : 0;
+    const totalMonthlySip = Number(summary.total_monthly_sip) || investments.filter(i => i.status === 'active' && i.investment_mode === 'SIP (Monthly)').reduce((s, i) => s + (Number(i.monthly_sip_amount) || 0), 0);
 
     const emiCalcPreviewData = calculateEmiValues(emiForm.total_principal, emiForm.total_months, emiForm.interest_rate);
     const isDarkTheme = settings.theme === 'dark';
@@ -901,6 +1011,9 @@ const KhataKit = () => {
                     <button type="button" className="kk-btn kk-btn-emerald" onClick={openAddIncomeModal}>
                         <Plus size={15} /> One-Time Income
                     </button>
+                    <button type="button" className="kk-btn kk-btn-secondary" onClick={openAddInvestmentModal}>
+                        <TrendingUp size={15} /> + Investment
+                    </button>
                     <button type="button" className="kk-btn kk-btn-secondary" onClick={openAddEmiModal}>
                         <Plus size={15} /> Add EMI
                     </button>
@@ -909,14 +1022,6 @@ const KhataKit = () => {
                     </button>
                     <button type="button" className="kk-btn kk-btn-secondary" onClick={openAddCardModal}>
                         <CreditCard size={15} /> Add Card
-                    </button>
-                    <button
-                        type="button"
-                        className="kk-icon-btn kk-desktop-settings-btn"
-                        onClick={openSettings}
-                        title="Settings & Backup"
-                    >
-                        <Settings size={17} />
                     </button>
                 </div>
             </header>
@@ -972,96 +1077,106 @@ const KhataKit = () => {
                         <span className="kk-tab-full">Fixed Expenses (Rent, Insurance, Bills)</span>
                         <span className="kk-tab-short">Fixed</span>
                     </button>
+                    <button
+                        type="button"
+                        className={`kk-nav-tab ${activeTab === 'investments' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('investments')}
+                    >
+                        <TrendingUp size={15} />
+                        <span className="kk-tab-full">Investments &amp; SIP Portfolio</span>
+                        <span className="kk-tab-short">Investments</span>
+                        <span className="kk-tab-badge secondary">{investments.length}</span>
+                    </button>
                 </nav>
             </div>
-
-            {/* KPI Summary Strip */}
-            <section className="kk-kpi-grid">
-                <div className="kk-kpi-card" style={{ '--kpi-color': '#f97316' }}>
-                    <div className="kk-kpi-top">
-                        <span className="kk-kpi-label">Total Month Outflow</span>
-                        {incomePct !== null && (
-                            <span className="kk-badge kk-badge-orange">{incomePct}% of Income</span>
-                        )}
-                    </div>
-                    <div className="kk-kpi-value">{formatMoney(summary.total_monthly_outflow)}</div>
-                    <div className="kk-kpi-sub">
-                        <span>EMIs + Fixed + Spends</span>
-                        {income > 0 && (
-                            <span>Left: <strong>{formatMoney(Math.max(0, income - summary.total_monthly_outflow))}</strong></span>
-                        )}
-                    </div>
-                </div>
-
-                <div className="kk-kpi-card" style={{ '--kpi-color': '#10b981', cursor: 'pointer' }} onClick={openAddIncomeModal}>
-                    <div className="kk-kpi-top">
-                        <span className="kk-kpi-label">Total Month Income</span>
-                        <span className="kk-badge kk-badge-paid">+ Add Income</span>
-                    </div>
-                    <div className="kk-kpi-value">{formatMoney(income)}</div>
-                    <div className="kk-kpi-sub">
-                        <span>One-Time: {formatMoney(totalOneTimeIncome)}</span>
-                        <span>Balance: <strong>{formatMoney(income - summary.total_monthly_outflow)}</strong></span>
-                    </div>
-                </div>
-
-                <div className="kk-kpi-card" style={{ '--kpi-color': '#10b981' }}>
-                    <div className="kk-kpi-top">
-                        <span className="kk-kpi-label">Paid vs Remaining Dues</span>
-                        <span className={`kk-badge ${summary.total_unpaid === 0 ? 'kk-badge-paid' : 'kk-badge-unpaid'}`}>
-                            {summary.paid_items_count}/{summary.total_items_count} Paid
-                        </span>
-                    </div>
-                    <div className="kk-kpi-value">
-                        {formatMoney(summary.total_unpaid)}{' '}
-                        <small className="kk-kpi-unit">unpaid</small>
-                    </div>
-                    <div className="kk-progress-track">
-                        <div className="kk-progress-fill" style={{ width: `${paidPct}%`, background: '#10b981' }}></div>
-                    </div>
-                    <div className="kk-kpi-sub">
-                        <span>Paid: {formatMoney(summary.total_paid)}</span>
-                        <span>{paidPct}% Done</span>
-                    </div>
-                </div>
-
-                <div className="kk-kpi-card" style={{ '--kpi-color': '#ea580c' }}>
-                    <div className="kk-kpi-top">
-                        <span className="kk-kpi-label">Total Card Statements</span>
-                        <span className="kk-badge kk-badge-orange">{cards.length} Cards</span>
-                    </div>
-                    <div className="kk-kpi-value">{formatMoney(summary.total_cards_statement)}</div>
-                    <div className="kk-kpi-sub">
-                        <span>Card EMIs + Bills + Spends</span>
-                    </div>
-                </div>
-
-                <div className="kk-kpi-card" style={{ '--kpi-color': '#0284c7' }}>
-                    <div className="kk-kpi-top">
-                        <span className="kk-kpi-label">Monthly EMIs</span>
-                        <span className="kk-badge kk-badge-nocost">{summary.active_emis_count} Active</span>
-                    </div>
-                    <div className="kk-kpi-value">{formatMoney(summary.total_emi_outflow)}</div>
-                    <div className="kk-kpi-sub">
-                        <span>Total EMI Debt Left: {formatMoney(summary.total_remaining_emi_debt)}</span>
-                    </div>
-                </div>
-
-                <div className="kk-kpi-card" style={{ '--kpi-color': '#f59e0b' }}>
-                    <div className="kk-kpi-top">
-                        <span className="kk-kpi-label">Fixed Expenses Due</span>
-                        <span className="kk-badge kk-badge-orange">Rent &amp; Insurance</span>
-                    </div>
-                    <div className="kk-kpi-value">{formatMoney(summary.total_fixed_outflow)}</div>
-                    <div className="kk-kpi-sub">
-                        <span>Recurring bills due in {formatMonthDisplay(selectedMonth, true)}</span>
-                    </div>
-                </div>
-            </section>
 
             {/* TAB 1: OVERVIEW & ANALYTICS */}
             {activeTab === 'dashboard' && (
                 <div className="kk-tab-pane">
+                    {/* KPI Summary Strip (Only shown in Overview & Analytics) */}
+                    <section className="kk-kpi-grid">
+                        <div className="kk-kpi-card" style={{ '--kpi-color': '#f97316' }}>
+                            <div className="kk-kpi-top">
+                                <span className="kk-kpi-label">Total Month Outflow</span>
+                                {incomePct !== null && (
+                                    <span className="kk-badge kk-badge-orange">{incomePct}% of Income</span>
+                                )}
+                            </div>
+                            <div className="kk-kpi-value">{formatMoney(summary.total_monthly_outflow)}</div>
+                            <div className="kk-kpi-sub">
+                                <span>EMIs + Fixed + Spends</span>
+                                {income > 0 && (
+                                    <span>Left: <strong>{formatMoney(Math.max(0, income - summary.total_monthly_outflow))}</strong></span>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="kk-kpi-card" style={{ '--kpi-color': '#10b981', cursor: 'pointer' }} onClick={openAddIncomeModal}>
+                            <div className="kk-kpi-top">
+                                <span className="kk-kpi-label">Total Month Income</span>
+                                <span className="kk-badge kk-badge-paid">+ Add Income</span>
+                            </div>
+                            <div className="kk-kpi-value">{formatMoney(income)}</div>
+                            <div className="kk-kpi-sub">
+                                <span>One-Time: {formatMoney(totalOneTimeIncome)}</span>
+                                <span>Balance: <strong>{formatMoney(income - summary.total_monthly_outflow)}</strong></span>
+                            </div>
+                        </div>
+
+                        <div className="kk-kpi-card" style={{ '--kpi-color': '#10b981' }}>
+                            <div className="kk-kpi-top">
+                                <span className="kk-kpi-label">Paid vs Remaining Dues</span>
+                                <span className={`kk-badge ${summary.total_unpaid === 0 ? 'kk-badge-paid' : 'kk-badge-unpaid'}`}>
+                                    {summary.paid_items_count}/{summary.total_items_count} Paid
+                                </span>
+                            </div>
+                            <div className="kk-kpi-value">
+                                {formatMoney(summary.total_unpaid)}{' '}
+                                <small className="kk-kpi-unit">unpaid</small>
+                            </div>
+                            <div className="kk-progress-track">
+                                <div className="kk-progress-fill" style={{ width: `${paidPct}%`, background: '#10b981' }}></div>
+                            </div>
+                            <div className="kk-kpi-sub">
+                                <span>Paid: {formatMoney(summary.total_paid)}</span>
+                                <span>{paidPct}% Done</span>
+                            </div>
+                        </div>
+
+                        <div className="kk-kpi-card" style={{ '--kpi-color': '#ea580c' }}>
+                            <div className="kk-kpi-top">
+                                <span className="kk-kpi-label">Total Card Statements</span>
+                                <span className="kk-badge kk-badge-orange">{cards.length} Cards</span>
+                            </div>
+                            <div className="kk-kpi-value">{formatMoney(summary.total_cards_statement)}</div>
+                            <div className="kk-kpi-sub">
+                                <span>Card EMIs + Bills + Spends</span>
+                            </div>
+                        </div>
+
+                        <div className="kk-kpi-card" style={{ '--kpi-color': '#0284c7' }}>
+                            <div className="kk-kpi-top">
+                                <span className="kk-kpi-label">Monthly EMIs</span>
+                                <span className="kk-badge kk-badge-nocost">{summary.active_emis_count} Active</span>
+                            </div>
+                            <div className="kk-kpi-value">{formatMoney(summary.total_emi_outflow)}</div>
+                            <div className="kk-kpi-sub">
+                                <span>Total EMI Debt Left: {formatMoney(summary.total_remaining_emi_debt)}</span>
+                            </div>
+                        </div>
+
+                        <div className="kk-kpi-card" style={{ '--kpi-color': '#f59e0b' }}>
+                            <div className="kk-kpi-top">
+                                <span className="kk-kpi-label">Fixed Expenses Due</span>
+                                <span className="kk-badge kk-badge-orange">Rent &amp; Insurance</span>
+                            </div>
+                            <div className="kk-kpi-value">{formatMoney(summary.total_fixed_outflow)}</div>
+                            <div className="kk-kpi-sub">
+                                <span>Recurring bills due in {formatMonthDisplay(selectedMonth, true)}</span>
+                            </div>
+                        </div>
+                    </section>
+
                     <div className="kk-dashboard-charts-grid">
                         {/* Card-Wise Bill Breakdown */}
                         <div className="kk-panel">
@@ -1860,6 +1975,186 @@ const KhataKit = () => {
                 </div>
             )}
 
+            {/* TAB 6: INVESTMENTS & SIP PORTFOLIO DASHBOARD */}
+            {activeTab === 'investments' && (
+                <div className="kk-tab-pane">
+                    {/* Investment Portfolio Summary Strip */}
+                    <div className="kk-kpi-grid" style={{ marginBottom: 14 }}>
+                        <div className="kk-kpi-card" style={{ '--kpi-color': '#0284c7', gridColumn: 'span 1' }}>
+                            <div className="kk-kpi-top">
+                                <span className="kk-kpi-label">Total Invested</span>
+                                <span className="kk-badge kk-badge-nocost">{investments.length} Assets</span>
+                            </div>
+                            <div className="kk-kpi-value">{formatMoney(totalPortfolioInv)}</div>
+                            <div className="kk-kpi-sub">
+                                <span>Principal Capital Deployed</span>
+                            </div>
+                        </div>
+
+                        <div className="kk-kpi-card" style={{ '--kpi-color': '#10b981' }}>
+                            <div className="kk-kpi-top">
+                                <span className="kk-kpi-label">Current Portfolio Value</span>
+                                <TrendingUp size={15} style={{ color: '#10b981' }} />
+                            </div>
+                            <div className="kk-kpi-value">{formatMoney(totalPortfolioVal)}</div>
+                            <div className="kk-kpi-sub">
+                                <span>Live / Estimated Value</span>
+                            </div>
+                        </div>
+
+                        <div className="kk-kpi-card" style={{ '--kpi-color': totalPortfolioGain >= 0 ? '#10b981' : '#f43f5e' }}>
+                            <div className="kk-kpi-top">
+                                <span className="kk-kpi-label">Total Profit / Returns</span>
+                                <span className={`kk-badge ${totalPortfolioGain >= 0 ? 'kk-badge-paid' : 'kk-badge-unpaid'}`}>
+                                    {totalPortfolioGain >= 0 ? '+' : ''}{totalPortfolioGainPct}%
+                                </span>
+                            </div>
+                            <div className="kk-kpi-value" style={{ color: totalPortfolioGain >= 0 ? '#059669' : '#e11d48' }}>
+                                {totalPortfolioGain >= 0 ? '+' : ''}{formatMoney(totalPortfolioGain)}
+                            </div>
+                            <div className="kk-kpi-sub">
+                                <span>Net Unrealized Gain</span>
+                            </div>
+                        </div>
+
+                        <div className="kk-kpi-card" style={{ '--kpi-color': '#f97316' }}>
+                            <div className="kk-kpi-top">
+                                <span className="kk-kpi-label">Monthly SIP Commitment</span>
+                                <span className="kk-badge kk-badge-orange">Active SIPs</span>
+                            </div>
+                            <div className="kk-kpi-value">{formatMoney(totalMonthlySip)}</div>
+                            <div className="kk-kpi-sub">
+                                <span>Auto-invested per month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Asset Allocation Breakdown Panel */}
+                    {assetAllocationEntries.length > 0 && (
+                        <div className="kk-panel" style={{ marginBottom: 14 }}>
+                            <div className="kk-panel-header">
+                                <div>
+                                    <h2 className="kk-panel-title">📊 Asset Allocation Breakdown</h2>
+                                    <p className="kk-panel-subtitle">Distribution of your portfolio across Mutual Funds, Stocks, FD, PPF &amp; Gold</p>
+                                </div>
+                            </div>
+                            <div className="kk-donut-legend">
+                                {assetAllocationEntries.map(([assetType, val], idx) => {
+                                    const pct = totalPortfolioVal > 0 ? Math.round((val / totalPortfolioVal) * 100) : 0;
+                                    const color = donutColors[idx % donutColors.length];
+                                    return (
+                                        <div key={assetType} className="kk-card-mini-item">
+                                            <div className="kk-card-mini-top" style={{ marginBottom: 4 }}>
+                                                <div className="kk-card-mini-name">
+                                                    <span className="kk-color-dot" style={{ background: color }}></span>
+                                                    <span>{assetType}</span>
+                                                </div>
+                                                <strong>{formatMoney(val)} ({pct}%)</strong>
+                                            </div>
+                                            <div className="kk-progress-track" style={{ margin: 0 }}>
+                                                <div className="kk-progress-fill" style={{ width: `${pct}%`, background: color }}></div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Investments Portfolio List Panel */}
+                    <div className="kk-panel">
+                        <div className="kk-panel-header wrap-gap">
+                            <div>
+                                <h2 className="kk-panel-title">📈 My Investments &amp; SIP Portfolio</h2>
+                                <p className="kk-panel-subtitle">
+                                    Track Mutual Fund SIPs, Stocks, Fixed Deposits (FD), PPF/NPS, and Gold investments
+                                </p>
+                            </div>
+                            <div className="kk-toolbar-filters">
+                                <select
+                                    className="kk-input-select"
+                                    value={investmentAssetFilter}
+                                    onChange={(e) => setInvestmentAssetFilter(e.target.value)}
+                                >
+                                    <option value="all">All Asset Types</option>
+                                    <option value="Mutual Fund / SIP">Mutual Fund / SIP</option>
+                                    <option value="Stocks / Equity">Stocks / Equity</option>
+                                    <option value="Fixed Deposit (FD)">Fixed Deposit (FD)</option>
+                                    <option value="PPF / EPF / NPS">PPF / EPF / NPS</option>
+                                    <option value="Gold / Silver">Gold / Silver</option>
+                                    <option value="Real Estate / Crypto">Real Estate / Crypto</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <button type="button" className="kk-btn kk-btn-primary" onClick={openAddInvestmentModal}>
+                                    + Add Investment / SIP
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="kk-item-cards-list">
+                            {!filteredInvestments.length ? (
+                                <p className="kk-text-muted" style={{ padding: '16px 0' }}>
+                                    No investments added yet. Click &ldquo;+ Add Investment / SIP&rdquo; to track your Mutual Funds, Stocks, FD, or PPF.
+                                </p>
+                            ) : (
+                                filteredInvestments.map(inv => {
+                                    const isPositive = (inv.gain_amount || 0) >= 0;
+                                    return (
+                                        <div key={inv.id} className="kk-item-card">
+                                            <div className="kk-item-main">
+                                                <div className="kk-item-badges-row">
+                                                    <span className="kk-badge kk-badge-orange">{inv.asset_type}</span>
+                                                    <span className="kk-badge kk-badge-nocost">{inv.investment_mode}</span>
+                                                    {inv.platform && (
+                                                        <span className="kk-badge kk-badge-orange">{inv.platform}</span>
+                                                    )}
+                                                    <span className={`kk-badge ${isPositive ? 'kk-badge-paid' : 'kk-badge-unpaid'}`}>
+                                                        {isPositive ? '+' : ''}{formatMoney(inv.gain_amount)} ({isPositive ? '+' : ''}{inv.gain_percent}%)
+                                                    </span>
+                                                </div>
+                                                <h3 className="kk-item-title">{inv.title}</h3>
+                                                <div className="kk-item-meta-line">
+                                                    <span>Invested: <strong>{formatMoney(inv.total_invested)}</strong></span>
+                                                    <span>•</span>
+                                                    <span>Current Value: <strong style={{ color: '#059669' }}>{formatMoney(inv.current_value)}</strong></span>
+                                                    {Number(inv.monthly_sip_amount) > 0 && (
+                                                        <>
+                                                            <span>•</span>
+                                                            <span>SIP: <strong>{formatMoney(inv.monthly_sip_amount)}/mo</strong> (Day {inv.sip_day || 5})</span>
+                                                        </>
+                                                    )}
+                                                    {inv.expected_return_rate > 0 && (
+                                                        <>
+                                                            <span>•</span>
+                                                            <span>Target: {inv.expected_return_rate}% p.a.</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                                {inv.notes && <div className="kk-subtext">{inv.notes}</div>}
+                                            </div>
+                                            <div className="kk-item-actions">
+                                                <div className="kk-item-price-tag">
+                                                    <strong style={{ color: '#059669' }}>{formatMoney(inv.current_value)}</strong>
+                                                    <small>value</small>
+                                                </div>
+                                                <div className="kk-action-btn-pair">
+                                                    <button type="button" className="kk-btn kk-btn-secondary kk-btn-sm" onClick={() => openEditInvestmentModal(inv)}>
+                                                        Edit
+                                                    </button>
+                                                    <button type="button" className="kk-btn kk-btn-danger-ghost kk-btn-sm" onClick={() => handleDeleteInvestment(inv.id)}>
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {typeof document !== 'undefined' && createPortal(
                 <div className={isDarkTheme ? 'kk-theme-dark' : 'kk-theme-light'}>
             {/* MODAL 1: ADD / EDIT CARD */}
@@ -2466,6 +2761,151 @@ const KhataKit = () => {
                 </div>
             )}
 
+            {/* MODAL 4C: ADD / EDIT INVESTMENT & SIP */}
+            {investmentModalOpen && (
+                <div className="kk-modal-backdrop" onClick={() => setInvestmentModalOpen(false)}>
+                    <div className="kk-modal-card kk-modal-lg" onClick={(e) => e.stopPropagation()}>
+                        <div className="kk-modal-header">
+                            <h3>{investmentForm.id ? 'Edit Investment / SIP' : 'Add Investment / SIP'}</h3>
+                            <button type="button" className="kk-modal-close" onClick={() => setInvestmentModalOpen(false)}>&times;</button>
+                        </div>
+                        <form onSubmit={handleSaveInvestment}>
+                            <div className="kk-form-grid">
+                                <div className="kk-form-group span-2">
+                                    <label>Investment / Fund / Asset Name *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        placeholder="e.g. Parag Parikh Flexi Cap SIP, Nifty 50 Index, HDFC FD, PPF"
+                                        value={investmentForm.title}
+                                        onChange={(e) => setInvestmentForm({ ...investmentForm, title: e.target.value })}
+                                    />
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Asset Type</label>
+                                    <select
+                                        value={investmentForm.asset_type}
+                                        onChange={(e) => setInvestmentForm({ ...investmentForm, asset_type: e.target.value })}
+                                    >
+                                        <option value="Mutual Fund / SIP">Mutual Fund / SIP</option>
+                                        <option value="Stocks / Equity">Stocks / Equity</option>
+                                        <option value="Fixed Deposit (FD)">Fixed Deposit (FD)</option>
+                                        <option value="PPF / EPF / NPS">PPF / EPF / NPS</option>
+                                        <option value="Gold / Silver">Gold / Silver</option>
+                                        <option value="Real Estate / Crypto">Real Estate / Crypto</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Investment Mode</label>
+                                    <select
+                                        value={investmentForm.investment_mode}
+                                        onChange={(e) => setInvestmentForm({ ...investmentForm, investment_mode: e.target.value })}
+                                    >
+                                        <option value="SIP (Monthly)">SIP (Monthly)</option>
+                                        <option value="One-Time (Lump Sum)">One-Time (Lump Sum)</option>
+                                        <option value="Quarterly">Quarterly</option>
+                                        <option value="Yearly">Yearly</option>
+                                    </select>
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Total Invested So Far *</label>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        required
+                                        placeholder="e.g. 120000"
+                                        value={investmentForm.total_invested}
+                                        onChange={(e) => setInvestmentForm({ ...investmentForm, total_invested: e.target.value })}
+                                    />
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Current Portfolio Value (Optional)</label>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        placeholder="Leave blank if same as invested"
+                                        value={investmentForm.current_value}
+                                        onChange={(e) => setInvestmentForm({ ...investmentForm, current_value: e.target.value })}
+                                    />
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Monthly SIP Amount (If SIP)</label>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        placeholder="e.g. 10000"
+                                        value={investmentForm.monthly_sip_amount}
+                                        onChange={(e) => setInvestmentForm({ ...investmentForm, monthly_sip_amount: e.target.value })}
+                                    />
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Expected Return Rate (% p.a.)</label>
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        placeholder="e.g. 12"
+                                        value={investmentForm.expected_return_rate}
+                                        onChange={(e) => setInvestmentForm({ ...investmentForm, expected_return_rate: e.target.value })}
+                                    />
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Platform / App / Bank</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. Groww, Zerodha, HDFC Bank, SBI"
+                                        value={investmentForm.platform}
+                                        onChange={(e) => setInvestmentForm({ ...investmentForm, platform: e.target.value })}
+                                    />
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>SIP Auto-Debit Day (1-31)</label>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        max={31}
+                                        value={investmentForm.sip_day}
+                                        onChange={(e) => setInvestmentForm({ ...investmentForm, sip_day: e.target.value })}
+                                    />
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Start Date</label>
+                                    <input
+                                        type="date"
+                                        value={investmentForm.start_date}
+                                        onChange={(e) => setInvestmentForm({ ...investmentForm, start_date: e.target.value })}
+                                    />
+                                </div>
+                                <div className="kk-form-group">
+                                    <label>Status</label>
+                                    <select
+                                        value={investmentForm.status}
+                                        onChange={(e) => setInvestmentForm({ ...investmentForm, status: e.target.value })}
+                                    >
+                                        <option value="active">Active</option>
+                                        <option value="paused">Paused</option>
+                                        <option value="redeemed">Redeemed / Closed</option>
+                                    </select>
+                                </div>
+                                <div className="kk-form-group span-2">
+                                    <label>Notes (Optional)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Folio number, goal name, maturity date..."
+                                        value={investmentForm.notes}
+                                        onChange={(e) => setInvestmentForm({ ...investmentForm, notes: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="kk-modal-footer">
+                                <button type="button" className="kk-btn kk-btn-ghost" onClick={() => setInvestmentModalOpen(false)}>Cancel</button>
+                                <button type="submit" className="kk-btn kk-btn-primary">Save Investment</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {/* MODAL 5: SETTINGS, MULTI-CURRENCY & MONGODB BACKUP */}
             {settingsModalOpen && (
                 <div className="kk-modal-backdrop" onClick={() => setSettingsModalOpen(false)}>
@@ -2625,6 +3065,17 @@ const KhataKit = () => {
                 >
                     <Home size={19} />
                     <span>Fixed</span>
+                </button>
+                <button
+                    type="button"
+                    className={`kk-mob-nav-item ${activeTab === 'investments' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('investments')}
+                >
+                    <div className="kk-mob-icon-wrap">
+                        <TrendingUp size={19} />
+                        {investments.length > 0 && <span className="kk-mob-badge secondary">{investments.length}</span>}
+                    </div>
+                    <span>Invest</span>
                 </button>
             </nav>
                 </div>,

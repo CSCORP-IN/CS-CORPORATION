@@ -10,6 +10,7 @@ import {
     KhataKitFixedExpense,
     KhataKitCardSpend,
     KhataKitIncome,
+    KhataKitInvestment,
     KhataKitMonthlyPayment
 } from '../models/KhataKit.js';
 
@@ -62,12 +63,16 @@ function getUserFallback(userId) {
             fixed_expenses: [],
             card_spends: [],
             incomes: [],
+            investments: [],
             monthly_payments: []
         };
         saveLocalStore();
     }
     if (!Array.isArray(fallbackUsers[key].incomes)) {
         fallbackUsers[key].incomes = [];
+    }
+    if (!Array.isArray(fallbackUsers[key].investments)) {
+        fallbackUsers[key].investments = [];
     }
     return fallbackUsers[key];
 }
@@ -165,13 +170,14 @@ async function getRawStateForMonth(userId, selectedMonth) {
     await ensureUserSettings(userId);
 
     if (isMongoConnected()) {
-        const [settingsDocs, cardsDocs, emisDocs, fixedDocs, spendsDocs, incomesDocs, paymentsDocs] = await Promise.all([
+        const [settingsDocs, cardsDocs, emisDocs, fixedDocs, spendsDocs, incomesDocs, investmentsDocs, paymentsDocs] = await Promise.all([
             KhataKitSetting.find({ user_id: userId }),
             KhataKitCard.find({ user_id: userId }).sort({ created_at: 1 }),
             KhataKitEmi.find({ user_id: userId }).sort({ due_day: 1, created_at: 1 }),
             KhataKitFixedExpense.find({ user_id: userId }).sort({ due_day: 1, created_at: 1 }),
             KhataKitCardSpend.find({ user_id: userId, month: selectedMonth }).sort({ spend_date: -1, created_at: -1 }),
             KhataKitIncome.find({ user_id: userId, month: selectedMonth }).sort({ income_date: -1, created_at: -1 }),
+            KhataKitInvestment.find({ user_id: userId }).sort({ created_at: -1 }),
             KhataKitMonthlyPayment.find({ user_id: userId, month: selectedMonth })
         ]);
 
@@ -185,6 +191,7 @@ async function getRawStateForMonth(userId, selectedMonth) {
             fixedRaw: fixedDocs.map(d => d.toJSON()),
             spendsRaw: spendsDocs.map(d => d.toJSON()),
             incomesRaw: incomesDocs.map(d => d.toJSON()),
+            investmentsRaw: investmentsDocs.map(d => d.toJSON()),
             paymentsRaw: paymentsDocs.map(d => d.toJSON())
         };
     }
@@ -197,13 +204,14 @@ async function getRawStateForMonth(userId, selectedMonth) {
         fixedRaw: [...userStore.fixed_expenses],
         spendsRaw: userStore.card_spends.filter(s => s.month === selectedMonth),
         incomesRaw: (userStore.incomes || []).filter(inc => inc.month === selectedMonth),
+        investmentsRaw: [...(userStore.investments || [])],
         paymentsRaw: userStore.monthly_payments.filter(p => p.month === selectedMonth)
     };
 }
 
 // Build complete dashboard payload for userId and selectedMonth (YYYY-MM)
 async function buildMonthPayload(userId, selectedMonth) {
-    const { settings, cards, emisRaw, fixedRaw, spendsRaw, incomesRaw, paymentsRaw } = await getRawStateForMonth(userId, selectedMonth);
+    const { settings, cards, emisRaw, fixedRaw, spendsRaw, incomesRaw, investmentsRaw, paymentsRaw } = await getRawStateForMonth(userId, selectedMonth);
 
     const cardMap = new Map(cards.map(c => [String(c.id), c]));
     const paymentMap = new Map();
@@ -434,6 +442,34 @@ async function buildMonthPayload(userId, selectedMonth) {
         };
     });
 
+    const enrichedInvestments = (investmentsRaw || []).map(inv => {
+        const invested = Number(inv.total_invested) || 0;
+        const currVal = inv.current_value !== undefined && Number(inv.current_value) > 0
+            ? Number(inv.current_value)
+            : invested;
+        const gainAmt = currVal - invested;
+        const gainPct = invested > 0 ? Number(((gainAmt / invested) * 100).toFixed(1)) : 0;
+        return {
+            ...inv,
+            id: String(inv.id),
+            total_invested: invested,
+            current_value: currVal,
+            gain_amount: gainAmt,
+            gain_percent: gainPct
+        };
+    });
+
+    const activeInvestments = enrichedInvestments.filter(i => i.status !== 'redeemed');
+    const totalPortfolioInvested = activeInvestments.reduce((s, i) => s + i.total_invested, 0);
+    const totalPortfolioCurrentValue = activeInvestments.reduce((s, i) => s + i.current_value, 0);
+    const totalPortfolioGain = totalPortfolioCurrentValue - totalPortfolioInvested;
+    const totalPortfolioGainPct = totalPortfolioInvested > 0
+        ? Number(((totalPortfolioGain / totalPortfolioInvested) * 100).toFixed(1))
+        : 0;
+    const totalMonthlySip = enrichedInvestments
+        .filter(i => i.status === 'active' && i.investment_mode === 'SIP (Monthly)')
+        .reduce((s, i) => s + (Number(i.monthly_sip_amount) || 0), 0);
+
     return {
         success: true,
         brand: 'Chaudhary & Sons (CS Corp) • KhataKit',
@@ -454,13 +490,20 @@ async function buildMonthPayload(userId, selectedMonth) {
             paid_items_count: checklist.filter(c => c.is_paid).length,
             total_items_count: checklist.length,
             active_emis_count: emis.filter(e => e.is_due_this_month).length,
-            total_remaining_emi_debt: emis.filter(e => e.status === 'active').reduce((s, e) => s + e.amount_remaining, 0)
+            total_remaining_emi_debt: emis.filter(e => e.status === 'active').reduce((s, e) => s + e.amount_remaining, 0),
+            total_portfolio_invested: totalPortfolioInvested,
+            total_portfolio_current_value: totalPortfolioCurrentValue,
+            total_portfolio_gain: totalPortfolioGain,
+            total_portfolio_gain_pct: totalPortfolioGainPct,
+            total_monthly_sip: totalMonthlySip,
+            active_investments_count: activeInvestments.length
         },
         cards: cardSummaries,
         emis,
         fixed_expenses: fixedExpenses,
         card_spends: enrichedSpends,
         incomes: (incomesRaw || []).map(inc => ({ ...inc, id: String(inc.id) })),
+        investments: enrichedInvestments,
         checklist,
         projection
     };
@@ -882,6 +925,105 @@ router.delete('/incomes/:id', async (req, res) => {
         } else {
             const userStore = getUserFallback(userId);
             userStore.incomes = (userStore.incomes || []).filter(inc => String(inc.id) !== String(id));
+            saveLocalStore();
+        }
+        return res.json({ ok: true });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+});
+
+// 6C. INVESTMENTS & SIP PORTFOLIO CRUD
+router.post('/investments', async (req, res) => {
+    try {
+        const userId = req.khataUserId;
+        const b = req.body || {};
+        const totalInvested = Number(b.total_invested) || 0;
+        const currentValue = (b.current_value !== undefined && b.current_value !== '' && Number(b.current_value) >= 0)
+            ? Number(b.current_value)
+            : totalInvested;
+
+        const invData = {
+            user_id: userId,
+            title: b.title || 'New Investment',
+            asset_type: b.asset_type || 'Mutual Fund / SIP',
+            investment_mode: b.investment_mode || 'SIP (Monthly)',
+            monthly_sip_amount: Number(b.monthly_sip_amount) || 0,
+            total_invested: totalInvested,
+            current_value: currentValue,
+            expected_return_rate: Number(b.expected_return_rate) || 12,
+            platform: b.platform || '',
+            sip_day: Number(b.sip_day) || 5,
+            start_date: b.start_date || new Date().toISOString().slice(0, 10),
+            status: b.status || 'active',
+            notes: b.notes || ''
+        };
+
+        if (isMongoConnected()) {
+            const created = await KhataKitInvestment.create(invData);
+            return res.status(201).json({ id: created._id.toString() });
+        } else {
+            const userStore = getUserFallback(userId);
+            const newId = 'inv_' + Date.now();
+            userStore.investments.unshift({ id: newId, ...invData });
+            saveLocalStore();
+            return res.status(201).json({ id: newId });
+        }
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+});
+
+router.put('/investments/:id', async (req, res) => {
+    try {
+        const userId = req.khataUserId;
+        const { id } = req.params;
+        const b = req.body || {};
+        const totalInvested = Number(b.total_invested) || 0;
+        const currentValue = (b.current_value !== undefined && b.current_value !== '' && Number(b.current_value) >= 0)
+            ? Number(b.current_value)
+            : totalInvested;
+
+        const updateData = {
+            title: b.title || 'Investment',
+            asset_type: b.asset_type || 'Mutual Fund / SIP',
+            investment_mode: b.investment_mode || 'SIP (Monthly)',
+            monthly_sip_amount: Number(b.monthly_sip_amount) || 0,
+            total_invested: totalInvested,
+            current_value: currentValue,
+            expected_return_rate: Number(b.expected_return_rate) || 12,
+            platform: b.platform || '',
+            sip_day: Number(b.sip_day) || 5,
+            start_date: b.start_date || '',
+            status: b.status || 'active',
+            notes: b.notes || ''
+        };
+
+        if (isMongoConnected()) {
+            await KhataKitInvestment.findOneAndUpdate({ _id: id, user_id: userId }, updateData);
+        } else {
+            const userStore = getUserFallback(userId);
+            const idx = (userStore.investments || []).findIndex(x => String(x.id) === String(id));
+            if (idx !== -1) {
+                userStore.investments[idx] = { ...userStore.investments[idx], ...updateData };
+                saveLocalStore();
+            }
+        }
+        return res.json({ ok: true });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+});
+
+router.delete('/investments/:id', async (req, res) => {
+    try {
+        const userId = req.khataUserId;
+        const { id } = req.params;
+        if (isMongoConnected()) {
+            await KhataKitInvestment.findOneAndDelete({ _id: id, user_id: userId });
+        } else {
+            const userStore = getUserFallback(userId);
+            userStore.investments = (userStore.investments || []).filter(x => String(x.id) !== String(id));
             saveLocalStore();
         }
         return res.json({ ok: true });

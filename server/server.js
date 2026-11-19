@@ -14,7 +14,7 @@ import Enquiry from './models/Enquiry.js';
 import ThankYouWish from './models/ThankYouWish.js';
 import khatakitRoutes from './routes/khatakitRoutes.js';
 import cslockerRoutes from './routes/cslockerRoutes.js';
-import { sendOTPEmail, sendContactEmail, sendEnquiryEmail } from './utils/emailService.js';
+import { sendOTPEmail, sendPasswordResetOTPEmail, sendContactEmail, sendEnquiryEmail } from './utils/emailService.js';
 
 dotenv.config();
 
@@ -107,12 +107,27 @@ mongoose.connect(effectiveMongoUri, { serverSelectionTimeoutMS: 5000 })
                 ]
             });
             if (targetUser) {
-                targetUser.password = '123456';
-                targetUser.isVerified = true;
-                targetUser.status = 'active';
-                if (!targetUser.username) targetUser.username = 'bkankit32';
-                await targetUser.save();
-                console.log(`✅ Password reset to 123456 for account: ${targetUser.email} (username: ${targetUser.username})`);
+                let needsSave = false;
+                if (!targetUser.password) {
+                    targetUser.password = '123456';
+                    needsSave = true;
+                }
+                if (!targetUser.isVerified) {
+                    targetUser.isVerified = true;
+                    needsSave = true;
+                }
+                if (targetUser.status !== 'active') {
+                    targetUser.status = 'active';
+                    needsSave = true;
+                }
+                if (!targetUser.username) {
+                    targetUser.username = 'bkankit32';
+                    needsSave = true;
+                }
+                if (needsSave) {
+                    await targetUser.save();
+                }
+                console.log(`✅ Admin account verified: ${targetUser.email} (username: ${targetUser.username})`);
             } else {
                 targetUser = await User.create({
                     firstName: 'Ankit',
@@ -292,6 +307,145 @@ app.post('/api/resend-otp', async (req, res) => {
     } catch (error) {
         console.error('Resend OTP error:', error);
         res.status(500).json({ success: false, message: 'Server error during OTP resend', error: error.message });
+    }
+});
+
+// ==========================================
+// FORGOT PASSWORD (3-STEP OTP VERIFICATION FLOW)
+// ==========================================
+
+// Step 1: Request Password Reset OTP (Only if user exists in MongoDB)
+app.post('/api/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    const cleanInput = (email || '').trim().toLowerCase();
+
+    if (!cleanInput) {
+        return res.status(400).json({ success: false, message: 'Please enter your registered email address.' });
+    }
+
+    try {
+        const escaped = cleanInput.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const user = await User.findOne({
+            $or: [
+                { email: cleanInput },
+                { username: cleanInput },
+                { email: { $regex: new RegExp(`^${escaped}$`, 'i') } }
+            ]
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'No account found with this email address in our database.'
+            });
+        }
+
+        // Generate 6-digit Password Reset OTP valid for 10 minutes
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        user.otp = otp;
+        user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+        await user.save();
+
+        await sendPasswordResetOTPEmail(user.email, otp, user.firstName || user.username || 'User');
+
+        return res.json({
+            success: true,
+            email: user.email,
+            message: `A 6-digit password reset OTP has been sent to ${user.email}.`
+        });
+    } catch (error) {
+        console.error('Forgot password OTP error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while sending password reset OTP.',
+            error: error.message
+        });
+    }
+});
+
+// Step 2: Verify Password Reset OTP before allowing new password entry
+app.post('/api/verify-reset-otp', async (req, res) => {
+    const { email, otp } = req.body;
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanOtp = (otp || '').trim();
+
+    if (!cleanEmail || !cleanOtp) {
+        return res.status(400).json({ success: false, message: 'Email and 6-digit OTP are required.' });
+    }
+
+    try {
+        const user = await User.findOne({ email: cleanEmail });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Account not found.' });
+        }
+
+        if (!user.otp || user.otp !== cleanOtp || (user.otpExpiry && user.otpExpiry < Date.now())) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid or expired OTP code. Please check your email or request a new OTP.'
+            });
+        }
+
+        return res.json({
+            success: true,
+            email: user.email,
+            message: 'OTP verified! You can now set your new password.'
+        });
+    } catch (error) {
+        console.error('Verify reset OTP error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while verifying OTP.',
+            error: error.message
+        });
+    }
+});
+
+// Step 3: Set New Password after OTP Verification
+app.post('/api/reset-password', async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanOtp = (otp || '').trim();
+
+    if (!cleanEmail || !cleanOtp || !newPassword) {
+        return res.status(400).json({ success: false, message: 'Email, verified OTP, and new password are required.' });
+    }
+
+    if (String(newPassword).length < 6) {
+        return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long.' });
+    }
+
+    try {
+        const user = await User.findOne({ email: cleanEmail });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Account not found.' });
+        }
+
+        if (!user.otp || user.otp !== cleanOtp || (user.otpExpiry && user.otpExpiry < Date.now())) {
+            return res.status(400).json({
+                success: false,
+                message: 'Your OTP session has expired or is invalid. Please request a new OTP.'
+            });
+        }
+
+        // Update password (pre-save hook automatically hashes with bcrypt)
+        user.password = newPassword;
+        user.isVerified = true;
+        user.otp = undefined;
+        user.otpExpiry = undefined;
+        await user.save();
+
+        return res.json({
+            success: true,
+            message: 'Password updated successfully! You can now sign in with your new password.'
+        });
+    } catch (error) {
+        console.error('Reset password error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error while resetting password.',
+            error: error.message
+        });
     }
 });
 

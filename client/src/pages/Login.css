@@ -126,6 +126,60 @@
     color: var(--text-muted);
 }
 
+.auth-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.forgot-password-link-btn {
+    background: transparent;
+    border: none;
+    color: #ea580c;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    transition: var(--transition);
+}
+
+.forgot-password-link-btn:hover {
+    color: #c2410c;
+    text-decoration: underline;
+}
+
+.forgot-step-pills {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.15rem;
+}
+
+.forgot-step-pill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.28rem 0.68rem;
+    border-radius: 9999px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+}
+
+.forgot-step-pill.active {
+    background: rgba(234, 88, 12, 0.14);
+    border-color: rgba(234, 88, 12, 0.4);
+    color: #ea580c;
+}
+
+.forgot-step-pill.done {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: #10b981;
+}
+
 .auth-field-box {
     position: relative;
     display: flex;
